@@ -3,9 +3,9 @@
  */
 
 angular.module('ipsurveyapp.Controllers', [])
-	.controller("loginCtrl", ['$scope','$rootScope', '$http', '$filter', '$compile', '$state','$cookies', 	
+	.controller("homeCtrl", ['$scope','$rootScope', '$http', '$filter', '$compile', '$state','$cookies', 	
 					  function($scope,$rootScope, $http, $filter, $compile, $state,$cookies) {
 		
-		console.log("Login Controller Initiated");
+		console.log("Home Controller Initiated");
 		
 	}]);
