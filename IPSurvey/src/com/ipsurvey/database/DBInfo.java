@@ -36,7 +36,7 @@ public class DBInfo {
     	
     try{
     	//resouce bundle to read string's specified in properties file
-    	ResourceBundle propsBundle=ResourceBundle.getBundle("apmcdb");
+    	ResourceBundle propsBundle=ResourceBundle.getBundle("ipsurveydb");
         
     	ip = propsBundle.getString("IP");
         database = propsBundle.getString("DATABASE");

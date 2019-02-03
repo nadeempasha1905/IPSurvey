@@ -7,16 +7,47 @@
 
 	<link rel="icon" type="image/png" href="images/icons/favicon.ico">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <!--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+    
+    <link rel="stylesheet" type="text/css" href="app/css/ipsurveystyles.css"> 
+    
+    <link rel="stylesheet" type="text/css" href="app/css/bootstrap.min.css">
+    
+    <link rel="stylesheet" type="text/css" href="assets/js/bootstrap-datetimepicker.min.css">
     
     <link rel="stylesheet" type="text/css" href="app/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="app/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
 	<link rel="stylesheet" type="text/css" href="app/css/util.css">
 	<link rel="stylesheet" type="text/css" href="app/css/main.css">
+	
+	<link href="assets/js/bootstrap-glyphicons.min.css" rel="stylesheet" type="text/css" />
+	
+	
+	<link href="assets/autocomplete/autocomplete.css" rel="stylesheet" type="text/css" />
+	<!-- <link href="assets/autocomplete/angular-auto-complete.css" rel="stylesheet" type="text/css" /> -->
     <title>IPSurvey</title>
+    
+    <style>
+		.bg-dark {
+		    /* background-color: #343a40!important; */
+		    background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);
+		    background: linear-gradient(to right, #001510, #00bf8f);
+		}
+		
+		.collapse ul>li {
+			padding: 0px 10px 0px 10px;
+		}
+</style>
   </head>
   <body ng-controller="navCtrl">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div id="loading">
+			<div class="loader">Loading...</div>
+		</div>
+		<div id="notification" class="alert" role="alert">
+			<strong>Well done!</strong> You successfully read this important alert message. 
+		</div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" ng-if="IsLoggedIn">
   <a class="navbar-brand" href="">IP-Survey</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -42,6 +73,7 @@
           Enumeration
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+         <a class="dropdown-item" ui-sref="villageenumeration">Village</a>
           <a class="dropdown-item" ui-sref="transformerenumeration">Transformer</a>
           <a class="dropdown-item" ui-sref="ipsetenumeration">IP-Set</a>
         </div>
@@ -63,16 +95,26 @@
       </li>
     </ul>
   </div>
+  <div style="float: right;"><button type="button" class="btn btn-light btn-sm" ng-click="logout()">Sign Out</button></div>
 </nav>
 	<div ui-view></div>
   </body>
   
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    
+     -->
+     
+       <!--  <script type="text/javascript" src="assets/jquery/js/jquery-3.2.1.slim.min.js"></script>
+       <script type="text/javascript" src="assets/jquery/js/popper.min.js"></script> -->
+       
+       <!-- <script type="text/javascript" src="assets/jquery/js/jquery-2.1.1.min.js"></script> -->
+       <script type="text/javascript" src="assets/jquery/js/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="assets/jquery-ui/js/jquery-ui.min.js"></script>
+      <script type="text/javascript" src="assets/jquery/js/bootstrap.min.js"></script>
+     
     <script type="text/javascript" src="assets/angularjs1_6/angular.min.js"></script>
     <script type="text/javascript" src="assets/angularjs1_6/angular-ui-router.min.js"></script>	
     <script type="text/javascript" src="assets/angularjs1_6/angular-animate.min.js"></script>
@@ -82,8 +124,26 @@
     <script type="text/javascript" src="assets/angularjs1_6/angular-touch.min.js"></script>	
     <script type="text/javascript" src="assets/angularjs1_6/angular-resource.min.js"></script>	
     <script type="text/javascript" src="assets/angularjs1_6/ocLazyLoad.min.js"></script>	
+    <script type="text/javascript" src="assets/angularjs1_6/angular-storage.min.js"></script>	
+    
+     <script type="text/javascript" src="assets/js/moment.min.js"></script>
+     <script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+     
+     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAjY-7_O0St6p0iwEuGEP4mhhN4il1CSto"></script>
+	 <script src="assets/map/maplabel-compiled.js"></script> 
     
     <script type="text/javascript" src="app/modules/app.js"></script>	
+    <script type="text/javascript" src="app/modules/utility.js"></script>
+    
+    <script type="text/javascript" src="assets/autocomplete/autocomplete.js"></script>
+    <!-- <script type="text/javascript" src="assets/autocomplete/angular-auto-complete.js"></script> -->
+    
+    <script type="text/javascript">
+	   /*  var domain = location.origin,
+	    service_domain = null, 
+	    baseURL = "/IPSurvey/",
+	    serviceURL = (service_domain || domain) + baseURL + "rest/services/"; */
+    </script>
     
     
 </html>

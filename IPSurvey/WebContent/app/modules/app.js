@@ -3,7 +3,7 @@
  */
 
 'use strict';
-angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies',])
+angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies','utility','angular-storage','autocomplete'])
 .constant('CONTEXT_PATH','appname')
 .constant('CACHEBUST_VERSION',"0.1")
 .constant('SITE_LAST_UPDATED','28/01/2019')
@@ -37,6 +37,10 @@ angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies',])
         			{
         				name : 'villagemaster', 
         				files: ['app/controllers/villagemaster.js']
+        			},
+        			{
+        				name : 'villageenumeration', 
+        				files: ['app/controllers/villageenumeration.js']
         			},
         			{
         				name : 'transformerenumeration', 
@@ -125,6 +129,16 @@ angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies',])
             }]
         }  
     })
+    .state('villageenumeration', {//State demonstrating Nested views
+        url: "/villageenumeration",
+        templateUrl: "app/templates/villageenumeration.html",
+        controller:'villageenumerationCtrl',                         
+        resolve: {
+            loadMyCtrl: ['$ocLazyLoad','$cookies','$state', function($ocLazyLoad,$cookies,$state) {
+                return $ocLazyLoad.load('villageenumeration'); 
+            }]
+        }  
+    })
      .state('transformerenumeration', {//State demonstrating Nested views
         url: "/transformerenumeration",
         templateUrl: "app/templates/transformerenumeration.html",
@@ -189,9 +203,29 @@ angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies',])
        
 }])
 
-.controller("navCtrl", [ '$scope',function($scope){
+.controller("navCtrl", function($scope,$rootScope,$state,store,$window){
 	console.log("navCtrl");
-}])
+	
+	//$scope.IsLoggedIn = false;
+	
+	 var domain = location.origin,
+	    service_domain = null, 
+	    baseURL = "/IPSurvey/",
+	    serviceURL = (service_domain || domain) + baseURL + "rest/services/";
+	 
+	 $rootScope.serviceURL = serviceURL;
+	 console.log("serviceURL",serviceURL);
+	 
+	 $rootScope.logout = function(){
+		
+		 store.remove('userinfo');
+		 $rootScope.IsLoggedIn = false;
+		 
+		 $state.go("login");
+		 $window.location.reload(true); 
+		 
+	 };
+})
 
 
 ;
