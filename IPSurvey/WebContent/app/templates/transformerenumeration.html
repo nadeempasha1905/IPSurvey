@@ -1,1 +1,301 @@
-<h2>Transformer Enum</h2>
+<style>
+ .thalign thead tr th{vertical-align: middle; }
+ .thalign tbody tr td{vertical-align: middle; }
+ 
+.modal-lg{
+	    max-width: 80%;
+}
+.modal-header{background-color: darkcyan;color: white;}
+		
+.modal_fixed_header_column table {position: relative;overflow: hidden;border-collapse: collapse;table-layout:fixed;}
+.modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
+.modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
+.modal_fixed_header_column thead th {min-width: 100px;width: 100px;color:white;border-color: #00bf8f !important;text-align: center;
+										font-size: 14px;height: 35px;word-wrap:break-word;}
+.modal_fixed_header_column tbody td {min-width: 100px;width: 100px;color: #353535;word-break: break-all;height: 35px;
+										word-wrap:break-word;font-weight: normal;}
+.modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(3){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(3){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(8){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(8){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(9){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(9){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(10){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(10){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(11){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(11){ min-width: 150px; width : 150px;word-wrap:break-word;}
+ 
+</style>
+
+<div class="container-fluid" style="margin-top: 20px;">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card w-100">
+    			<div class="card-body">
+    				<div class="row">
+    					<div class="col-md-12">
+    						<div class="row">
+    							<div class="col-md-3">	
+    								<h5 class="card-title">Transformer Enumeration</h5>
+    								<hr/>
+    							</div>
+    						</div>
+    						<div class="row">
+    							<div class="col-md-2">
+				    		 		 <label for="searchzonelist">Zone</label>
+									    <select class="form-control" id="searchzonelist" 
+									    ng-model="search.zone"
+									    ng-options="u as u.value for u in searchzonelist" ng-change="getcircleList([],null,'search')" 
+									    ng-disabled="ZONEUSER || CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER">
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+   		 		   		 		<div class="col-md-2" >
+			    		 		 <label for="searchcirclelist">Circle</label>
+								    <select class="form-control" id="searchcirclelist" 
+								    ng-model="search.circle"
+								    ng-options="u as u.value for u in searchcirclelist" ng-change="getdivisionList([],null,'search')" 
+								    ng-disabled="CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchdivisionlist">Division</label>
+								    <select class="form-control" id="searchdivisionlist" 
+								    ng-model="search.division"
+								    ng-options="u as u.value for u in searchdivisionlist" ng-change="getsubdivisionList([],null,'search')" 
+								    ng-disabled="DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2"  >
+			    		 		 <label for="searchsubdivisionlist">Sub-Division</label>
+								    <select class="form-control" id="searchsubdivisionlist" 
+								    ng-model="search.subdivision"
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList();" 
+								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+    						</div>	
+    						
+    						<div class="row mt-3">
+	    						<div class="col-md-2"  >
+				    		 		 <label for="searchstationlist">Station</label>
+									    <select class="form-control" id="searchstationlist" 
+									    ng-model="search.station"
+									    ng-options="u as u.value for u in searchstationlist" ng-change="getFeederList()" 
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		 <label for="searchfeederlist">Feeder</label>
+									    <select class="form-control" id="searchfeederlist" 
+									    ng-model="search.feeder"
+									    ng-options="u as u.value for u in searchfeederlist" 
+									   
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+			    		 		 <label for="searchomsectionlist">O&M Section</label>
+								    <select class="form-control" id="searchomsectionlist" 
+								    ng-model="search.omsection"
+								    ng-options="u as u.value for u in searchomsectionlist" 
+								    ng-disabled="OMSECTIONUSER"  
+								   
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 			</div>
+   								<div class="col-md-2" style="margin-top: 25px;">
+				   		 			<button class="btn btn-sm btn-primary" ng-click="SearchTransformerEnumDetails()">Search</button>
+				   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
+				   		 		</div>
+    						</div>
+    						<!-- <div class="row mt-3">
+    							<div class="col-md-2">
+    								<label for="autocompletevillagename">Village<span style="color: red;">&nbsp;(Search here ...)</span></label>
+							      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletevillagename" data="SEARCHED_VILLAGE_MASTER_DATA" on-type="updateVillages"></autocomplete>
+							    </div>
+    						</div> -->
+    						<div class="row mt-4">
+    							<div class="col-md-2">
+		    						<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" 
+		    							data-target="..transformerenumerate-addedit-modal" ng-click="addeditTransformerEnumeration(null,'add')">
+		    							<i class="fa fa-plus"></i>&nbsp;Add Enumeration Data</button>
+    							</div>
+    						</div>	
+    						<div class="row mt-3">
+    							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
+    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
+									  <thead>
+									    <tr>
+									      <th></th>
+									      <th>Sub Division</th>
+									      <th>O&M Section</th>
+									      <th>Station</th>
+									      <th>Feeder</th>
+									      <th>Transformer</th>
+									      <th>Village</th>
+									      <th>TIMS Code</th>
+									      <th>Latitude</th>
+									      <th>Longitude</th>
+									      <th>Altitude</th>
+									      <th>Created By</th>
+									      <th>Created On</th>
+									      <th>Updated By</th>
+									      <th>Updated On</th>
+									      <th>Remarks</th>
+									    </tr>
+									  </thead>
+									  <tbody>
+									  	<tr ng-repeat="data in TRANSFORMER_ENUM_DATA">
+									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".transformerenumerate-addedit-modal" 
+									  			ng-click="addeditTransformerEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>{{data.SUBDIVISION_NAME}}</td>
+									  		<td>{{data.OMSECTION_NAME}}</td>
+									  		<td>{{data.TE_STATION_CODE}}</td>
+									  		<td>{{data.TE_FEEDER_CODE}}</td>
+									  		<td>{{data.TE_TRANSFORMER_NAME}}</td>
+									  		<td>{{data.TE_VILLAGE}}</td>
+									  		<td>{{data.TE_TIMS_CODE}}</td>
+									  		<td>{{data.TE_LATTITUDE}}</td>
+									  		<td>{{data.TE_LONGITUDE}}</td>
+									  		<td>{{data.TE_ALTITUDE}}</td>
+									  		<td>{{data.VE_CREATED_BY}}</td>
+									  		<td>{{data.VE_CREATED_ON}}</td>
+									  		<td>{{data.VE_UPDATED_BY}}</td>
+									  		<td>{{data.VE_UPDATED_ON}}</td>
+									  		<td>{{data.TE_REMARKS}}</td>
+									  	</tr>
+									  </tbody>
+									</table>
+    							</div>
+    						</div>
+    					</div>
+    				</div>	
+    			</div>
+    		</div>
+    	</div>
+    </div>			
+ </div>   	
+ 
+ <div class="modal fade villageenumerate-addedit-modal" id="villageenumerate-addedit-modal" tabindex="-1" role="dialog"
+	style="z-index: 2026;" aria-hidden="true" data-backdrop="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{modal_heading}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+        
+        <div class="row">
+        	<div class="col-md-9">
+   		 	<div class="row mt-3" >
+   		 		<div class="col-md-4">
+    		 		 <label for="modalomsectionlist">O&M Section</label>
+					    <select class="form-control" id="modalomsectionlist" 
+					    ng-model="modal.omsection"
+					    ng-options="u as u.value for u in modalomsectionlist"  
+					     ng-change="getvillagemasterdatalist()"
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
+				<div class="col-md-4">
+					<label for="autocompletevillagename">Village<span style="color: red;">&nbsp;(Search here & press enter)</span></label>
+			      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletevillagename" 
+			      	 data="SEARCHED_VILLAGE_MASTER_DATA" on-type="updateVillages" ng-enter="verifyvillageexists()"></autocomplete>
+			    </div>
+    		 </div>
+    		 <div class="row mt-3" >
+   		 		<div class="col-md-4">
+   		 			<label for="modallatitude">Latitude</label>
+   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists">
+   		 		</div>
+   		 		<div class="col-md-4">
+   		 			<label for="modallongitude">Longitude</label>
+   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists">
+   		 		</div>
+   		 		<div class="col-md-4">
+   		 			<label for="modalaltitude">Altitude</label>
+   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists">
+   		 		</div>
+   		 	</div>
+   		 	<div class="row mt-3" >
+   		 		<div class="col-md-12">
+   		 			<label for="modalremerks">Remarks</label>
+   		 			<input class="form-control" type="text" ng-model="modal.remarks" id="modalremerks" ng-readonly="newuseridexists">
+   		 		</div>
+   		 	</div>	
+   		 	<div class="row mt-3" >
+   		 	 <div class="col-md-4" ng-show="action === 'edit'" >
+	    		 	<div class="form-check" style="margin-top: 20px;">
+					    <input type="checkbox" class="form-check-input" id="exampleCheck1" ng-model="modal.changeimage" ng-disabled="newuseridexists">
+					    <label class="form-check-label" for="exampleCheck1">Change Image</label>
+					  </div>
+	    		 </div>
+   		 		<div class="col-md-8" ng-show="action === 'add' || modal.changeimage">
+   		 		<label for="modalchooseimage">Choose Image</label>
+   		 			<input type="file" class="btn alert-info btn-md btn-block" id="modalchooseimage" name="modalchooseimage"  ng-disabled="newuseridexists" 
+								    		ng-model="modal.chooseimage" onchange="readURL(this);">
+   		 		</div>
+   		 	</div>	
+    		   <div class="row mt-3" >
+    		  		<div class="col-md-3">
+    		 		 <button type="button" class="btn btn-md btn-success btn-block" ng-click="SaveRecord()" ng-disabled="newuseridexists">Save</button>
+    		 		 </div>
+	    		 	<div class="col-md-3" ng-show="action == 'add'">		 
+	    		 		 <button type="button" class="btn btn-outline-secondary btn-block" ng-click="addeditVillageEnumeration(null,'add')">Reset</button>
+	    		 		</div>
+	    		  </div>
+	        </div>
+	        <div class="col-md-3">
+	        	<img alt="No Image" ng-src="data:image/png;base64,{{imagedata}}" width="100%" height="290px">
+	        	<br/>
+	        	<br/>
+	        	<img id="uploadPreview" style="width: 100%; height: 120px;">
+	        </div>
+        </div>
+        
+        
+
+        	</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+ <script>
+ function readURL(input) {
+	    if (input.files && input.files[0]) {
+	        var reader = new FileReader();
+
+	        reader.onload = function (e) {
+	            $('#uploadPreview')
+	            .attr('src', e.target.result);
+	        };
+
+	        reader.readAsDataURL(input.files[0]);
+	    }
+	}
+  </script>

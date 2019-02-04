@@ -111,6 +111,26 @@ public class ServiceRouter {
 	}
 	
 	@POST
+	@Path("/getstationlist")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getstationlist(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		System.out.println("hi....."+object);
+		return utilObj.getstationlist(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getfeederlist")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getfeederlist(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		System.out.println("hi....."+object);
+		return utilObj.getfeederlist(object,ipAdress);
+	}
+	
+	@POST
 	@Path("/getuserdetailslist")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
@@ -172,6 +192,31 @@ public class ServiceRouter {
 	
 	
 	@POST
+	@Path("/gettransformerenumerationdetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject gettransformerenumerationdetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.gettransformerenumerationdetails(object,ipAdress);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@POST
 	@Path("/saveimage")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({MediaType.APPLICATION_JSON})
@@ -183,8 +228,16 @@ public class ServiceRouter {
 		System.out.println(filename);
 		
 		return enumObj.saveimage(uploadedInputStream,fileDetail,filename);
-
+	}
+	
+	@POST
+	@Path("/getimagedata")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getimagedata(final JSONObject object, @Context HttpServletRequest request){
+		System.out.println("Fetching Image Data.......");
 		
+		return enumObj.getimagedata(object,request);
 	}
 	
 			

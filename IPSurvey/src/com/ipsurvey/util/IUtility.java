@@ -23,5 +23,9 @@ public interface IUtility {
 	JSONObject getomsectionlist(JSONObject object, String ipAdress);
 
 	JSONObject getvillagemasterdata(JSONObject object, String ipAdress);
+
+	JSONObject getstationlist(JSONObject object, String ipAdress);
+
+	JSONObject getfeederlist(JSONObject object, String ipAdress);
 	
 }

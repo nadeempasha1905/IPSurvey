@@ -254,18 +254,56 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 		};
 		
+		
+		$scope.ROWID = "";
+		$scope.imagedata = "";
 		$scope.addeditVillageEnumeration = function(record,action){
 			
+			$scope.ROWID = "";
+			$scope.imagedata = "";
+			 $('#uploadPreview').attr('src', null);
+			 $scope.modal.changeimage = false;
+			 $scope.modal.chooseimage = null;
+			 $('#modalchooseimage').val('');
+			 
 			$scope.getomsectionList([],null,'modal');
 			if(action === 'add'){
 				$scope.action = 'add';
 				
-				$scope.modal_heading = "Add Village Enumeration Data";
+				$scope.modal_heading = "Ad	d Village Enumeration Data";
 				$scope.newuseridexists = true;
+				
+				
+				$scope.search.autocompletevillagename = '';
+				$scope.modal.latitude = '' ;
+				$scope.modal.longitude = '' ;
+				$scope.modal.altitude = '';
+				$scope.modal.remarks = '';
+				
 			}else{
+				
+				console.log(record);
+				$scope.ROWID = record.row_id;
 				$scope.action = 'edit';
 				$scope.newuseridexists = false;
 				$scope.modal_heading = "Edit Village Enumeration Data";
+				
+				$scope.modal.omsection = $filter('filter')($scope.modalomsectionlist,{key:record.VE_LOCATION_CODE},true)[0];
+				//$scope.getvillagemasterdatalist();
+				$scope.search.autocompletevillagename = record.VE_VILLAGE_NAME;
+				$scope.modal.latitude = record.VE_LATTITUDE;
+				$scope.modal.longitude = record.VE_LONGITUDE;
+				$scope.modal.altitude = record.VE_ALTITUDE;
+				$scope.modal.remarks = record.VE_REMARKS;
+				
+				if(record.VE_IMAGE_PATH.length >0 || record.VE_IMAGE_PATH != undefined || record.VE_IMAGE_PATH != null){
+					remote.load("getimagedata", function(response){
+						console.log("getimagedata",response);
+						$scope.imagedata = response.encodedBase64;
+					},{
+						filename:record.VE_IMAGE_PATH
+					}, 'POST');
+				}
 			}
 			
 		};
@@ -321,7 +359,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			
 			var request = {
-					rowid:'',
+					rowid:$scope.ROWID,
 					location_code:$scope.modal.omsection.key,
 					village_name:$scope.search.autocompletevillagename,
 					latitude:$scope.modal.latitude,

@@ -254,6 +254,75 @@ public class UtilityImpl implements IUtility{
 		}
 		return JSON_RESPONSE;
 	}
+
+	@Override
+	public JSONObject getstationlist(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " SELECT SM_STATION_CODE, SM_STATION_NAME  "
+					+ " FROM STATION_MASTER "
+					+ " WHERE SM_LOCATION_CODE = '"+(String)object.get("location_code")+"' " ;
+			
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				json = new JSONObject();
+				json.put("key", 	rs.getString("SM_STATION_CODE"));
+				json.put("value", 			rs.getString("SM_STATION_NAME"));
+				json_array.add(json);
+			}
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("STATION_MASTER_DATA", json_array);
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		return JSON_RESPONSE;
+	}
+
+	@Override
+	public JSONObject getfeederlist(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " SELECT FM_FEEDER_CODE, FM_FEEDER_NAME "
+					+ " FROM FEEDER_MASTER  "
+					+ " WHERE FM_LOCATION_CODE = '"+(String)object.get("location_code")+"' AND "
+					+ " FM_STATION_CODE = '"+(String)object.get("station_code")+"' ORDER BY FM_FEEDER_NAME ASC " ;
+
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				json = new JSONObject();
+				json.put("key", 	rs.getString("FM_FEEDER_CODE"));
+				json.put("value", 			rs.getString("FM_FEEDER_NAME"));
+				json_array.add(json);
+			}
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("FEEDER_MASTER_DATA", json_array);
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		return JSON_RESPONSE;
+	}
 	
 	
 
