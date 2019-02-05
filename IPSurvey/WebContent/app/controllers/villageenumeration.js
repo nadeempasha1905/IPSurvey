@@ -270,7 +270,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			if(action === 'add'){
 				$scope.action = 'add';
 				
-				$scope.modal_heading = "Ad	d Village Enumeration Data";
+				$scope.modal_heading = "Add Village Enumeration Data";
 				$scope.newuseridexists = true;
 				
 				

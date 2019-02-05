@@ -323,6 +323,53 @@ public class UtilityImpl implements IUtility{
 		}
 		return JSON_RESPONSE;
 	}
+
+	@Override
+	public JSONObject gettransformermasterdata(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " SELECT TM_LOCATION_CODE, TM_STATION_CODE, TM_FEEDER_CODE, TM_OM_CODE, TM_TRANSFORMER_CODE, "
+					+ " TM_TRANSFORMER_NAME, TM_SURVEY_STS, TM_CREATED_BY, TM_CREATED_ON, TM_UPDATED_BY, TM_UPDATED_ON, TM_CAPACITY_KVA,"
+					+ " TM_VILLAGE "
+					+ " FROM TRANSFORMER_MASTER "
+					+ "	WHERE TM_LOCATION_CODE = '"+(String)object.get("location_code")+"' " ;
+			
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				json = new JSONObject();
+				json.put("TM_LOCATION_CODE", 	rs.getString("TM_LOCATION_CODE"));
+				json.put("TM_STATION_CODE", 	rs.getString("TM_STATION_CODE"));
+				json.put("TM_FEEDER_CODE", 	rs.getString("TM_FEEDER_CODE"));
+				json.put("TM_OM_CODE", 	rs.getString("TM_OM_CODE"));
+				json.put("TM_TRANSFORMER_CODE", 	rs.getString("TM_TRANSFORMER_CODE"));
+				json.put("TM_TRANSFORMER_NAME", 	rs.getString("TM_TRANSFORMER_NAME"));
+				json.put("TM_SURVEY_STS", 	rs.getString("TM_SURVEY_STS"));
+				json.put("TM_CREATED_BY", 	rs.getString("TM_CREATED_BY"));
+				json.put("TM_CREATED_ON", 	rs.getString("TM_CREATED_ON"));
+				json.put("TM_UPDATED_BY", 	rs.getString("TM_UPDATED_BY"));
+				json.put("TM_UPDATED_ON", 	rs.getString("TM_UPDATED_ON"));
+				json.put("TM_CAPACITY_KVA", 	rs.getString("TM_CAPACITY_KVA"));
+				json.put("TM_VILLAGE", 	rs.getString("TM_VILLAGE"));
+				json_array.add(json);
+			}
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("TRANSFORMER_MASTER_DATA", json_array);
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		return JSON_RESPONSE;
+	}
 	
 	
 

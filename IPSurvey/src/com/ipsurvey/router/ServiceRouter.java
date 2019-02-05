@@ -200,7 +200,14 @@ public class ServiceRouter {
 		return enumObj.gettransformerenumerationdetails(object,ipAdress);
 	}
 	
-	
+	@POST
+	@Path("/gettransformermasterdata")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject gettransformermasterdata(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return utilObj.gettransformermasterdata(object,ipAdress);
+	}
 	
 	
 	

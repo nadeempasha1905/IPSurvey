@@ -11,25 +11,17 @@
 .modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
 		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
 .modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
-.modal_fixed_header_column thead th {min-width: 100px;width: 100px;color:white;border-color: #00bf8f !important;text-align: center;
+.modal_fixed_header_column thead th {min-width: 150px;width: 150px;color:white;border-color: #00bf8f !important;text-align: center;
 										font-size: 14px;height: 35px;word-wrap:break-word;}
-.modal_fixed_header_column tbody td {min-width: 100px;width: 100px;color: #353535;word-break: break-all;height: 35px;
+.modal_fixed_header_column tbody td {min-width: 150px;width: 150px;color: #353535;word-break: break-all;height: 35px;
 										word-wrap:break-word;font-weight: normal;}
 .modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
 .modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
 .modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(3){ min-width: 200px; width : 200px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(3){ min-width: 200px; width : 200px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(8){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(8){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(9){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(9){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(10){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(10){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(11){ min-width: 150px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(11){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
  
 </style>
 
@@ -80,7 +72,7 @@
 			    		 		 <label for="searchsubdivisionlist">Sub-Division</label>
 								    <select class="form-control" id="searchsubdivisionlist" 
 								    ng-model="search.subdivision"
-								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList();" 
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList('search');" 
 								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
 								    >
 								      <option value="">------Select------</option>
@@ -93,7 +85,7 @@
 				    		 		 <label for="searchstationlist">Station</label>
 									    <select class="form-control" id="searchstationlist" 
 									    ng-model="search.station"
-									    ng-options="u as u.value for u in searchstationlist" ng-change="getFeederList()" 
+									    ng-options="u as u.value for u in searchstationlist" ng-change="getFeederList('search')" 
 									    >
 									      <option value="">------Select------</option>
 									    </select>
@@ -133,7 +125,7 @@
     						<div class="row mt-4">
     							<div class="col-md-2">
 		    						<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" 
-		    							data-target="..transformerenumerate-addedit-modal" ng-click="addeditTransformerEnumeration(null,'add')">
+		    							data-target=".transformerenumerate-addedit-modal" ng-click="addeditTransformerEnumeration(null,'add')">
 		    							<i class="fa fa-plus"></i>&nbsp;Add Enumeration Data</button>
     							</div>
     						</div>	
@@ -192,7 +184,7 @@
     </div>			
  </div>   	
  
- <div class="modal fade villageenumerate-addedit-modal" id="villageenumerate-addedit-modal" tabindex="-1" role="dialog"
+ <div class="modal fade transformerenumerate-addedit-modal" id="transformerenumerate-addedit-modal" tabindex="-1" role="dialog"
 	style="z-index: 2026;" aria-hidden="true" data-backdrop="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -207,6 +199,13 @@
         
         <div class="row">
         	<div class="col-md-9">
+        	<div class="row mt-3" >
+   		 		<div class="col-md-6">
+					<label for="autocompletetransformername">Transformer Name<span style="color: red;">&nbsp;(Search here & press enter)</span></label>
+			      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletetransformername" 
+			      	 data="SEARCHED_TRANSFORMER_MASTER_DATA" on-type="updateTransformers" ng-enter="verifytransformerexists()"></autocomplete>
+			    </div>
+   		 	</div>	
    		 	<div class="row mt-3" >
    		 		<div class="col-md-4">
     		 		 <label for="modalomsectionlist">O&M Section</label>
@@ -218,11 +217,25 @@
 					      <option value="">------Select------</option>
 					    </select>
    		 		</div>
-				<div class="col-md-4">
-					<label for="autocompletevillagename">Village<span style="color: red;">&nbsp;(Search here & press enter)</span></label>
-			      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletevillagename" 
-			      	 data="SEARCHED_VILLAGE_MASTER_DATA" on-type="updateVillages" ng-enter="verifyvillageexists()"></autocomplete>
-			    </div>
+   		 		<div class="col-md-4">
+    		 		 <label for="modalstationlist">Station</label>
+					    <select class="form-control" id="modalstationlist" 
+					    ng-model="modal.station"
+					    ng-options="u as u.value for u in modalstationlist"  
+					    ng-change="getFeederList()" 
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
+   		 		<div class="col-md-4">
+    		 		 <label for="modalfeederlist">Feeder</label>
+					    <select class="form-control" id="modalfeederlist" 
+					    ng-model="modal.feeder"
+					    ng-options="u as u.value for u in modalfeederlist"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
     		 </div>
     		 <div class="row mt-3" >
    		 		<div class="col-md-4">

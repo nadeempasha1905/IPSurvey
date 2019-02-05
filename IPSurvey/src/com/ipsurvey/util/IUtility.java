@@ -27,5 +27,7 @@ public interface IUtility {
 	JSONObject getstationlist(JSONObject object, String ipAdress);
 
 	JSONObject getfeederlist(JSONObject object, String ipAdress);
+
+	JSONObject gettransformermasterdata(JSONObject object, String ipAdress);
 	
 }
