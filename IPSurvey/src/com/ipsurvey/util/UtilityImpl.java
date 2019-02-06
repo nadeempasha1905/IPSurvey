@@ -32,6 +32,44 @@ public class UtilityImpl implements IUtility{
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public JSONObject getcodedetails(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " SELECT  CM_VALUE , CM_DESCR  FROM CODE_MASTER WHERE NVL(CM_DEL_FLG,'N') = 'N' AND CM_TYPE='"+(String)object.get("code_type")+" ";
+			
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				json = new JSONObject();
+				json.put("key",   rs.getString("CM_VALUE"));
+				json.put("value", rs.getString("CM_DESCR"));
+				json_array.add(json);
+			}
+			
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("CODES_LIST", json_array);
+			
+			
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		
+		return JSON_RESPONSE;
+	}
 
 	@Override
 	public JSONObject getzonelist(JSONObject object, String ipAdress) {
@@ -335,10 +373,12 @@ public class UtilityImpl implements IUtility{
 		
 		try {
 			String get_permission_query = " SELECT TM_LOCATION_CODE, TM_STATION_CODE, TM_FEEDER_CODE, TM_OM_CODE, TM_TRANSFORMER_CODE, "
-					+ " TM_TRANSFORMER_NAME, TM_SURVEY_STS, TM_CREATED_BY, TM_CREATED_ON, TM_UPDATED_BY, TM_UPDATED_ON, TM_CAPACITY_KVA,"
-					+ " TM_VILLAGE "
+					+ " TM_TRANSFORMER_NAME, TM_SURVEY_STS, TM_CREATED_BY, TO_CHAR(TM_CREATED_ON,'DD/MM/YYYY HH:MI::SS AM') TM_CREATED_ON, TM_UPDATED_BY, TO_CHAR(TM_UPDATED_ON,'DD/MM/YY HH:MI:SS AM') TM_UPDATED_ON, TM_CAPACITY_KVA,"
+					+ " TM_VILLAGE  "
 					+ " FROM TRANSFORMER_MASTER "
-					+ "	WHERE TM_LOCATION_CODE = '"+(String)object.get("location_code")+"' " ;
+					+ "	WHERE "
+					+ " TM_OM_CODE = '"+(String)object.get("location_code")+"' "
+					+ " and nvl(TM_SURVEY_STS,'N') = 'N' " ;
 			
 			ps = dbConn.prepareStatement(get_permission_query);
 			rs = ps.executeQuery();
@@ -361,6 +401,38 @@ public class UtilityImpl implements IUtility{
 			}
 			JSON_RESPONSE.put("status", "success");
 			JSON_RESPONSE.put("TRANSFORMER_MASTER_DATA", json_array);
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		return JSON_RESPONSE;
+	}
+
+	@Override
+	public JSONObject getenumeratedvillageslist(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " select VE_VILLAGE_NAME from VILLAGE_ENUMERATION  where VE_LOCATION_CODE = '211030102'   order by nvl(VE_UPDATED_ON,VE_CREATED_ON) desc " ;
+			
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				json = new JSONObject();
+				json.put("key", 	rs.getString("VE_VILLAGE_NAME"));
+				json.put("value", 	rs.getString("VE_VILLAGE_NAME"));
+				json_array.add(json);
+			}
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("VILLAGE_ENUM_DATA", json_array);
 		} catch (Exception e) { 
 			// TODO Auto-generated catch block
 			e.printStackTrace();

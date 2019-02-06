@@ -11,7 +11,9 @@ import net.sf.json.JSONObject;
  *
  */
 public interface IUtility {
-
+	
+	JSONObject getcodedetails(JSONObject object, String ipAdress);
+	
 	JSONObject getzonelist(JSONObject object, String ipAdress);
 
 	JSONObject getcirclelist(JSONObject object, String ipAdress);
@@ -29,5 +31,7 @@ public interface IUtility {
 	JSONObject getfeederlist(JSONObject object, String ipAdress);
 
 	JSONObject gettransformermasterdata(JSONObject object, String ipAdress);
+
+	JSONObject getenumeratedvillageslist(JSONObject object, String ipAdress);
 	
 }

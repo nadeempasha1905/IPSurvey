@@ -166,7 +166,7 @@ angular.module('ipsurveyapp.Controllers', [])
 					$scope.searchsubdivisionlist = response.SUBDIVISION_LIST;
 					if(arr.length > 0){
 						$scope.search.subdivision = $filter('filter')($scope.searchsubdivisionlist,{key:arr[3]},true)[0];
-						$scope.getStationList();
+						$scope.getStationList('search');
 						if(usertype > 4){
 							$scope.getomsectionList(arr,usertype,'search');
 						}else{
@@ -199,7 +199,6 @@ angular.module('ipsurveyapp.Controllers', [])
 						location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
 					}, 'POST');
 				}else{
-					$scope.gettransformermasterdata();
 					$scope.modalomsectionlist=[];
 					if($scope.search.subdivision === undefined || $scope.search.subdivision === null){
 						alert("select sub division !!!")
@@ -209,6 +208,8 @@ angular.module('ipsurveyapp.Controllers', [])
 						$scope.modalomsectionlist = response.OMSECTION_LIST;
 						if($scope.search.omsection != undefined || $scope.search.omsection != null){
 							$scope.modal.omsection = $filter('filter')($scope.modalomsectionlist,{key:$scope.search.omsection.key},true)[0];
+							$scope.gettransformermasterdata();
+							$scope.getenumeratedvillageslist('');
 						}
 					},{
 						location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
@@ -216,7 +217,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 		};
 		
-		$scope.getStationList = function(searchtype){
+		$scope.getStationList = function(searchtype,editstationcode,editfeedercode){
 			if(searchtype === 'search'){
 				$scope.searchstationlist=[];$scope.searchfeederlist=[];
 				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){
@@ -234,6 +235,10 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 				remote.load("getstationlist", function(response){
 					$scope.modalstationlist = response.STATION_MASTER_DATA;
+					if(editstationcode != null){
+						$scope.modal.station =  $filter('filter')($scope.modalstationlist,{key:editstationcode},true)[0];
+						$scope.getFeederList('modal',editstationcode,editfeedercode);
+					}
 				},{
 					location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
 				}, 'POST');
@@ -242,7 +247,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 		};
 		
-		$scope.getFeederList = function(searchtype){
+		$scope.getFeederList = function(searchtype,editstationcode,editfeedercode){
 			if(searchtype === 'search'){
 				$scope.searchfeederlist=[];
 				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){return;}
@@ -259,6 +264,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				if($scope.modal.station === undefined || $scope.modal.station === null){return;}
 				remote.load("getfeederlist", function(response){
 					$scope.modalfeederlist = response.FEEDER_MASTER_DATA;
+					if(editfeedercode != null){
+						$scope.modal.feeder  =  $filter('filter')($scope.modalfeederlist,{key:editfeedercode},true)[0];
+					}
 				},{
 					location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key),
 					station_code:($scope.modal.station === undefined || $scope.modal.station === null ? '' : $scope.modal.station.key)
@@ -288,8 +296,8 @@ angular.module('ipsurveyapp.Controllers', [])
 		$scope.gettransformermasterdata = function(){
 			$scope.gettransformermasterdatalist = [];
 			$scope.TRANSFORMER_MASTER_DATA = [];
-			if($scope.search.subdivision === undefined || $scope.search.subdivision === null){
-				notify("Please select Sub-Division !!!");
+			if($scope.modal.omsection === undefined || $scope.modal.omsection === null){
+				notify.warn("Please select O&M Section !!!");
 				return;
 			}
 			
@@ -300,7 +308,23 @@ angular.module('ipsurveyapp.Controllers', [])
 				});
 				$scope.filltransformerdata();
 			},{
-				location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
+				location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key)
+			}, 'POST');
+		};
+		
+		$scope.getenumeratedvillageslist = function(value){
+			$scope.getenumeratedvillages = [];
+			if($scope.modal.omsection === undefined || $scope.modal.omsection === null){
+				notify.warn("Please select O&M Section !!!");
+				return;
+			}
+			remote.load("getenumeratedvillageslist", function(response){
+				$scope.getenumeratedvillages = response.VILLAGE_ENUM_DATA;
+				if(value != null || value.length >0){
+					$scope.modal.village =  $filter('filter')($scope.getenumeratedvillages,{key:value},true)[0];
+				}
+			},{
+				location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key)
 			}, 'POST');
 		};
 		
@@ -319,8 +343,10 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		$scope.ROWID = "";
 		$scope.imagedata = "";
+		$scope.NEW_TC_CODE = "";
 		$scope.addeditTransformerEnumeration = function(record,action){
 			
+			$scope.NEW_TC_CODE = "";
 			$scope.ROWID = "";
 			$scope.imagedata = "";
 			 $('#uploadPreview').attr('src', null);
@@ -328,10 +354,11 @@ angular.module('ipsurveyapp.Controllers', [])
 			 $scope.modal.chooseimage = null;
 			 $('#modalchooseimage').val('');
 			 
-			$scope.getomsectionList([],null,'modal');
-			$scope.getStationList('modal');
-			
 			if(action === 'add'){
+				
+				$scope.getomsectionList([],null,'modal');
+				$scope.getStationList('modal',null,null);
+				
 				$scope.action = 'add';
 				
 				$scope.modal_heading = "Add Transformer Enumeration Data";
@@ -343,32 +370,189 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.longitude = '' ;
 				$scope.modal.altitude = '';
 				$scope.modal.remarks = '';
+				$scope.modal.transformercode = '';
+				$scope.modal.timscode = '';
+				$scope.modal.capacitykva = '';
 				
 			}else{
 				
-/*				console.log(record);
+				$scope.getomsectionList([],null,'modal');
+				$timeout(function(){
+					$scope.getStationList('modal',record.TE_STATION_CODE,record.TE_FEEDER_CODE);
+				},200);
+				$timeout(function(){
+					$scope.getenumeratedvillageslist(record.TE_VILLAGE);
+				},200);
+				
 				$scope.ROWID = record.row_id;
 				$scope.action = 'edit';
 				$scope.newuseridexists = false;
 				$scope.modal_heading = "Edit Transformer Enumeration Data";
 				
-				$scope.modal.omsection = $filter('filter')($scope.modalomsectionlist,{key:record.VE_LOCATION_CODE},true)[0];
-				$scope.search.autocompletevillagename = record.VE_VILLAGE_NAME;
-				$scope.modal.latitude = record.VE_LATTITUDE;
-				$scope.modal.longitude = record.VE_LONGITUDE;
-				$scope.modal.altitude = record.VE_ALTITUDE;
-				$scope.modal.remarks = record.VE_REMARKS;
+				 $scope.search.autocompletetransformername = record.TE_TRANSFORMER_NAME;
+					$scope.modal.latitude = record.TE_LATTITUDE;
+					$scope.modal.longitude = record.TE_LONGITUDE;
+					$scope.modal.altitude = record.TE_ALTITUDE;
+					$scope.modal.remarks = record.TE_REMARKS;
+					$scope.modal.transformercode = record.TE_TRANSFORMER_CODE;
+					$scope.modal.timscode = record.TE_TIMS_CODE;
+					$scope.modal.capacitykva = record.TE_CAPACITY_KVA;
+					//$scope.modal.village = record.TE_VILLAGE;
+					
+					if(record.TE_IMAGE_PATH.length >0 || record.TE_IMAGE_PATH != undefined || record.TE_IMAGE_PATH != null){
+						remote.load("getimagedata", function(response){
+							console.log("getimagedata",response);
+							$scope.imagedata = response.encodedBase64;
+						},{
+							filename:record.TE_IMAGE_PATH
+						}, 'POST');
+					}
+					
+					$scope.NEW_TC_CODE = record.TE_TRANSFORMER_CODE;
 				
-				if(record.VE_IMAGE_PATH.length >0 || record.VE_IMAGE_PATH != undefined || record.VE_IMAGE_PATH != null){
-					remote.load("getimagedata", function(response){
-						console.log("getimagedata",response);
-						$scope.imagedata = response.encodedBase64;
-					},{
-						filename:record.VE_IMAGE_PATH
-					}, 'POST');
-				}*/
 			}
 			
+		};
+		
+		$scope.newuseridexists = true;
+		$scope.verifytransformerexists = function(){
+			$scope.newuseridexists = true;
+			if($scope.search.autocompletetransformername === undefined 
+					|| $scope.search.autocompletetransformername === null 
+						|| $scope.search.autocompletetransformername == ''){
+				return;
+			}
+			
+			var transformer_code = $filter('filter')($scope.gettransformermasterdatalist,{TM_TRANSFORMER_NAME:$scope.search.autocompletetransformername},true)[0];
+			console.log("transformer_code",transformer_code);
+			
+			$scope.NEW_TC_CODE = "";
+			
+			$scope.NEW_TC_CODE =  (transformer_code === null || transformer_code === undefined ? '' : transformer_code.TM_TRANSFORMER_CODE);
+			
+			remote.load("validatetransformerdetails", function(response){
+				console.log("validatetransformerdetails",response);
+				
+				if(response.action === 'success'){
+					$scope.getStationList('modal',response.TM_STATION_CODE,response.TM_FEEDER_CODE);
+					$scope.modal.transformercode = response.TM_TRANSFORMER_CODE;
+					$scope.modal.timscode = $scope.modal.omsection.key+""+response.TM_TRANSFORMER_CODE;
+					$scope.modal.capacitykva = response.TM_CAPACITY_KVA;
+					$scope.modal.latitude = '' ;
+					$scope.modal.longitude = '' ;
+					$scope.modal.altitude = '';
+					$scope.modal.remarks = '';
+					$scope.newuseridexists = false;
+					$scope.NEW_TC_CODE = response.TM_TRANSFORMER_CODE;
+				}
+				
+				if(response.action === 'new'){
+					$scope.modal.transformercode = response.NEW_TC_CODE;
+					$scope.modal.timscode = response.TIMS_CODE;
+					$scope.modal.capacitykva = '';
+					$scope.modal.latitude = '' ;
+					$scope.modal.longitude = '' ;
+					$scope.modal.altitude = '';
+					$scope.modal.remarks = '';
+					$scope.newuseridexists = false;
+					$scope.NEW_TC_CODE = response.NEW_TC_CODE;
+				}
+				
+			},{
+				location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key),
+				tc_code:(transformer_code === null || transformer_code === undefined ? '' : transformer_code.TM_TRANSFORMER_CODE) , 
+				tc_name:$scope.search.autocompletetransformername	
+			}, 'POST');
+			
+			
+			
+		};
+		
+		$scope.SaveRecord = function(){
+			
+			var files=$('#modalchooseimage')[0].files;
+			var formdata = new FormData(); 
+			
+			if($scope.modal.omsection === undefined || $scope.modal.omsection === null){notify.warn("Please Select OM Section");return;}
+			if($scope.search.autocompletetransformername === undefined || $scope.search.autocompletetransformername === null){notify.warn("Please enter transformer name");return;}
+			if($scope.modal.station === undefined || $scope.modal.station === null){notify.warn("Please Select Station");return;}
+			if($scope.modal.feeder === undefined || $scope.modal.feeder === null){notify.warn("Please Select Feeder");return;}
+			if($scope.modal.village === undefined || $scope.modal.village === null){notify.warn("Please Select viilage");return;}
+			if($scope.modal.latitude === undefined || $scope.modal.latitude === null){notify.warn("Please enter latitude");return;}
+			if($scope.modal.longitude === undefined || $scope.modal.longitude === null){notify.warn("Please enter longitude");return;}
+			if($scope.modal.altitude === undefined || $scope.modal.altitude === null){notify.warn("Please enter altitude");return;}
+			
+			var imagepath = "";
+			if(files.length > 0){
+				imagepath = $scope.modal.omsection.key+"_"+$scope.NEW_TC_CODE+"_"+$scope.search.autocompletetransformername+"_"+files[0].name;
+			}
+			
+			if($scope.action === 'add'){
+				if(files.length > 0){
+					formdata.append('file',files[0]);
+					formdata.append('filename',imagepath);
+				}
+			}
+			
+			if($scope.modal.changeimage){
+				if(files.length > 0){
+					formdata.append('file',files[0]);
+					formdata.append('filename',imagepath);
+				}else{
+					notify.warn("Please choose image !!");return;
+				}
+			}
+
+			var request = {
+					rowid:$scope.ROWID,
+					location_code:$scope.modal.omsection.key,
+					stationcode:$scope.modal.station.key,
+					feedercode:$scope.modal.feeder.key,
+					transformercode:$scope.NEW_TC_CODE,
+					transformername:$scope.search.autocompletetransformername,
+					timscode:$scope.modal.timscode,
+					capacitykva:$scope.modal.capacitykva,
+					connectedloadkva:$scope.modal.capacitykva,
+					village_name:($scope.modal.village === undefined || $scope.modal.village === null ? '' : $scope.modal.village.key),
+					latitude:$scope.modal.latitude,
+					longitude:$scope.modal.longitude,
+					altitude:$scope.modal.altitude,
+					remarks:($scope.modal.remarks === undefined || $scope.modal.remarks === null ? '' : $scope.modal.remarks),
+					userid:$scope.userinfo.username,
+					imagepath:(imagepath == null || imagepath == '' || imagepath == undefined ? '' : imagepath)	
+			};
+			
+			console.log("request",request);
+			
+			remote.load("upserttransformerenumeration", function(response){
+				console.log("upserttransformerenumeration",response);
+				if(response.status === 'success'){
+					if(files.length > 0){
+						$('#loading').show();
+							formdata.append('file',files[0]);
+							formdata.append('filename',imagepath);
+							$http.post($rootScope.serviceURL+'saveimage',formdata, {
+						    	 transformRequest: angular.identity,
+						    	 headers: {'Content-Type': undefined}
+						        }).then(function (data){
+						        	//console.log(data);
+						        	$('#loading').hide();
+						        	$timeout(function(){
+										$('#transformerenumerate-addedit-modal').modal('toggle');
+										$scope.SearchTransformerEnumDetails();
+									},2000);
+						        },function (data){
+							  		//console.log(data);
+							  		$('#loading').hide();
+							  	});
+						}else{
+							$timeout(function(){
+								$('#transformerenumerate-addedit-modal').modal('toggle');
+								$scope.SearchTransformerEnumDetails();
+							},2000);
+						}
+				}
+			},request, 'POST');
 		};
 		
 		$scope.initialize();

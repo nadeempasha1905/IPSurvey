@@ -209,7 +209,32 @@ public class ServiceRouter {
 		return utilObj.gettransformermasterdata(object,ipAdress);
 	}
 	
+	@POST
+	@Path("/getenumeratedvillageslist")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getenumeratedvillageslist(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return utilObj.getenumeratedvillageslist(object,ipAdress);
+	}
 	
+	@POST
+	@Path("/validatetransformerdetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject validatetransformerdetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.validatetransformerdetails(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/upserttransformerenumeration")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject upserttransformerenumeration(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.upserttransformerenumeration(object,ipAdress);
+	}
 	
 	
 	

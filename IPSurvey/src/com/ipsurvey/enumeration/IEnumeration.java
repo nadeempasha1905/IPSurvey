@@ -29,7 +29,11 @@ public interface IEnumeration {
 	JSONObject getimagedata(JSONObject object, HttpServletRequest request);
 
 	JSONObject gettransformerenumerationdetails(JSONObject object, String ipAdress);
-	
-	
 
+	JSONObject getipcodenumber(JSONObject object, String ipAdress);
+
+	JSONObject validatetransformerdetails(JSONObject object, String ipAdress);
+
+	JSONObject upserttransformerenumeration(JSONObject object, String ipAdress);
+	
 }

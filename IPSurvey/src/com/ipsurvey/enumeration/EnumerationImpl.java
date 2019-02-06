@@ -331,7 +331,7 @@ public class EnumerationImpl implements IEnumeration{
 			try {
 				//dbConn = dbObject.getDatabaseConnection();
 
-					String sql = " SELECT ROWIDTOCHAR (ROWID) row_id,TE_CIRCLE_CODE, TE_DIVISION_CODE, "
+					/*String sql = " SELECT ROWIDTOCHAR (ROWID) row_id,TE_CIRCLE_CODE, TE_DIVISION_CODE, "
 							+ " (SELECT location_name FROM LOCATION WHERE location_code=TE_SUBDIVISION_CODE) SUBDIVISION_NAME,TE_SUBDIVISION_CODE,"
 							+ " (SELECT location_name FROM LOCATION WHERE location_code= TE_OM_CODE) OMSECTION_NAME,TE_SUBDIVISION_CODE, TE_OM_CODE, "
 							//+ "	 (select SM_STATION_NAME from STATION_MASTER where SM_STATION_CODE = TE_STATION_CODE ) station_name ,"
@@ -342,16 +342,35 @@ public class EnumerationImpl implements IEnumeration{
 							+ "  TE_LONGITUDE, TE_LATTITUDE, TE_ALTITUDE, TE_REMARKS, TE_CREATED_BY, TE_CREATED_ON, TE_UPDATED_BY, TE_UPDATED_ON, "
 							+ "  TE_VILLAGE, TE_IMAGE_PATH "
 							+ "  FROM TRANSFORMER_ENUMERATION  "
-							+ "  WHERE 1 = 1 " ;
-					if(((String)object.get("location_code")).length() > 0) {
-						sql = sql + " AND TE_OM_CODE = '"+(String)object.get("location_code")+"' " ;
-					}
+							+ "  WHERE 1 = 1 " ;*/
+				
+				String sql =  " SELECT ROWIDTOCHAR (T.ROWID) ROW_ID,TE_CIRCLE_CODE, TE_DIVISION_CODE,"
+							+ " TE_SUBDIVISION_CODE, L1.LOCATION_NAME  SUBDIVISION_NAME,"
+							+ " TE_OM_CODE, L2.LOCATION_NAME  OM_NAME,"
+							+ " TE_STATION_CODE, SM.SM_STATION_NAME   STATION_NAME,"
+							+ " TE_FEEDER_CODE, FM.FM_FEEDER_NAME FEEDER_NAME,"
+							+ " TE_TRANSFORMER_CODE, TE_TRANSFORMER_NAME, "
+							+ " TE_TIMS_CODE, TE_CAPACITY_KVA, TE_VILLAGE,  "
+							+ "	TE_LATTITUDE, TE_LONGITUDE, TE_ALTITUDE, TE_REMARKS, TE_IMAGE_PATH, "
+							/*+ " TE_CREATED_BY, TO_CHAR(TE_CREATED_ON,'DD/MM/YYYY HH:MI:SS AM') TE_CREATED_ON, "*/
+							+ " nvl(TE_CREATED_BY,TE_UPDATED_BY) TE_UPDATED_BY, TO_CHAR(nvl(TE_UPDATED_ON,TE_CREATED_ON),'DD/MM/YYYY HH:MI:SS AM') TE_UPDATED_ON "
+							+ " FROM TRANSFORMER_ENUMERATION T "
+							+ " LEFT OUTER JOIN LOCATION L1 ON L1.LOCATION_CODE  = T.TE_SUBDIVISION_CODE "
+							+ " LEFT OUTER JOIN LOCATION L2 ON L2.LOCATION_CODE  = T.TE_OM_CODE "
+							+ "	LEFT OUTER JOIN STATION_MASTER SM ON SM.SM_LOCATION_CODE = T.TE_SUBDIVISION_CODE AND SM.SM_STATION_CODE = T.TE_STATION_CODE "
+							+ "	LEFT OUTER JOIN FEEDER_MASTER FM ON FM.FM_LOCATION_CODE = T.TE_SUBDIVISION_CODE AND FM.FM_STATION_CODE = T.TE_STATION_CODE AND FM.FM_FEEDER_CODE = T.TE_FEEDER_CODE "
+							+ " WHERE TE_OM_CODE = '"+(String)object.get("location_code")+"' ";
+						
 					if(((String)object.get("station_code")).length() > 0) {
 						sql = sql + " AND TE_STATION_CODE = '"+(String)object.get("station_code")+"' " ;
 					}
 					if(((String)object.get("feeder_code")).length() > 0) {
 						sql = sql + " AND TE_FEEDER_CODE = '"+(String)object.get("feeder_code")+"' " ;
 					}
+
+					/*sql = sql + " ORDER BY TE_OM_CODE, TE_STATION_CODE,TE_FEEDER_CODE,TE_VILLAGE,TE_TRANSFORMER_CODE " ;*/
+					
+					sql = sql + " ORDER BY nvl(TE_UPDATED_ON,TE_CREATED_ON) " ;
 					
 					System.out.println(sql);
 
@@ -365,27 +384,26 @@ public class EnumerationImpl implements IEnumeration{
 						json.put("row_id", (rs.getString("row_id") == null ? "" : rs.getString("row_id")));
 						json.put("TE_CIRCLE_CODE", (rs.getString("TE_CIRCLE_CODE") == null ? "" : rs.getString("TE_CIRCLE_CODE")));
 						json.put("TE_DIVISION_CODE", (rs.getString("TE_DIVISION_CODE") == null ? "" : rs.getString("TE_DIVISION_CODE")));
+						json.put("TE_SUBDIVISION_CODE", (rs.getString("TE_SUBDIVISION_CODE") == null ? "" : rs.getString("TE_SUBDIVISION_CODE")));
 						json.put("SUBDIVISION_NAME", (rs.getString("SUBDIVISION_NAME") == null ? "" : rs.getString("SUBDIVISION_NAME")));
-						json.put("TE_SUBDIVISION_CODE", (rs.getString("TE_SUBDIVISION_CODE") == null ? "" : rs.getString("TE_SUBDIVISION_CODE")));
-						json.put("OMSECTION_NAME", (rs.getString("OMSECTION_NAME") == null ? "" : rs.getString("OMSECTION_NAME")));
-						json.put("TE_SUBDIVISION_CODE", (rs.getString("TE_SUBDIVISION_CODE") == null ? "" : rs.getString("TE_SUBDIVISION_CODE")));
+						json.put("TE_OM_CODE", (rs.getString("TE_OM_CODE") == null ? "" : rs.getString("TE_OM_CODE")));
+						json.put("OM_NAME", (rs.getString("OM_NAME") == null ? "" : rs.getString("OM_NAME")));
 						json.put("TE_STATION_CODE", (rs.getString("TE_STATION_CODE") == null ? "" : rs.getString("TE_STATION_CODE")));
-						//json.put("station_name", (rs.getString("station_name") == null ? "" : rs.getString("station_name")));
-						//json.put("feeder_name", (rs.getString("feeder_name") == null ? "" : rs.getString("feeder_name")));
+						json.put("STATION_NAME", (rs.getString("STATION_NAME") == null ? "" : rs.getString("STATION_NAME")));
 						json.put("TE_FEEDER_CODE", (rs.getString("TE_FEEDER_CODE") == null ? "" : rs.getString("TE_FEEDER_CODE")));
+						json.put("FEEDER_NAME", (rs.getString("FEEDER_NAME") == null ? "" : rs.getString("FEEDER_NAME")));
 						json.put("TE_TRANSFORMER_CODE", (rs.getString("TE_TRANSFORMER_CODE") == null ? "" : rs.getString("TE_TRANSFORMER_CODE")));
 						json.put("TE_TRANSFORMER_NAME", (rs.getString("TE_TRANSFORMER_NAME") == null ? "" : rs.getString("TE_TRANSFORMER_NAME")));
+						json.put("TE_CAPACITY_KVA", (rs.getString("TE_CAPACITY_KVA") == null ? "" : rs.getString("TE_CAPACITY_KVA")));
 						json.put("TE_TIMS_CODE", (rs.getString("TE_TIMS_CODE") == null ? "" : rs.getString("TE_TIMS_CODE")));
-						json.put("TE_LONGITUDE", (rs.getString("TE_LONGITUDE") == null ? "" : rs.getString("TE_LONGITUDE")));
+						json.put("TE_VILLAGE", (rs.getString("TE_VILLAGE") == null ? "" : rs.getString("TE_VILLAGE")));
 						json.put("TE_LATTITUDE", (rs.getString("TE_LATTITUDE") == null ? "" : rs.getString("TE_LATTITUDE")));
+						json.put("TE_LONGITUDE", (rs.getString("TE_LONGITUDE") == null ? "" : rs.getString("TE_LONGITUDE")));
 						json.put("TE_ALTITUDE", (rs.getString("TE_ALTITUDE") == null ? "" : rs.getString("TE_ALTITUDE")));
 						json.put("TE_REMARKS", (rs.getString("TE_REMARKS") == null ? "" : rs.getString("TE_REMARKS")));
-						json.put("TE_CREATED_BY", (rs.getString("TE_CREATED_BY") == null ? "" : rs.getString("TE_CREATED_BY")));
-						json.put("TE_CREATED_ON", (rs.getString("TE_CREATED_ON") == null ? "" : rs.getString("TE_CREATED_ON")));
+						json.put("TE_IMAGE_PATH", (rs.getString("TE_IMAGE_PATH") == null ? "" : rs.getString("TE_IMAGE_PATH")));
 						json.put("TE_UPDATED_BY", (rs.getString("TE_UPDATED_BY") == null ? "" : rs.getString("TE_UPDATED_BY")));
 						json.put("TE_UPDATED_ON", (rs.getString("TE_UPDATED_ON") == null ? "" : rs.getString("TE_UPDATED_ON")));
-						json.put("TE_VILLAGE", (rs.getString("TE_VILLAGE") == null ? "" : rs.getString("TE_VILLAGE")));
-						json.put("TE_IMAGE_PATH", (rs.getString("TE_IMAGE_PATH") == null ? "" : rs.getString("TE_IMAGE_PATH")));
 						
 						array.add(json);
 					}
@@ -407,6 +425,192 @@ public class EnumerationImpl implements IEnumeration{
 			}
 			
 			return JSON_RESPONSE;
+		}
+		
+		@Override
+		public JSONObject getipcodenumber(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			JSONObject json = null;
+			JSONArray  json_array = new JSONArray();
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			
+			try {
+				String get_permission_query = " SELECT '"+(String)object.get("om_code")+"'||'"+(String)object.get("transformer_code")+"'||'00'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(IE_CODE_NUMBER,16))),0)+1,2,'0') CODE_NUMBER"
+											+ " FROM IP_ENUMERATION"
+											+ " WHERE IE_OM_CODE='"+(String)object.get("om_code")+"' AND IE_TRANSFORMER_CODE='"+(String)object.get("transformer_code")+"' AND IE_POLE_CODE='00'";
+						
+				ps = dbConn.prepareStatement(get_permission_query);
+				rs = ps.executeQuery();
+				
+				while (rs.next()) {
+					
+					json = new JSONObject();
+					json.put("code_number", rs.getString("CODE_NUMBER"));
+					json_array.add(json);
+				}
+				
+				JSON_RESPONSE.put("status", "success");
+				JSON_RESPONSE.put("CODE_NUMBER", json_array);
+				
+				
+			} catch (Exception e) { 
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
+				DBManagerResourceRelease.close(rs);
+				DBManagerResourceRelease.close(ps);
+			}
+			
+			return JSON_RESPONSE;
+		}
+
+		@Override
+		public JSONObject validatetransformerdetails(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			CallableStatement calstmt = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			
+			try {
+				
+				 if(object.isEmpty()) {
+					 JSON_RESPONSE.put("status", "error");
+					 JSON_RESPONSE.put("message", "Invalid Object");
+				 }else {
+					
+					 String sql = "{ call GET_TC_MASTER_DETAILS(?,'"+(String)object.get("location_code")+"',"
+					 		+ "'"+((String)object.get("tc_code") == null || (String)object.get("tc_code") == "" ? "" : (String)object.get("tc_code") )+"',"
+					 				+ "'"+((String)object.get("tc_name") == null || (String)object.get("tc_name") == "" ? "" : (String)object.get("tc_name"))+"')}";
+
+					 System.out.println(sql);
+				calstmt = dbConn.prepareCall(sql);
+				calstmt.registerOutParameter(1,OracleTypes.CURSOR );
+				calstmt.executeQuery();
+				
+				rs = (ResultSet) calstmt.getObject(1);
+				String result_proc = "";
+				
+				if(rs.next()) {
+					result_proc = rs.getString("RESP");
+					
+					if(result_proc.equals("success")) {
+						
+						JSON_RESPONSE.put("status", "success");
+						JSON_RESPONSE.put("action", "success");
+						JSON_RESPONSE.put("message", "Transformer Not Enumerated . You may continue !!!");
+						JSON_RESPONSE.put("TM_OM_CODE", rs.getString("TM_OM_CODE"));
+						JSON_RESPONSE.put("TM_STATION_CODE", rs.getString("TM_STATION_CODE"));
+						JSON_RESPONSE.put("TM_FEEDER_CODE", rs.getString("TM_FEEDER_CODE"));
+						JSON_RESPONSE.put("TM_TRANSFORMER_CODE", rs.getString("TM_TRANSFORMER_CODE"));
+						JSON_RESPONSE.put("TM_TRANSFORMER_NAME", rs.getString("TM_TRANSFORMER_NAME"));
+						JSON_RESPONSE.put("TM_CAPACITY_KVA", rs.getString("TM_CAPACITY_KVA"));
+						
+					}
+					
+					if(result_proc.equals("surveyed")) {
+						
+						JSON_RESPONSE.put("status", "error");
+						JSON_RESPONSE.put("message", "Transformer Already Surveyed !!!");
+						
+					}
+					
+					if(result_proc.equals("dup")) {
+						
+						JSON_RESPONSE.put("status", "error");
+						JSON_RESPONSE.put("message", "Transformer Name Already Exists . Cannot Duplicate !!!");
+						
+					}
+					
+					if(result_proc.equals("new")) {
+						
+						JSON_RESPONSE.put("status", "success");
+						JSON_RESPONSE.put("action", "new");
+						JSON_RESPONSE.put("message", "Adding New Transformer !!!");
+						JSON_RESPONSE.put("TIMS_CODE", rs.getString("TIMS_CODE"));
+						JSON_RESPONSE.put("NEW_TC_CODE", rs.getString("NEW_TC_CODE"));
+						
+					}
+				}
+				
+				 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JSON_RESPONSE.put("status", "fail");
+			JSON_RESPONSE.put("message", "Database error occured !!!");
+		}finally {
+			DBManagerResourceRelease.close(ps);
+			DBManagerResourceRelease.close(calstmt);
+		}
+		return JSON_RESPONSE;
+		}
+
+		@Override
+		public JSONObject upserttransformerenumeration(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			CallableStatement calstmt = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			
+			try {
+				
+				 if(object.isEmpty()) {
+					 JSON_RESPONSE.put("status", "error");
+					 JSON_RESPONSE.put("message", "Invalid Object");
+				 }else {
+					
+					/*PROCEDURE UPSERT_TRANSFORMER_ENUMERATION(CUR OUT SYS_REFCURSOR, P_ROW_ID IN VARCHAR2, P_LOCATION_CODE IN VARCHAR2, P_STATION_CODE IN VARCHAR2, P_FEEDER_CODE IN VARCHAR2, 
+                                         P_TRANSFORMER_CODE IN VARCHAR2, P_TRANSFORMER_NAME IN VARCHAR2, P_TIMS_CODE IN VARCHAR2, P_CAPACITY_KVA IN VARCHAR2, P_CONN_LD_KVA IN VARCHAR2, 
+                                         P_LONGITUDE IN VARCHAR2, P_LATTITUDE IN VARCHAR2, P_ALTITUDE IN VARCHAR2, P_REMARKS IN VARCHAR2, 
+                                         P_CREATED_UPDATED_BY IN VARCHAR2, P_VILLAGE IN VARCHAR2, P_IMAGE_PATH IN VARCHAR2) IS */		
+					 
+					 String sql = "{ call UPSERT_TRANSFORMER_ENUMERATION(?,"
+							+ "'" + (String) object.get("rowid") + "'," + "'" + (String) object.get("location_code") + "'," + "'"
+							+ (String) object.get("stationcode") + "'," + "'" + (String) object.get("feedercode") + "','" 
+							+ (String) object.get("transformercode") + "'," + "'" + (String) object.get("transformername") + "','" 
+							+ (String) object.get("timscode") + "'," + "'" + (String) object.get("capacitykva") + "','" 
+							+ (String) object.get("connectedloadkva") + "'," + "'" + (String) object.get("longitude") + "','" 
+							+ (String) object.get("latitude") + "'," + "'" + (String) object.get("altitude") + "'," + "'"
+							+ (String) object.get("remarks") + "'," + "'" + (String) object.get("userid") + "'," + "'"
+							+ (String) object.get("village_name") + "'," + "'" + (String) object.get("imagepath") + "')}";
+
+					 System.out.println(sql);
+				calstmt = dbConn.prepareCall(sql);
+				calstmt.registerOutParameter(1,OracleTypes.CURSOR );
+				calstmt.executeUpdate();
+				
+				rs = (ResultSet) calstmt.getObject(1);
+				String result_proc = "";
+				if(rs.next()) {
+					result_proc = rs.getString("RESP");
+				}
+				
+				if(result_proc.equals("success")) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Transformer Enumeration Inserted/Updated sucessfully .");
+				}else {
+					JSON_RESPONSE.put("status", "fail");
+					JSON_RESPONSE.put("message", "Transformer Enumeration Inserted/Updated Failed !!!");
+				}
+
+				 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JSON_RESPONSE.put("status", "fail");
+			JSON_RESPONSE.put("message", "Transformer Enumeration Inserted/Updated Failed");
+		}finally {
+			DBManagerResourceRelease.close(ps);
+			DBManagerResourceRelease.close(calstmt);
+		}
+		return JSON_RESPONSE;
+	
 		}
 
 

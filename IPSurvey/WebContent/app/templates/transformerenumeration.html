@@ -78,6 +78,17 @@
 								      <option value="">------Select------</option>
 								    </select>
 			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchomsectionlist">O&M Section</label>
+								    <select class="form-control" id="searchomsectionlist" 
+								    ng-model="search.omsection"
+								    ng-options="u as u.value for u in searchomsectionlist" 
+								    ng-disabled="OMSECTIONUSER"  
+								   
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 			</div>
     						</div>	
     						
     						<div class="row mt-3">
@@ -100,17 +111,6 @@
 									      <option value="">------Select------</option>
 									    </select>
 				   		 		</div>
-				   		 		<div class="col-md-2" >
-			    		 		 <label for="searchomsectionlist">O&M Section</label>
-								    <select class="form-control" id="searchomsectionlist" 
-								    ng-model="search.omsection"
-								    ng-options="u as u.value for u in searchomsectionlist" 
-								    ng-disabled="OMSECTIONUSER"  
-								   
-								    >
-								      <option value="">------Select------</option>
-								    </select>
-			   		 			</div>
    								<div class="col-md-2" style="margin-top: 25px;">
 				   		 			<button class="btn btn-sm btn-primary" ng-click="SearchTransformerEnumDetails()">Search</button>
 				   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
@@ -140,16 +140,15 @@
 									      <th>Station</th>
 									      <th>Feeder</th>
 									      <th>Transformer</th>
-									      <th>Village</th>
 									      <th>TIMS Code</th>
+									      <th>Capacity (KVA)</th>
+									      <th>Village</th>
 									      <th>Latitude</th>
 									      <th>Longitude</th>
 									      <th>Altitude</th>
-									      <th>Created By</th>
-									      <th>Created On</th>
+									      <th>Remarks</th>
 									      <th>Updated By</th>
 									      <th>Updated On</th>
-									      <th>Remarks</th>
 									    </tr>
 									  </thead>
 									  <tbody>
@@ -157,20 +156,19 @@
 									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".transformerenumerate-addedit-modal" 
 									  			ng-click="addeditTransformerEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
 									  		<td>{{data.SUBDIVISION_NAME}}</td>
-									  		<td>{{data.OMSECTION_NAME}}</td>
-									  		<td>{{data.TE_STATION_CODE}}</td>
-									  		<td>{{data.TE_FEEDER_CODE}}</td>
+									  		<td>{{data.OM_NAME}}</td>
+									  		<td>{{data.STATION_NAME}}</td>
+									  		<td>{{data.FEEDER_NAME}}</td>
 									  		<td>{{data.TE_TRANSFORMER_NAME}}</td>
-									  		<td>{{data.TE_VILLAGE}}</td>
 									  		<td>{{data.TE_TIMS_CODE}}</td>
+									  		<td>{{data.TE_CAPACITY_KVA}}</td>
+									  		<td>{{data.TE_VILLAGE}}</td>
 									  		<td>{{data.TE_LATTITUDE}}</td>
 									  		<td>{{data.TE_LONGITUDE}}</td>
 									  		<td>{{data.TE_ALTITUDE}}</td>
-									  		<td>{{data.VE_CREATED_BY}}</td>
-									  		<td>{{data.VE_CREATED_ON}}</td>
-									  		<td>{{data.VE_UPDATED_BY}}</td>
-									  		<td>{{data.VE_UPDATED_ON}}</td>
 									  		<td>{{data.TE_REMARKS}}</td>
+									  		<td>{{data.TE_UPDATED_BY}}</td>
+									  		<td>{{data.TE_UPDATED_ON}}</td>
 									  	</tr>
 									  </tbody>
 									</table>
@@ -200,23 +198,23 @@
         <div class="row">
         	<div class="col-md-9">
         	<div class="row mt-3" >
-   		 		<div class="col-md-6">
-					<label for="autocompletetransformername">Transformer Name<span style="color: red;">&nbsp;(Search here & press enter)</span></label>
-			      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletetransformername" 
-			      	 data="SEARCHED_TRANSFORMER_MASTER_DATA" on-type="updateTransformers" ng-enter="verifytransformerexists()"></autocomplete>
-			    </div>
-   		 	</div>	
-   		 	<div class="row mt-3" >
-   		 		<div class="col-md-4">
+        	<div class="col-md-4">
     		 		 <label for="modalomsectionlist">O&M Section</label>
 					    <select class="form-control" id="modalomsectionlist" 
 					    ng-model="modal.omsection"
 					    ng-options="u as u.value for u in modalomsectionlist"  
-					     ng-change="getvillagemasterdatalist()"
+					     ng-change="gettransformermasterdata();getenumeratedvillageslist('');"
 					    >
 					      <option value="">------Select------</option>
 					    </select>
    		 		</div>
+   		 		<div class="col-md-8">
+					<label for="autocompletetransformername">Transformer Name<span style="color: red;">&nbsp;(Search here & press enter)</span></label>
+			      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletetransformername" 
+			      	 data="SEARCHED_TRANSFORMER_MASTER_DATA" on-type="updateTransformers" ng-enter="verifytransformerexists()" ng-disabled="!newuseridexists" ></autocomplete>
+			    </div>
+   		 	</div>	
+   		 	<div class="row mt-3" >
    		 		<div class="col-md-4">
     		 		 <label for="modalstationlist">Station</label>
 					    <select class="form-control" id="modalstationlist" 
@@ -235,6 +233,29 @@
 					    >
 					      <option value="">------Select------</option>
 					    </select>
+   		 		</div>
+   		 		<div class="col-md-4">
+    		 		 <label for="modalvillageslist">Villages</label>
+					    <select class="form-control" id="modalvillageslist" 
+					    ng-model="modal.village"
+					    ng-options="u as u.value for u in getenumeratedvillages"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
+    		 </div>
+    		 <div class="row mt-3" >
+   		 		<div class="col-md-4">
+    		 		 <label for="modaltransformercode">Transformer Code</label>
+					 <input class="form-control" type="text" ng-model="modal.transformercode" id="modaltransformercode" ng-readonly="true">
+   		 		</div>
+   		 		<div class="col-md-4">
+    		 		 <label for="modaltimscode">TIMS Code</label>
+					 <input class="form-control" type="text" ng-model="modal.timscode" id="modal.timscode" ng-readonly="true">
+   		 		</div>
+   		 		<div class="col-md-4">
+    		 		  <label for="modalcapacitykva">Capacity KVA</label>
+					 <input class="form-control" type="text" ng-model="modal.capacitykva" id="modal.capacitykva" ng-readonly="newuseridexists">
    		 		</div>
     		 </div>
     		 <div class="row mt-3" >
