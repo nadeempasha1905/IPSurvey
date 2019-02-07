@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response;
 
 import com.ipsurvey.enumeration.EnumerationImpl;
 import com.ipsurvey.enumeration.IEnumeration;
+import com.ipsurvey.map.IViewMap;
+import com.ipsurvey.map.ViewMapImpl;
 import com.ipsurvey.user.IUserManagement;
 import com.ipsurvey.user.UserManagementImpl;
 import com.ipsurvey.util.IUtility;
@@ -39,6 +41,7 @@ public class ServiceRouter {
 	IUtility utilObj = new UtilityImpl();
 	IUserManagement userObj = new UserManagementImpl();
 	IEnumeration enumObj =  new EnumerationImpl();
+	IViewMap mapObj =  new ViewMapImpl();
 	
 	@POST
 	@Path("/signin_pc")
@@ -237,7 +240,23 @@ public class ServiceRouter {
 	}
 	
 	
+	/**********************************/
+	//View Map
 	
+	@POST
+	@Path("/gettransformerpoints")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject gettransformerpoints(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return mapObj.gettransformerpoints(object,ipAdress);
+	}
+	
+	
+	
+	
+	
+	/*********************************/
 	
 	
 	

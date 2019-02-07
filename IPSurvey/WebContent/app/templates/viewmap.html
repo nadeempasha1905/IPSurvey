@@ -34,17 +34,95 @@
                     <span class="sidebar-close"><span class="glyphicon glyphicon-menu-left"></span></span>                    
                 </h1><br>	
                 <form class="form-compact" role="form" name="mapform">
-                
                 <div class="form-group">
+                <small>
 					<label>Search By:</label>
-						<select class="form-control" ng-model="filterby" style="width:200px;" ng-change="">
+						<select class="form-control" ng-model="filterby" style="width:60%;height:30px;    font-size: small;" ng-change="">
 							    <option value="transformer" selected="selected">Transformer</option>	
 							    <option value="ipset">IP-set</option>	
 					</select>
+                </small>
 				 </div>
+				 
+				 <div class="form-group">
+	                <small>
+	                	<label for="searchcirclelist">Zone</label>
+	                	 <select class="form-control" id="searchzonelist"  style="width:60%;height:30px;    font-size: small;"
+						    ng-model="search.zone"
+						    ng-options="u as u.value for u in searchzonelist" ng-change="getcircleList([],null,'search')" 
+						    ng-disabled="ZONEUSER || CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER">
+						      <option value="">------Select------</option>
+						    </select>
+	                </small>
+                </div>
                 
-			     <button type="button" ng-disabled="mapform.$invalid" class="btn btn-primary" ng-click="setFilterts()">Search</button>&nbsp;&nbsp;
-			     <button type="button" class="btn btn-default" ng-click="">Reset</button>          	
+                 <div class="form-group">
+	                <small>
+	                	 <label for="searchcirclelist">Circle</label>
+								    <select class="form-control" id="searchcirclelist"  style="width:60%;height:30px;    font-size: small;"
+								    ng-model="search.circle"
+								    ng-options="u as u.value for u in searchcirclelist" ng-change="getdivisionList([],null,'search')" 
+								    ng-disabled="CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+	                </small>
+                </div>
+                 <div class="form-group">
+	                <small>
+	                	 <label for="searchdivisionlist">Division</label>
+								    <select class="form-control" id="searchdivisionlist" style="width:60%;height:30px;    font-size: small;"
+								    ng-model="search.division"
+								    ng-options="u as u.value for u in searchdivisionlist" ng-change="getsubdivisionList([],null,'search')" 
+								    ng-disabled="DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+	                </small>
+                </div>
+                
+                 <div class="form-group">
+	                <small>
+	                	  <label for="searchsubdivisionlist">Sub-Division</label>
+								    <select class="form-control" id="searchsubdivisionlist" style="width:60%;height:30px;    font-size: small;"
+								    ng-model="search.subdivision"
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search')" 
+								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+	                </small>
+                </div>
+                
+                 <div class="form-group">
+	                <small>
+	                	<label for="searchomsectionlist">O&M Section</label>
+						    <select class="form-control" id="searchomsectionlist"  style="width:60%;height:30px;    font-size: small;"
+						    ng-model="search.omsection"
+						    ng-options="u as u.value for u in searchomsectionlist" 
+						    ng-disabled="OMSECTIONUSER"  
+						   ng-change="getenumeratedvillageslist();"
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	                </small>
+                </div>
+                
+                <div class="form-group">
+	                <small>
+     	                 <label for="modalvillageslist">Villages</label>
+					    <select class="form-control" id="modalvillageslist" style="width:60%;height:30px;    font-size: small;"
+					    ng-model="modal.village"
+					    ng-options="u as u.value for u in getenumeratedvillages"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+	                </small>
+                </div>
+                
+
+			     <button type="button" ng-disabled="mapform.$invalid" class="btn btn-primary" ng-click="applyfiletrs()">Search</button>&nbsp;&nbsp;
+			     <button type="button" class="btn btn-secondary" ng-click="">Reset</button>          	
                  </form>
                  
                  
