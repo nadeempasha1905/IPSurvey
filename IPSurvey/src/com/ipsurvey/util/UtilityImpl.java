@@ -421,7 +421,9 @@ public class UtilityImpl implements IUtility{
 		JSONObject JSON_RESPONSE = new JSONObject();
 		
 		try {
-			String get_permission_query = " select VE_VILLAGE_NAME from VILLAGE_ENUMERATION  where VE_LOCATION_CODE = '211030102'   order by nvl(VE_UPDATED_ON,VE_CREATED_ON) desc " ;
+			String get_permission_query = " select VE_VILLAGE_NAME from VILLAGE_ENUMERATION  "
+					+ " where VE_LOCATION_CODE = '"+(String)object.get("location_code")+"'   "
+							+ " order by nvl(VE_UPDATED_ON,VE_CREATED_ON) desc " ;
 			
 			ps = dbConn.prepareStatement(get_permission_query);
 			rs = ps.executeQuery();
@@ -433,6 +435,41 @@ public class UtilityImpl implements IUtility{
 			}
 			JSON_RESPONSE.put("status", "success");
 			JSON_RESPONSE.put("VILLAGE_ENUM_DATA", json_array);
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		return JSON_RESPONSE;
+	}
+
+	@Override
+	public JSONObject getenumeratedtransformerslist(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " select TE_TRANSFORMER_CODE, TE_TRANSFORMER_NAME  "
+					+ " from TRANSFORMER_ENUMERATION  "
+					+ " where TE_OM_CODE = '"+(String)object.get("location_code")+"'   "
+					+ " order by nvl(TE_UPDATED_ON,TE_CREATED_ON) desc " ;
+			
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				json = new JSONObject();
+				json.put("key", 	rs.getString("TE_TRANSFORMER_CODE"));
+				json.put("value", 	rs.getString("TE_TRANSFORMER_NAME"));
+				json_array.add(json);
+			}
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("TRANSFORMER_ENUM_DATA", json_array);
 		} catch (Exception e) { 
 			// TODO Auto-generated catch block
 			e.printStackTrace();

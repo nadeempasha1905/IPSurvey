@@ -222,6 +222,15 @@ public class ServiceRouter {
 	}
 	
 	@POST
+	@Path("/getenumeratedtransformerslist")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getenumeratedtransformerslist(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return utilObj.getenumeratedtransformerslist(object,ipAdress);
+	}
+	
+	@POST
 	@Path("/validatetransformerdetails")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
@@ -250,6 +259,15 @@ public class ServiceRouter {
 	public JSONObject gettransformerpoints(final JSONObject object, @Context HttpServletRequest request){
 		String ipAdress = request.getRemoteHost();
 		return mapObj.gettransformerpoints(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getmappingpoints")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getmappingpoints(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return mapObj.getmappingpoints(object,ipAdress);
 	}
 	
 	

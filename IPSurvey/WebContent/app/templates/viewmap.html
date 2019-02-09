@@ -34,7 +34,7 @@
                     <span class="sidebar-close"><span class="glyphicon glyphicon-menu-left"></span></span>                    
                 </h1><br>	
                 <form class="form-compact" role="form" name="mapform">
-                <div class="form-group">
+               <!--  <div class="form-group">
                 <small>
 					<label>Search By:</label>
 						<select class="form-control" ng-model="filterby" style="width:60%;height:30px;    font-size: small;" ng-change="">
@@ -42,7 +42,7 @@
 							    <option value="ipset">IP-set</option>	
 					</select>
                 </small>
-				 </div>
+				 </div> -->
 				 
 				 <div class="form-group">
 	                <small>
@@ -86,7 +86,7 @@
 	                	  <label for="searchsubdivisionlist">Sub-Division</label>
 								    <select class="form-control" id="searchsubdivisionlist" style="width:60%;height:30px;    font-size: small;"
 								    ng-model="search.subdivision"
-								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search')" 
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList('search');" 
 								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
 								    >
 								      <option value="">------Select------</option>
@@ -101,10 +101,35 @@
 						    ng-model="search.omsection"
 						    ng-options="u as u.value for u in searchomsectionlist" 
 						    ng-disabled="OMSECTIONUSER"  
-						   ng-change="getenumeratedvillageslist();"
+						   ng-change="getenumeratedvillageslist();getenumeratedtransformerslist();"
 						    >
 						      <option value="">------Select------</option>
 						    </select>
+	                </small>
+                </div>
+                
+                <div class="form-group">
+	                <small>
+     	                 <label for="searchstationlist">Station</label>
+						    <select class="form-control" id="searchstationlist"  style="width:60%;height:30px;    font-size: small;" 
+						    ng-model="search.station"
+						    ng-options="u as u.value for u in searchstationlist" ng-change="getFeederList('search')" 
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	                </small>
+                </div>
+                
+                <div class="form-group">
+	                <small>
+	                	 <label for="searchstationlist">Feeder</label>
+     	              <select class="form-control" id="searchfeederlist"  style="width:60%;height:30px;    font-size: small;"  
+					    ng-model="search.feeder"
+					    ng-options="u as u.value for u in searchfeederlist" 
+					   
+					    >
+					      <option value="">------Select------</option>
+					    </select>
 	                </small>
                 </div>
                 
@@ -120,9 +145,21 @@
 	                </small>
                 </div>
                 
+                 <div class="form-group">
+	                <small>
+     	                 <label for="modaltransformerslist">Transformers</label>
+					    <select class="form-control" id="modaltransformerslist" style="width:60%;height:30px;    font-size: small;"
+					    ng-model="modal.transformers"
+					    ng-options="u as u.value for u in getenumeratedtransformers"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+	                </small>
+                </div>
+                
 
-			     <button type="button" ng-disabled="mapform.$invalid" class="btn btn-primary" ng-click="applyfiletrs()">Search</button>&nbsp;&nbsp;
-			     <button type="button" class="btn btn-secondary" ng-click="">Reset</button>          	
+			     <button type="button" ng-disabled="mapform.$invalid" class="btn btn-primary btn-sm" ng-click="applyfiletrs()">Search</button>&nbsp;&nbsp;
+			     <button type="button" class="btn btn-secondary  btn-sm" ng-click="">Reset</button>          	
                  </form>
                  
                  

@@ -190,6 +190,7 @@ angular.module('ipsurveyapp.Controllers', [])
 					$scope.searchsubdivisionlist = response.SUBDIVISION_LIST;
 					if(arr.length > 0){
 						$scope.search.subdivision = $filter('filter')($scope.searchsubdivisionlist,{key:arr[3]},true)[0];
+						$scope.getStationList('search');
 						if(usertype > 4){
 							$scope.getomsectionList(arr,usertype,'search');
 						}else{
@@ -239,6 +240,65 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 		};
 		
+		$scope.getStationList = function(searchtype,editstationcode,editfeedercode){
+			if(searchtype === 'search'){
+				$scope.searchstationlist=[];$scope.searchfeederlist=[];
+				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){
+					return;
+				}
+				remote.load("getstationlist", function(response){
+					$scope.searchstationlist = response.STATION_MASTER_DATA;
+				},{
+					location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
+				}, 'POST');
+			}else{
+				$scope.modalstationlist=[];$scope.modalfeederlist=[];
+				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){
+					return;
+				}
+				remote.load("getstationlist", function(response){
+					$scope.modalstationlist = response.STATION_MASTER_DATA;
+					if(editstationcode != null){
+						$scope.modal.station =  $filter('filter')($scope.modalstationlist,{key:editstationcode},true)[0];
+						$scope.getFeederList('modal',editstationcode,editfeedercode);
+					}
+				},{
+					location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
+				}, 'POST');
+			}
+			
+			
+		};
+		
+		$scope.getFeederList = function(searchtype,editstationcode,editfeedercode){
+			if(searchtype === 'search'){
+				$scope.searchfeederlist=[];
+				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){return;}
+				if($scope.search.station === undefined || $scope.search.station === null){return;}
+				remote.load("getfeederlist", function(response){
+					$scope.searchfeederlist = response.FEEDER_MASTER_DATA;
+				},{
+					location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key),
+					station_code:($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key)
+				}, 'POST');
+			}else{
+				$scope.modalfeederlist=[];
+				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){return;}
+				if($scope.modal.station === undefined || $scope.modal.station === null){return;}
+				remote.load("getfeederlist", function(response){
+					$scope.modalfeederlist = response.FEEDER_MASTER_DATA;
+					if(editfeedercode != null){
+						$scope.modal.feeder  =  $filter('filter')($scope.modalfeederlist,{key:editfeedercode},true)[0];
+					}
+				},{
+					location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key),
+					station_code:($scope.modal.station === undefined || $scope.modal.station === null ? '' : $scope.modal.station.key)
+				}, 'POST');
+			}
+			
+			
+		};
+		
 		$scope.getenumeratedvillageslist = function(value){
 			$scope.getenumeratedvillages = [];
 			if($scope.search.omsection === undefined || $scope.search.omsection === null){
@@ -250,6 +310,19 @@ angular.module('ipsurveyapp.Controllers', [])
 				if(value != null || value.length >0){
 					$scope.modal.village =  $filter('filter')($scope.getenumeratedvillages,{key:value},true)[0];
 				}
+			},{
+				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key)
+			}, 'POST');
+		};
+		
+		$scope.getenumeratedtransformerslist = function(value){
+			$scope.getenumeratedtransformers = [];
+			if($scope.search.omsection === undefined || $scope.search.omsection === null){
+				notify.warn("Please select O&M Section !!!");
+				return;
+			}
+			remote.load("getenumeratedtransformerslist", function(response){
+				$scope.getenumeratedtransformers = response.TRANSFORMER_ENUM_DATA;
 			},{
 				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key)
 			}, 'POST');
@@ -274,6 +347,11 @@ angular.module('ipsurveyapp.Controllers', [])
 						    });  
 		 			   
 		}*/
+		
+		
+		
+		var markers = [];
+		var layerGroup;
 		
 		$scope.init_leaflet = function(){
 			
@@ -309,6 +387,9 @@ angular.module('ipsurveyapp.Controllers', [])
 			L.control.zoom({
 				position: 'bottomright'
 			}).addTo(map);
+			
+			
+			layerGroup = L.layerGroup().addTo(map)
 			
 /*			// create a red polyline from an array of LatLng points
 			var latlngs = [
@@ -349,9 +430,153 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		$scope.applyfiletrs = function(){
 			
-			$scope.gettransformerpoints();
+			if($scope.search.omsection === undefined || $scope.search.omsection === null){notify.warn("Please select O&M Section !!!");return;}
+			
+			//$scope.gettransformerpoints();
+			$scope.getmappingpoints();
 			
 			$('#sidebar').toggleClass('collapsed');
+			
+		};
+		
+		$scope.getmappingpoints = function(){
+			
+			layerGroup.clearLayers();
+			$scope.mappingpoints = [];
+			var lat_to_center = "",lng_to_center = ""
+			var icon_transformer 		= L.icon({iconUrl: 'app/images/map/powersubstation_black.png'});
+			var icon_transformer25 		= L.icon({iconUrl: 'app/images/map/powersubstation_blue_25.png'});
+			var icon_transformer63 		= L.icon({iconUrl: 'app/images/map/powersubstation_grey_63.png'});
+			var icon_transformer100 		= L.icon({iconUrl: 'app/images/map/powersubstation_green_100.png'});
+			var icon_transformer160 		= L.icon({iconUrl: 'app/images/map/powersubstation_white_25.png'});
+			var icon_transformer250 		= L.icon({iconUrl: 'app/images/map/powersubstation_red_250.png'});
+			var icon_ipset 				= L.icon({iconUrl: 'app/images/map/information_red.png'});
+			var icon_village 			= L.icon({iconUrl: 'app/images/map/smallcity.png'});
+			
+			
+			
+			
+			remote.load("getmappingpoints", function(response){
+				$scope.mappingpoints = response.data;
+				
+				if($scope.mappingpoints.length == 0 ){
+					$scope.reset();
+					notify.error("No Records Found !!!!");
+					return;
+				}
+				
+				$scope.mappingpoints.map(function(e,index){
+					
+					if($scope.modal.transformers != undefined || $scope.modal.transformers != null){
+						
+						if(index === 0){
+							lat_to_center = e.TC_LATTITUDE;
+							lng_to_center = e.TC_LONGITUDE;
+							
+							var html='<table class="table table-condensed table-bordered" id="tableId" style="font-size: 12px;">';
+							html+="<tr>";
+							html+="<td colspan='4' style='width: 300px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>Transformer Details</b></td>";
+							html+="</tr><tr><td ><b>O&M Section</b></td><td >"+e.OM_NAME+"</td><td ><b>Village Name</b></td><td >"+e.VILLAGE_NAME+"</td>";
+							html+="</tr><tr><td ><b>Transformer Name</b></td><td >"+e.TC_NAME+"</td><td ><b>Capacity (KVA)</b></td><td >"+e.TC_CAPACITY_KVA+"</td>";
+							html+="</tr><tr><td ><b>Station Name</b></td><td >"+e.STATION_NAME+"</td><td ><b>Feeder Name</b></td><td >"+e.FEEDER_NAME+"</td>";
+							html+="</tr><tr><td ><b>Latitude</b></td><td >"+e.TC_LATTITUDE+"</td><td ><b>Longitude</b></td><td >"+e.TC_LONGITUDE+"</td>";
+							
+							var linkFunction = $compile(angular.element(html));
+							console.log(linkFunction)
+							
+							var icon = "";
+							if(e.TC_CAPACITY_KVA === "25"){icon=icon_transformer25;}else if(e.TC_CAPACITY_KVA === "63"){icon=icon_transformer63;}else if(e.TC_CAPACITY_KVA === "100"){icon=icon_transformer100;}
+							else if(e.TC_CAPACITY_KVA === "160"){icon=icon_transformer160;}else if(e.TC_CAPACITY_KVA === "250"){icon=icon_transformer250;}else {icon=icon_transformer;}
+							
+							L.marker([e.TC_LATTITUDE, e.TC_LONGITUDE], {icon: icon})
+							.bindPopup(L.popup({minWidth: 400, maxWidth: 500}).setContent(linkFunction($scope)[0]))
+							.addTo(layerGroup);
+							
+							lat_to_center = e.VILLAGE_LATTITUDE;
+							lng_to_center = e.VILLAGE_LONGITUDE;
+							html='<table class="table table-condensed table-bordered" id="tableId" style="font-size: 12px;">';
+							html+="<tr>";
+							html+="<td colspan='4' style='width: 300px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>Transformer Details</b></td>";
+							html+="</tr><tr><td ><b>O&M Section</b></td><td >"+e.OM_NAME+"</td><td ><b>Village Name</b></td><td >"+e.VILLAGE_NAME+"</td>";
+							linkFunction = $compile(angular.element(html));
+							L.marker([e.VILLAGE_LATTITUDE, e.VILLAGE_LONGITUDE], {icon: icon_village})
+							.bindPopup(L.popup({minWidth: 400, maxWidth: 500}).setContent(linkFunction($scope)[0]))
+							.addTo(layerGroup);
+						}
+
+						var html='<table class="table table-condensed table-bordered" id="tableId" style="font-size: 12px;">';
+						html+="<tr>";
+						html+="<td colspan='6' style='width: 900px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>IP-Set Details</b></td>";
+						html+="</tr><tr><td ><b>O&M Section</b></td><td >"+e.OM_NAME+"</td><td ><b>Village Name</b></td><td >"+e.VILLAGE_NAME+"</td><td ><b>Station Name</b></td><td >"+e.STATION_NAME+"</td>";
+						html+="</tr><tr><td ><b>Feeder Name</b></td><td >"+e.FEEDER_NAME+"</td><td ><b>Transformer Name</b></td><td >"+e.TC_NAME+"</td><td ><b>Capacity (KVA)</b></td><td >"+e.TC_CAPACITY_KVA+"</td>";
+						html+="</tr><tr><td ><b>RR Number</b></td><td >"+e.RR_NO+"</td><td ><b>Consumer Name</b></td><td >"+e.CUSTOMER_NAME+"</td><td ><b>Address</b></td><td >"+e.ADDRESS1 +" "+e.ADDRESS2+"</td>";
+						html+="</tr><tr><td ><b>Load (HP)</b></td><td >"+e.LOAD_HP+"</td><td ><b>Service Date</b></td><td >"+e.SERVICE_DATE+"</td><td ><b>Inspection Date</b></td><td >"+e.INSPECTION_DATE+"</td>";
+						html+="</tr><tr><td ><b>Connection Type</b></td><td >"+e.CONNECTION_TYPE+"</td><td ><b>Consumer Status</b></td><td >"+e.CUSTOMER_STATUS+"</td><td ><b>Water Source</b></td><td >"+e.WATER_SOURCE+"</td>";
+						html+="</tr><tr><td ><b>Meter Make</b></td><td >"+e.METER_MAKE+"</td><td ><b>Meter Sl.No</b></td><td >"+e.METER_SLNO+"</td><td ><b>Meter Type</b></td><td >"+e.METER_TYPE+"</td>";
+						html+="</tr><tr><td ><b>Current (B)</b></td><td >"+e.CURRENT_B+"</td><td ><b>Current (R)</b></td><td >"+e.CURRENT_R+"</td><td ><b>Current (Y)</b></td><td >"+e.CURRENT_Y+"</td>";
+						html+="</tr><tr><td ><b>VOLTAGE (BR)</b></td><td >"+e.VOLTAGE_BR+"</td><td ><b>VOLTAGE (RB)</b></td><td >"+e.VOLTAGE_RB+"</td><td ><b>VOLTAGE (RY)</b></td><td >"+e.VOLTAGE_RY+"</td>";
+						html+="</tr><tr><td ><b>Remarks</b></td><td colspan='5'>"+e.REMARKS+"</td>";
+						
+						var linkFunction = $compile(angular.element(html));
+						console.log(linkFunction)
+						
+						L.marker([e.IP_LATTITUDE, e.IP_LONGITUDE], {icon: icon_ipset})
+						.bindPopup(L.popup({minWidth: 400, maxWidth: 900}).setContent(linkFunction($scope)[0]))
+						.addTo(layerGroup);
+					
+						
+					}else{
+						
+						//if(index === 0){
+							lat_to_center = e.TC_LATTITUDE;
+							lng_to_center = e.TC_LONGITUDE;
+						//}
+						
+						var html='<table class="table table-condensed table-bordered" id="tableId" style="font-size: 12px;">';
+						html+="<tr>";
+						html+="<td colspan='4' style='width: 300px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>Transformer Details</b></td>";
+						html+="</tr><tr><td ><b>O&M Section</b></td><td >"+e.OM_NAME+"</td><td ><b>Village Name</b></td><td >"+e.VILLAGE_NAME+"</td>";
+						html+="</tr><tr><td ><b>Transformer Name</b></td><td >"+e.TC_NAME+"</td><td ><b>Capacity (KVA)</b></td><td >"+e.TC_CAPACITY_KVA+"</td>";
+						html+="</tr><tr><td ><b>Station Name</b></td><td >"+e.STATION_NAME+"</td><td ><b>Feeder Name</b></td><td >"+e.FEEDER_NAME+"</td>";
+						html+="</tr><tr><td ><b>Latitude</b></td><td >"+e.TC_LATTITUDE+"</td><td ><b>Longitude</b></td><td >"+e.TC_LONGITUDE+"</td>";
+						
+						var linkFunction = $compile(angular.element(html));
+						console.log(linkFunction)
+						
+						var icon = "";
+						if(e.TC_CAPACITY_KVA === "25"){icon=icon_transformer25;}
+						else if(e.TC_CAPACITY_KVA === "63"){icon=icon_transformer63;}
+						else if(e.TC_CAPACITY_KVA === "100"){icon=icon_transformer100;}
+						else if(e.TC_CAPACITY_KVA === "160"){icon=icon_transformer160;}
+						else if(e.TC_CAPACITY_KVA === "250"){icon=icon_transformer250;}
+						else {icon=icon_transformer;}
+						
+						L.marker([e.TC_LATTITUDE, e.TC_LONGITUDE], {icon: icon})
+						.bindPopup(L.popup({minWidth: 400, maxWidth: 500}).setContent(linkFunction($scope)[0]))
+						.addTo(layerGroup);
+					}
+					
+				});
+				
+				map.setView(new L.LatLng(lat_to_center, lng_to_center),13);
+				
+			},{
+				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key),
+				station_code :($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key),
+				feeder_code  :($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key),
+				village      :($scope.modal.village === undefined || $scope.modal.village === null ? '' : $scope.modal.village.key),
+				transformer_code:($scope.modal.transformers === undefined || $scope.modal.transformers === null ? '' : $scope.modal.transformers.key)
+			}, 'POST');
+			
+			
+		};
+		
+		$scope.reset = function(){
+			
+			layerGroup.clearLayers();
+			$scope.mappingpoints = [];
+			map.setView(new L.LatLng(12.91723, 74.85603),5);
+			$scope.initialize();
 			
 		};
 		
@@ -370,7 +595,8 @@ angular.module('ipsurveyapp.Controllers', [])
 						lat = e.TE_LATTITUDE;
 						lng = e.TE_LONGITUDE;
 					}
-					L.marker([e.TE_LATTITUDE, e.TE_LONGITUDE], {icon: myIcon}).addTo(map);
+					L.marker([e.TE_LATTITUDE, e.TE_LONGITUDE], {icon: myIcon}).addTo(map)
+					.bindPopup('A pretty CSS3 popup.<br> Easily customizable.');
 				});
 				
 				//map.panTo(new L.LatLng(lat, lng));

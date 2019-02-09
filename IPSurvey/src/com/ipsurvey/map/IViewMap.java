@@ -12,6 +12,8 @@ import net.sf.json.JSONObject;
 public interface IViewMap {
 
 	JSONObject gettransformerpoints(JSONObject object, String ipAdress);
+
+	JSONObject getmappingpoints(JSONObject object, String ipAdress);
 	
 	
 

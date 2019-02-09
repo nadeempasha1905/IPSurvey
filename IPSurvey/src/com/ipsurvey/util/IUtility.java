@@ -34,4 +34,6 @@ public interface IUtility {
 
 	JSONObject getenumeratedvillageslist(JSONObject object, String ipAdress);
 	
+	JSONObject getenumeratedtransformerslist(JSONObject object, String ipAdress);
+	
 }
