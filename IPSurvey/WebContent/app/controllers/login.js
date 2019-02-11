@@ -27,7 +27,8 @@ angular.module('ipsurveyapp.Controllers', [])
 					
 					store.set('userinfo', response);
 					
-					$state.go("home");
+					/*$state.go("home");*/
+					$state.go("viewmap");
 				}else{
 					
 				}

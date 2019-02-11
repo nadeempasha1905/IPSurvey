@@ -23,5 +23,7 @@ public interface IUserManagement {
 	JSONObject verifyuserid(JSONObject object, HttpServletRequest request, HttpServletResponse response);
 
 	JSONObject upsertuserdetails(JSONObject object, HttpServletRequest request, HttpServletResponse response);
+	
+	JSONObject chnagepassword(JSONObject object, HttpServletRequest request, HttpServletResponse response);
 
 }

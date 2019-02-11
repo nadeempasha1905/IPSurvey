@@ -166,6 +166,14 @@ public class ServiceRouter {
 	public JSONObject upsertuserdetails(final JSONObject object,@Context HttpServletRequest request,@Context HttpServletResponse response){
 		return userObj.upsertuserdetails(object,request,response);
 	}
+	
+	@POST
+	@Path("/chnagepassword")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject chnagepassword(final JSONObject object,@Context HttpServletRequest request,@Context HttpServletResponse response){
+		return userObj.chnagepassword(object,request,response);
+	}
 
 	@POST
 	@Path("/getvillagemasterdata")

@@ -203,7 +203,7 @@ angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies','utility','a
        
 }])
 
-.controller("navCtrl", function($scope,$rootScope,$state,store,$window){
+.controller("navCtrl", function($scope,$rootScope,$state,store,$window,$timeout){
 	console.log("navCtrl");
 	
 	//$scope.IsLoggedIn = false;
@@ -221,8 +221,12 @@ angular.module('ipsurveyapp',['ui.router','oc.lazyLoad','ngCookies','utility','a
 		 store.remove('userinfo');
 		 $rootScope.IsLoggedIn = false;
 		 
-		 $state.go("login");
-		 $window.location.reload(true); 
+		 $timeout(function(){
+			 $state.go("login");
+			 $window.location.reload(true); 
+		 },1000);
+		 
+		
 		 
 	 };
 })

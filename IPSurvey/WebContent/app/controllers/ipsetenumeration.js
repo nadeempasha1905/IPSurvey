@@ -417,19 +417,31 @@ angular.module('ipsurveyapp.Controllers', [])
 			if($scope.modal.omsection === undefined || $scope.modal.omsection === null){notify.error("Please Select O&M Section !!!");	return;	}
 			if($scope.modal.transformers === undefined || $scope.modal.transformers === null){notify.error("Please Select Transformer !!!");	return;	}
 			
-			remote.load("getipcodenumber", function(response){
-				$scope.modal.codenumber = response.code_number;
-				if(value){
-					if($scope.modal.connectiontypes != undefined || $scope.modal.connectiontypes != null){
+				if($scope.modal.connectiontypes != undefined || $scope.modal.connectiontypes != null){
+					if(value){
 						if($scope.modal.connectiontypes.key === '2' || $scope.modal.connectiontypes.key === '3'){
-							$scope.modal.codenumber =  response.code_number;
+							remote.load("getipcodenumber", function(response){
+								$scope.modal.codenumber = response.code_number;
+								$scope.modal.rrnumber =  response.code_number;
+							},{
+								om_code:$scope.modal.omsection.key,
+								transformer_code:$scope.modal.transformers.key
+							}, 'POST');
+						}else{
+							$scope.modal.codenumber = '';
+							$scope.modal.rrnumber =  '';
 						}
+					}else{
+						remote.load("getipcodenumber", function(response){
+							$scope.modal.codenumber = response.code_number;
+						},{
+							om_code:$scope.modal.omsection.key,
+							transformer_code:$scope.modal.transformers.key
+						}, 'POST');
 					}
+				}else{
+					notify.error("Please Select Connection Type !!!");	return;
 				}
-			},{
-				om_code:$scope.modal.omsection.key,
-				transformer_code:$scope.modal.transformers.key
-			}, 'POST');
 		};
 		
 		
@@ -462,9 +474,16 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal_heading = "Add Ipset Enumeration Data";
 				$scope.newuseridexists = true;
 				
+				$scope.modal.rrnumber = '';
+				$scope.modal.codenumber = '';
+				$scope.modal.consumername = '';
+				$scope.modal.address1 = '';
+				$scope.modal.address2 = '';
 				$scope.modal.loadkw = '0';
 				$scope.modal.loadhp = '5';
-				
+				$scope.modal.meterslno = '';
+				$scope.modal.finalreading = '';
+
 				$scope.modal.voltage1 = '';
 				$scope.modal.voltage2 = '';
 				$scope.modal.voltage3 = '';
@@ -504,8 +523,8 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.consumername = record.IE_CUSTOMER_NAME;
 				$scope.modal.address1 = record.IE_ADDRESS1;
 				$scope.modal.address2 = record.IE_ADDRESS2;
-				$scope.modal.servicedate = '';
-				$scope.modal.inspectiondate = '';
+				$scope.modal.servicedate =  record.IE_SERVICE_DATE;
+				$scope.modal.inspectiondate =  record.IE_INSPECTION_DATE;
 				$scope.modal.meterslno = record.IE_MTR_SLNO;
 				$scope.modal.finalreading = record.IE_FINAL_READING;
 				$scope.modal.loadkw = record.IE_LOAD_KW;
@@ -728,17 +747,19 @@ angular.module('ipsurveyapp.Controllers', [])
 			},{
 				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key),
 				station_code:($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key),
-				feeder_code:($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key)
+				feeder_code:($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key),
+				transformer_code:($scope.search.transformers === undefined || $scope.search.transformers === null ? '' : $scope.search.transformers.key),
+				rr_no:($scope.search.rrnumber === undefined || $scope.search.rrnumber === null || $scope.search.rrnumber === '' ? '' : $scope.search.rrnumber),
+				village:($scope.search.village === undefined || $scope.search.village === null ? '' : $scope.search.village.key)
 			}, 'POST');
 			
 		};
 		
-		$scope.getipcodeforunauthoriseandunidentified = function(){
-			
-			
+		$scope.ResetUserDetails = function(){
+			$scope.IPSET_ENUM_DATA = [];
+			$scope.initialize();
 			
 		};
-		
 		
 		$scope.initialize();
 		

@@ -384,4 +384,46 @@ public class UserManagementImpl implements IUserManagement {
 	}
 	return JSON_RESPONSE;
 	}
+
+	@Override
+	public JSONObject chnagepassword(JSONObject object, HttpServletRequest request, HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		PreparedStatement ps = null;
+		CallableStatement calstmt = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			
+			if (object.isEmpty()) {
+				JSON_RESPONSE.put("status", "error");
+				JSON_RESPONSE.put("message", "Invalid Object");
+			} else {
+
+				String sql = " UPDATE DEVICE_USER_MASTER SET DUM_PASSWORD='"+ EncriptAndDecript.encrypt((String) object.get("pass"))+"' WHERE DUM_USER_ID = '"+ (String) object.get("userid")+"' ";
+
+				ps = dbConn.prepareStatement(sql);
+
+				System.out.println(sql);
+
+				int result_proc = ps.executeUpdate();
+				if (result_proc > 0) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Password Changed Succesfully !!! .");
+				} else {
+					JSON_RESPONSE.put("status", "error");
+					JSON_RESPONSE.put("message", "Password Not Changed !!! .");
+				}
+
+			}
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		JSON_RESPONSE.put("status", "fail");
+		JSON_RESPONSE.put("message", "Error Occured . Password Not Changed !!! .");
+	}finally {
+		DBManagerResourceRelease.close(ps);
+		DBManagerResourceRelease.close(calstmt);
+	}
+	return JSON_RESPONSE;
+	}
 }

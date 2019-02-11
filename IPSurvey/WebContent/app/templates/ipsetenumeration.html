@@ -119,7 +119,7 @@
 									    </select>
 				   		 		</div>
 				   		 		<div class="col-md-2" >
-				    		 		  <label for="searchvillageslist">Villages</label>
+				    		 		  <label for="searchvillageslist">Village</label>
 									    <select class="form-control" id="searchvillageslist"  
 									    ng-model="search.village"
 									    ng-options="u as u.value for u in getenumeratedvillages"  
@@ -136,6 +136,10 @@
 									      <option value="">------Select------</option>
 									    </select>
 				   		 		</div>
+				   		 		<div class="col-md-2">
+				    		 		<label for="searchrrnumber">RR Number</label>
+									 <input class="form-control" type="text" ng-model="search.rrnumber" autocomplete="off">
+				    		 	</div>
    								<div class="col-md-2" style="margin-top: 25px;">
 				   		 			<button class="btn btn-sm btn-primary" ng-click="SearchIpsetEnumDetails()">Search</button>
 				   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
@@ -167,7 +171,7 @@
 											<th>Transformer</th>
 											<th>Village</th>
 											<th>RR number</th>
-											<th>Ip Code Number</th>
+											<th>Code Number</th>
 											<th>Consumer Name</th>
 											<th>Address1</th>
 											<th>Address2</th>
@@ -181,6 +185,8 @@
 											<th>Meter Type</th>
 											<th>Meter Sl. No.</th>
 											<th>Final Reading</th>
+											<th>Service Date</th>
+											<th>Inspection Date</th>
 											<th>Load (KW)</th>
 											<th>Load (HP)</th>
 											<th>Voltage-1</th>
@@ -212,15 +218,17 @@
 									  		<td>{{data.IE_ADDRESS1}}</td>
 									  		<td>{{data.IE_ADDRESS2}}</td>
 									  		<td>{{data.IE_PHONE_NUMBER}}</td>
-									  		<td>{{data.IE_CONNECTION_TYPE}}</td>
-									  		<td>{{data.IE_CUSTOMER_STATUS}}</td>
-									  		<td>{{data.IE_WATER_SOURCE}}</td>
-									  		<td>{{data.IE_SCHEME}}</td>
+									  		<td>{{data.IE_CONNECTION_TYPE_DESCR}}</td>
+									  		<td>{{data.IE_CUSTOMER_STATUS_DESCR}}</td>
+									  		<td>{{data.IE_WATER_SOURCE_DESCR}}</td>
+									  		<td>{{data.IE_SCHEME_DESCR}}</td>
 									  		<td>{{data.IE_METER_FLAG}}</td>
-									  		<td>{{data.IE_MTR_MAKE}}</td>
-									  		<td>{{data.IE_MTR_TYPE}}</td>
+									  		<td>{{data.IE_MTR_MAKE_DESCR}}</td>
+									  		<td>{{data.IE_MTR_TYPE_DESCR}}</td>
 									  		<td>{{data.IE_MTR_SLNO}}</td>
 									  		<td>{{data.IE_FINAL_READING}}</td>
+									  		<td>{{data.IE_SERVICE_DATE}}</td>
+									  		<td>{{data.IE_INSPECTION_DATE}}</td>
 									  		<td>{{data.IE_LOAD_KW}}</td>
 									  		<td>{{data.IE_LOAD_HP}}</td>
 									  		<td>{{data.IE_VOLTAGE_RY}}</td>
@@ -299,15 +307,6 @@
 						      <option value="">------Select------</option>
 						    </select>
 	   		 		</div>
-	   		 		<div class="col-md-3">
-	    		 		 <label for="modalvillageslist">Villages</label>
-						    <select class="form-control" id="modalvillageslist" 
-						    ng-model="modal.village"
-						    ng-options="u as u.value for u in getmodalenumeratedvillages"  
-						    >
-						      <option value="">------Select------</option>
-						    </select>
-	   		 		</div>
 	   		 		<div class="col-md-3 mt-3" >
 	    		 		 <label for="searchtransformerslist">Transformers</label>
 						    <select class="form-control" id="searchtransformerslist" 
@@ -336,7 +335,6 @@
 								    <select class="form-control" id="connectiontypes" 
 								    ng-model="modal.connectiontypes"
 								    ng-options="u as u.value for u in modalconnectiontypes" 
-								    ng-disabled="newuseridexists" 
 								    ng-change="getipcodenumber(true)"
 								    >
 								      <option value="">------Select------</option>
@@ -359,7 +357,7 @@
 			    		 		<!-- <input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="action == 'edit' || !newuseridexists || modal.connectionstatus || modal.connectiontypes" 
 			    		 			ng-enter="VerifyRRNumber()" > -->
 			    		 			
-			    		 			<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="!newuseridexists || modal.connectionstatus || modal.connectiontypes" 
+			    		 			<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off"  
 			    		 			ng-enter="VerifyRRNumber()" >
 			   		 		</div>
 			   		 		<div class="col-md-3">
@@ -380,6 +378,15 @@
 					     		<label for="address2">Address 2</label>
 							 	<input class="form-control" type="text" ng-model="modal.address2" autocomplete="off" ng-readonly="newuseridexists">
 							 </div>	
+							 <div class="col-md-3">
+			    		 		 <label for="modalvillageslist">Villages</label>
+								    <select class="form-control" id="modalvillageslist" 
+								    ng-model="modal.village"
+								    ng-options="u as u.value for u in getmodalenumeratedvillages"  
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
 							 <div class="col-md-3">
 					     		<label for="phone">Phone</label>
 							 	<input class="form-control" type="text" ng-model="modal.phone" autocomplete="off" ng-readonly="newuseridexists">

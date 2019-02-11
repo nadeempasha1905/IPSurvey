@@ -779,11 +779,19 @@ public class EnumerationImpl implements IEnumeration{
 			try {
 				String sql =  " SELECT ROWIDTOCHAR (T.ROWID) ROW_ID,IE_SUBDIVISION_CODE , L1.LOCATION_NAME  SUBDIVISION_NAME, IE_OM_CODE, L2.LOCATION_NAME  OM_NAME ,"
 						    + "  IE_STATION_CODE, SM.SM_STATION_NAME   STATION_NAME, IE_FEEDER_CODE, FM.FM_FEEDER_NAME FEEDER_NAME, IE_TRANSFORMER_CODE,"
-							+ " IE_POLE_CODE, IE_RR_NO, IE_CUSTOMER_NAME, IE_ADDRESS1, IE_ADDRESS2, IE_VILLIAGE, IE_LOAD_KW, IE_LOAD_HP, IE_SCHEME, IE_CONNECTION_TYPE,"
-							+ " IE_CUSTOMER_STATUS, IE_WATER_SOURCE, IE_SERVICE_DATE, IE_INSPECTION_DATE, IE_METER_FLAG, IE_CROP, IE_VOLTAGE_RY, IE_VOLTAGE_RB, IE_VOLTAGE_BR, "
-							+ " IE_CURRENT_R, IE_CURRENT_Y, IE_CURRENT_B, IE_LONGITUDE, IE_LATTITUDE, IE_ALTITUDE, IE_SURVEYOR_NAME, IE_MTR_SLNO, IE_MTR_MAKE, IE_MTR_TYPE, "
+							+ " IE_POLE_CODE, IE_RR_NO, IE_CUSTOMER_NAME, IE_ADDRESS1, IE_ADDRESS2, IE_VILLIAGE, IE_LOAD_KW, IE_LOAD_HP,"
+							+ " FN_GET_CODE_NAME(IE_SCHEME,'SCHEME') IE_SCHEME_DESCR,IE_SCHEME,"
+							+ " FN_GET_CODE_NAME(IE_CONNECTION_TYPE,'SER_STS') IE_CONNECTION_TYPE_DESCR, IE_CONNECTION_TYPE,"
+							+ " FN_GET_CODE_NAME(IE_CUSTOMER_STATUS,'INSTL_STS') IE_CUSTOMER_STATUS_DESCR, IE_CUSTOMER_STATUS,"
+							+ " FN_GET_CODE_NAME(IE_WATER_SOURCE,'WTR_SOURCE') IE_WATER_SOURCE_DESCR, IE_WATER_SOURCE, "
+							+ " to_char(IE_SERVICE_DATE,'DD/MM/YYYY') IE_SERVICE_DATE,"
+							+ " to_char(IE_INSPECTION_DATE,'DD/MM/YYYY') IE_INSPECTION_DATE, "
+							+ " IE_METER_FLAG, IE_CROP, IE_VOLTAGE_RY, IE_VOLTAGE_RB, IE_VOLTAGE_BR, "
+							+ " IE_CURRENT_R, IE_CURRENT_Y, IE_CURRENT_B, IE_LONGITUDE, IE_LATTITUDE, IE_ALTITUDE, IE_SURVEYOR_NAME, IE_MTR_SLNO,"
+							+ " FN_GET_CODE_NAME(IE_MTR_MAKE,'MTR_MAKE') IE_MTR_MAKE_DESCR, IE_MTR_MAKE,"
+							+ " FN_GET_CODE_NAME(IE_MTR_TYPE,'MTR_TYP') IE_MTR_TYPE_DESCR,  IE_MTR_TYPE, "
 							+ " IE_FINAL_READING, IE_CODE_NUMBER, IE_PHONE_NUMBER, IE_PHASE, IE_IMAGE_PATH , "
-							+ " nvl(IE_CREATED_BY, IE_UPDATED_BY) IE_UPDATED_BY, TO_CHAR(nvl(IE_UPDATED_ON,IE_CREATED_ON),'DD/MM/YYYY HH:MI:SS AM') IE_UPDATED_ON "
+							+ " nvl(IE_CREATED_BY, IE_UPDATED_BY) IE_UPDATED_BY, TO_CHAR(nvl(t.IE_UPDATED_ON,t.IE_CREATED_ON),'DD/MM/YYYY HH:MI:SS AM') IE_UPDATED_ON "
 							+ " FROM IP_ENUMERATION T "
 							+ " LEFT OUTER JOIN LOCATION L1 ON L1.LOCATION_CODE  = T.IE_SUBDIVISION_CODE "
 							+ " LEFT OUTER JOIN LOCATION L2 ON L2.LOCATION_CODE  = T.IE_OM_CODE "
@@ -797,8 +805,17 @@ public class EnumerationImpl implements IEnumeration{
 					if(((String)object.get("feeder_code")).length() > 0) {
 						sql = sql + " AND IE_FEEDER_CODE = '"+(String)object.get("feeder_code")+"' " ;
 					}
+					if(((String)object.get("transformer_code")).length() > 0) {
+						sql = sql + " AND IE_TRANSFORMER_CODE = '"+(String)object.get("transformer_code")+"' " ;
+					}
+					if(((String)object.get("village")).length() > 0) {
+						sql = sql + " AND IE_VILLIAGE = '"+(String)object.get("village")+"' " ;
+					}
+					if(((String)object.get("rr_no")).length() > 0) {
+						sql = sql + " AND IE_RR_NO like '%"+(String)object.get("rr_no")+"%' " ;
+					}
 					
-					sql = sql + " ORDER BY nvl(IE_UPDATED_ON,IE_CREATED_ON) " ;
+					sql = sql + " ORDER BY nvl(t.IE_UPDATED_ON,t.IE_CREATED_ON) desc " ;
 					
 					System.out.println(sql);
 
@@ -855,6 +872,12 @@ public class EnumerationImpl implements IEnumeration{
 						json.put("IE_IMAGE_PATH", (rs.getString("IE_IMAGE_PATH") == null ? "" : rs.getString("IE_IMAGE_PATH")));
 						json.put("IE_UPDATED_BY", (rs.getString("IE_UPDATED_BY") == null ? "" : rs.getString("IE_UPDATED_BY")));
 						json.put("IE_UPDATED_ON", (rs.getString("IE_UPDATED_ON") == null ? "" : rs.getString("IE_UPDATED_ON")));
+						json.put("IE_SCHEME_DESCR", (rs.getString("IE_SCHEME_DESCR") == null ? "" : rs.getString("IE_SCHEME_DESCR")));
+						json.put("IE_CONNECTION_TYPE_DESCR", (rs.getString("IE_CONNECTION_TYPE_DESCR") == null ? "" : rs.getString("IE_CONNECTION_TYPE_DESCR")));
+						json.put("IE_CUSTOMER_STATUS_DESCR", (rs.getString("IE_CUSTOMER_STATUS_DESCR") == null ? "" : rs.getString("IE_CUSTOMER_STATUS_DESCR")));
+						json.put("IE_WATER_SOURCE_DESCR", (rs.getString("IE_WATER_SOURCE_DESCR") == null ? "" : rs.getString("IE_WATER_SOURCE_DESCR")));
+						json.put("IE_MTR_MAKE_DESCR", (rs.getString("IE_MTR_MAKE_DESCR") == null ? "" : rs.getString("IE_MTR_MAKE_DESCR")));
+						json.put("IE_MTR_TYPE_DESCR", (rs.getString("IE_MTR_TYPE_DESCR") == null ? "" : rs.getString("IE_MTR_TYPE_DESCR")));
 						
 						array.add(json);
 					}
