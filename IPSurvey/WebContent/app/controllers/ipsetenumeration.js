@@ -216,9 +216,6 @@ angular.module('ipsurveyapp.Controllers', [])
 						$scope.modalomsectionlist = response.OMSECTION_LIST;
 						if($scope.search.omsection != undefined || $scope.search.omsection != null){
 							$scope.modal.omsection = $filter('filter')($scope.modalomsectionlist,{key:$scope.search.omsection.key},true)[0];
-							$scope.gettransformermasterdata();
-							$scope.getenumeratedvillageslist('','modal');
-							$scope.getenumeratedtransformerslist('','modal');
 						}
 					},{
 						location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
@@ -301,6 +298,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 				remote.load("getenumeratedvillageslist", function(response){
 					$scope.getmodalenumeratedvillages = response.VILLAGE_ENUM_DATA;
+					if(value != null || value.length >0){
+						$scope.modal.village =  $filter('filter')($scope.getmodalenumeratedvillages,{key:value},true)[0];
+					}
 				},{
 					location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key)
 				}, 'POST');
@@ -328,6 +328,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 				remote.load("getenumeratedtransformerslist", function(response){
 					$scope.getmodalenumeratedtransformers = response.TRANSFORMER_ENUM_DATA;
+					if(value != null || value.length >0){
+						$scope.modal.transformers =  $filter('filter')($scope.getmodalenumeratedtransformers,{key:value},true)[0];
+					}
 				},{
 					location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key)
 				}, 'POST');
@@ -340,6 +343,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modalconnectiontypes = [];
 				remote.load("getcodedetails", function(response){
 					$scope.modalconnectiontypes = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.connectiontypes =  $filter('filter')($scope.modalconnectiontypes,{key:value},true)[0];
+					}
 				},{
 					code_type:'SER_STS'
 				}, 'POST');
@@ -349,6 +355,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modalconnectionstatus = [];
 				remote.load("getcodedetails", function(response){
 					$scope.modalconnectionstatus = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.connectionstatus =  $filter('filter')($scope.modalconnectionstatus,{key:value},true)[0];
+					}
 				},{
 					code_type:'INSTL_STS'
 				}, 'POST');
@@ -358,6 +367,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modalwatersource = [];
 				remote.load("getcodedetails", function(response){
 					$scope.modalwatersource = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.watersource =  $filter('filter')($scope.modalwatersource,{key:value},true)[0];
+					}
 				},{
 					code_type:'WTR_SOURCE'
 				}, 'POST');
@@ -367,6 +379,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modalconnectionscheme = [];
 				remote.load("getcodedetails", function(response){
 					$scope.modalconnectionscheme = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.connectionscheme =  $filter('filter')($scope.modalconnectionscheme,{key:value},true)[0];
+					}
 				},{
 					code_type:'SCHEME'
 				}, 'POST');
@@ -376,6 +391,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modalmetertype = [];
 				remote.load("getcodedetails", function(response){
 					$scope.modalmetertype = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.metertype =  $filter('filter')($scope.modalmetertype,{key:value},true)[0];
+					}
 				},{
 					code_type:'MTR_TYP'
 				}, 'POST');
@@ -385,20 +403,29 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modalmetermake = [];
 				remote.load("getcodedetails", function(response){
 					$scope.modalmetermake = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.metermake =  $filter('filter')($scope.modalmetermake,{key:value},true)[0];
+					}
 				},{
 					code_type:'MTR_MAKE'
 				}, 'POST');
 			}
 		};
 		
-		$scope.getipcodenumber = function(){
-			
+		$scope.getipcodenumber = function(value){
 			if($scope.search.subdivision === undefined || $scope.search.subdivision === null){notify.error("Please Select Subdivision !!!");	return;	}
 			if($scope.modal.omsection === undefined || $scope.modal.omsection === null){notify.error("Please Select O&M Section !!!");	return;	}
 			if($scope.modal.transformers === undefined || $scope.modal.transformers === null){notify.error("Please Select Transformer !!!");	return;	}
 			
 			remote.load("getipcodenumber", function(response){
 				$scope.modal.codenumber = response.code_number;
+				if(value){
+					if($scope.modal.connectiontypes != undefined || $scope.modal.connectiontypes != null){
+						if($scope.modal.connectiontypes.key === '2' || $scope.modal.connectiontypes.key === '3'){
+							$scope.modal.codenumber =  response.code_number;
+						}
+					}
+				}
 			},{
 				om_code:$scope.modal.omsection.key,
 				transformer_code:$scope.modal.transformers.key
@@ -419,17 +446,16 @@ angular.module('ipsurveyapp.Controllers', [])
 			 $scope.modal.chooseimage = null;
 			 $('#modalchooseimage').val('');
 			 
-			 	$scope.getcodedetails('','SER_STS');
+			if(action === 'add'){
+				
+				$scope.getomsectionList([],null,'modal');
+				$scope.getStationList('modal',null,null);
+				$scope.getcodedetails('','SER_STS');
 				$scope.getcodedetails('','INSTL_STS');
 				$scope.getcodedetails('','WTR_SOURCE');
 				$scope.getcodedetails('','SCHEME');
 				$scope.getcodedetails('','MTR_MAKE');
 				$scope.getcodedetails('','MTR_TYP');
-			 
-			if(action === 'add'){
-				
-				$scope.getomsectionList([],null,'modal');
-				$scope.getStationList('modal',null,null);
 				
 				$scope.action = 'add';
 				
@@ -456,38 +482,52 @@ angular.module('ipsurveyapp.Controllers', [])
 			}else{
 				
 				$scope.getomsectionList([],null,'modal');
-				$timeout(function(){
-					$scope.getStationList('modal',record.TE_STATION_CODE,record.TE_FEEDER_CODE);
-				},200);
-				$timeout(function(){
-					$scope.getenumeratedvillageslist(record.TE_VILLAGE);
-				},200);
+				$timeout(function(){$scope.getStationList('modal',record.IE_STATION_CODE,record.IE_FEEDER_CODE);},500);
+				$timeout(function(){$scope.getcodedetails(record.IE_CONNECTION_TYPE,'SER_STS');},100);
+				$timeout(function(){$scope.getcodedetails(record.IE_CUSTOMER_STATUS,'INSTL_STS');},100);
+				$timeout(function(){$scope.getcodedetails(record.IE_WATER_SOURCE,'WTR_SOURCE');},100);
+				$timeout(function(){$scope.getcodedetails(record.IE_SCHEME,'SCHEME');},100);
+				$timeout(function(){$scope.getcodedetails(record.IE_MTR_MAKE,'MTR_MAKE');},100);
+				$timeout(function(){$scope.getcodedetails(record.IE_MTR_TYPE,'MTR_TYP');},100);
+				$scope.modal.meterstatus = $filter('filter')($scope.modalmeterstatus,{key:record.IE_METER_FLAG},true)[0];
+				
+				$timeout(function(){$scope.getenumeratedvillageslist(record.IE_VILLIAGE,'modal');},1000);
+				$timeout(function(){$scope.getenumeratedtransformerslist(record.IE_TRANSFORMER_CODE,'modal');},1000);
 				
 				$scope.ROWID = record.row_id;
 				$scope.action = 'edit';
 				$scope.newuseridexists = false;
 				$scope.modal_heading = "Edit IPset Enumeration Data";
 				
-				 $scope.search.autocompletetransformername = record.TE_TRANSFORMER_NAME;
-					$scope.modal.latitude = record.TE_LATTITUDE;
-					$scope.modal.longitude = record.TE_LONGITUDE;
-					$scope.modal.altitude = record.TE_ALTITUDE;
-					$scope.modal.remarks = record.TE_REMARKS;
-					$scope.modal.transformercode = record.TE_TRANSFORMER_CODE;
-					$scope.modal.timscode = record.TE_TIMS_CODE;
-					$scope.modal.capacitykva = record.TE_CAPACITY_KVA;
-					//$scope.modal.village = record.TE_VILLAGE;
+				$scope.modal.rrnumber = record.IE_RR_NO;
+				$scope.modal.codenumber = record.IE_CODE_NUMBER;
+				$scope.modal.consumername = record.IE_CUSTOMER_NAME;
+				$scope.modal.address1 = record.IE_ADDRESS1;
+				$scope.modal.address2 = record.IE_ADDRESS2;
+				$scope.modal.servicedate = '';
+				$scope.modal.inspectiondate = '';
+				$scope.modal.meterslno = record.IE_MTR_SLNO;
+				$scope.modal.finalreading = record.IE_FINAL_READING;
+				$scope.modal.loadkw = record.IE_LOAD_KW;
+				$scope.modal.loadhp = record.IE_LOAD_HP;
+				$scope.modal.voltage1 = record.IE_VOLTAGE_RY;
+				$scope.modal.voltage2 = record.IE_VOLTAGE_RB;
+				$scope.modal.voltage3 = record.IE_VOLTAGE_BR;
+				$scope.modal.current1 = record.IE_CURRENT_R;
+				$scope.modal.current2 = record.IE_CURRENT_Y;
+				$scope.modal.current3 = record.IE_CURRENT_B;
+				$scope.modal.latitude = record.IE_LATTITUDE;
+				$scope.modal.longitude = record.IE_LONGITUDE;
+				$scope.modal.altitude = record.IE_ALTITUDE;
 					
-					if(record.TE_IMAGE_PATH.length >0 || record.TE_IMAGE_PATH != undefined || record.TE_IMAGE_PATH != null){
+					if(record.IE_IMAGE_PATH.length >0 || record.IE_IMAGE_PATH != undefined || record.IE_IMAGE_PATH != null){
 						remote.load("getimagedata", function(response){
 							console.log("getimagedata",response);
 							$scope.imagedata = response.encodedBase64;
 						},{
-							filename:record.TE_IMAGE_PATH
+							filename:record.IE_IMAGE_PATH
 						}, 'POST');
 					}
-					
-					$scope.NEW_TC_CODE = record.TE_TRANSFORMER_CODE;
 				
 			}
 		};
@@ -506,7 +546,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.village = (response.village === undefined || response.village === null || response.village === '' ? undefined : $filter('filter')($scope.getmodalenumeratedvillages,{key:response.village},true)[0]);
 				$scope.newuseridexists = false;
 				
-				$scope.getipcodenumber();
+				$scope.getipcodenumber(false);
 				
 				$scope.modal.connectiontypes = $filter('filter')($scope.modalconnectiontypes,{key:'1'},true)[0];
 				$scope.modal.connectionstatus = $filter('filter')($scope.modalconnectionstatus,{key:'1'},true)[0];
@@ -690,6 +730,12 @@ angular.module('ipsurveyapp.Controllers', [])
 				station_code:($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key),
 				feeder_code:($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key)
 			}, 'POST');
+			
+		};
+		
+		$scope.getipcodeforunauthoriseandunidentified = function(){
+			
+			
 			
 		};
 		

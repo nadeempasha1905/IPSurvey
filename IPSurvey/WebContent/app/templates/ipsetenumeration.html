@@ -192,29 +192,48 @@
 											<th>Latitude</th>
 											<th>Longitude</th>
 											<th>Altitude</th>
-											<th>Remarks</th>
 											<th>Updated By</th>
 											<th>Updated On</th>
 											</tr>
 									  </thead>
 									  <tbody>
-									  	<tr ng-repeat="data in TRANSFORMER_ENUM_DATA">
+									  	<tr ng-repeat="data in IPSET_ENUM_DATA">
 									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".ipsetenumerate-addedit-modal" 
 									  			ng-click="addeditIPsetEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
 									  		<td>{{data.SUBDIVISION_NAME}}</td>
 									  		<td>{{data.OM_NAME}}</td>
 									  		<td>{{data.STATION_NAME}}</td>
 									  		<td>{{data.FEEDER_NAME}}</td>
-									  		<td>{{data.TE_TRANSFORMER_NAME}}</td>
-									  		<td>{{data.TE_TIMS_CODE}}</td>
-									  		<td>{{data.TE_CAPACITY_KVA}}</td>
-									  		<td>{{data.TE_VILLAGE}}</td>
-									  		<td>{{data.TE_LATTITUDE}}</td>
-									  		<td>{{data.TE_LONGITUDE}}</td>
-									  		<td>{{data.TE_ALTITUDE}}</td>
-									  		<td>{{data.TE_REMARKS}}</td>
-									  		<td>{{data.TE_UPDATED_BY}}</td>
-									  		<td>{{data.TE_UPDATED_ON}}</td>
+									  		<td>{{data.IE_TRANSFORMER_CODE}}</td>
+									  		<td>{{data.IE_VILLIAGE}}</td>
+									  		<td>{{data.IE_RR_NO}}</td>
+									  		<td>{{data.IE_CODE_NUMBER}}</td>
+									  		<td>{{data.IE_CUSTOMER_NAME}}</td>
+									  		<td>{{data.IE_ADDRESS1}}</td>
+									  		<td>{{data.IE_ADDRESS2}}</td>
+									  		<td>{{data.IE_PHONE_NUMBER}}</td>
+									  		<td>{{data.IE_CONNECTION_TYPE}}</td>
+									  		<td>{{data.IE_CUSTOMER_STATUS}}</td>
+									  		<td>{{data.IE_WATER_SOURCE}}</td>
+									  		<td>{{data.IE_SCHEME}}</td>
+									  		<td>{{data.IE_METER_FLAG}}</td>
+									  		<td>{{data.IE_MTR_MAKE}}</td>
+									  		<td>{{data.IE_MTR_TYPE}}</td>
+									  		<td>{{data.IE_MTR_SLNO}}</td>
+									  		<td>{{data.IE_FINAL_READING}}</td>
+									  		<td>{{data.IE_LOAD_KW}}</td>
+									  		<td>{{data.IE_LOAD_HP}}</td>
+									  		<td>{{data.IE_VOLTAGE_RY}}</td>
+									  		<td>{{data.IE_VOLTAGE_RB}}</td>
+									  		<td>{{data.IE_VOLTAGE_BR}}</td>
+									  		<td>{{data.IE_CURRENT_R}}</td>
+									  		<td>{{data.IE_CURRENT_Y}}</td>
+									  		<td>{{data.IE_CURRENT_B}}</td>
+									  		<td>{{data.IE_LATTITUDE}}</td>
+									  		<td>{{data.IE_LONGITUDE}}</td>
+									  		<td>{{data.IE_ALTITUDE}}</td>
+									  		<td>{{data.IE_UPDATED_BY}}</td>
+									  		<td>{{data.IE_UPDATED_ON}}</td>
 									  	</tr>
 									  </tbody>
 									</table>
@@ -310,10 +329,37 @@
 	   		 		<div class="card">
 	   		 			<div class="card-header">Consumer Details</div>
 					  <div class="card-body">
+					  
+					  	<div class="row mt-3">
+					  		<div class="col-md-3">
+							 	 <label for="connectiontypes">Connection Types</label>
+								    <select class="form-control" id="connectiontypes" 
+								    ng-model="modal.connectiontypes"
+								    ng-options="u as u.value for u in modalconnectiontypes" 
+								    ng-disabled="newuseridexists" 
+								    ng-change="getipcodenumber(true)"
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							  <div class="col-md-3">
+							 	 <label for="connectionstatus">Connection Status</label>
+								    <select class="form-control" id="connectionstatus" 
+								    ng-model="modal.connectionstatus"
+								    ng-options="u as u.value for u in modalconnectionstatus"  
+								    ng-disabled="newuseridexists"
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+					  	</div>
 					    <div class="row mt-3">
 					    	<div class="col-md-3">
 			   		 			<label for="rrnumber">RR Number<span style="color: red;" ng-show="action == 'add'">&nbsp;(Type & press enter)</span></label>
-			    		 		<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="action == 'edit' || !newuseridexists" 
+			    		 		<!-- <input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="action == 'edit' || !newuseridexists || modal.connectionstatus || modal.connectiontypes" 
+			    		 			ng-enter="VerifyRRNumber()" > -->
+			    		 			
+			    		 			<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="!newuseridexists || modal.connectionstatus || modal.connectiontypes" 
 			    		 			ng-enter="VerifyRRNumber()" >
 			   		 		</div>
 			   		 		<div class="col-md-3">
@@ -334,26 +380,6 @@
 					     		<label for="address2">Address 2</label>
 							 	<input class="form-control" type="text" ng-model="modal.address2" autocomplete="off" ng-readonly="newuseridexists">
 							 </div>	
-							 <div class="col-md-3">
-							 	 <label for="connectiontypes">Connection Types</label>
-								    <select class="form-control" id="connectiontypes" 
-								    ng-model="modal.connectiontypes"
-								    ng-options="u as u.value for u in modalconnectiontypes" 
-								    ng-disabled="newuseridexists" 
-								    >
-								      <option value="">------Select------</option>
-							    	</select>
-							 </div>
-							  <div class="col-md-3">
-							 	 <label for="connectionstatus">Connection Status</label>
-								    <select class="form-control" id="connectionstatus" 
-								    ng-model="modal.connectionstatus"
-								    ng-options="u as u.value for u in modalconnectionstatus"  
-								    ng-disabled="newuseridexists"
-								    >
-								      <option value="">------Select------</option>
-							    	</select>
-							 </div>
 							 <div class="col-md-3">
 					     		<label for="phone">Phone</label>
 							 	<input class="form-control" type="text" ng-model="modal.phone" autocomplete="off" ng-readonly="newuseridexists">
