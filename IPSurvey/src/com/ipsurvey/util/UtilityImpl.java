@@ -43,7 +43,7 @@ public class UtilityImpl implements IUtility{
 		JSONObject JSON_RESPONSE = new JSONObject();
 		
 		try {
-			String get_permission_query = " SELECT  CM_VALUE , CM_DESCR  FROM CODE_MASTER WHERE NVL(CM_DEL_FLG,'N') = 'N' AND CM_TYPE='"+(String)object.get("code_type")+" ";
+			String get_permission_query = " SELECT  CM_VALUE , CM_DESCR  FROM CODE_MASTER WHERE NVL(CM_DEL_FLG,'N') = 'N' AND CM_TYPE='"+(String)object.get("code_type")+"'  ";
 			
 			ps = dbConn.prepareStatement(get_permission_query);
 			rs = ps.executeQuery();

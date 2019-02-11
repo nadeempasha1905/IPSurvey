@@ -335,7 +335,8 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			var imagepath = "";
 			if(files.length > 0){
-				imagepath = $scope.modal.omsection.key+"_"+$scope.search.autocompletevillagename+"_"+files[0].name;
+				var file_ext = files[0].name;
+				imagepath = $scope.modal.omsection.key+"_"+$scope.search.autocompletevillagename+file_ext.substring(file_ext.indexOf("."));
 			}
 			
 			if($scope.action === 'add'){

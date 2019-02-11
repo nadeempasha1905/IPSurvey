@@ -430,8 +430,6 @@ public class EnumerationImpl implements IEnumeration{
 		@Override
 		public JSONObject getipcodenumber(JSONObject object, String ipAdress) {
 			// TODO Auto-generated method stub
-			JSONObject json = null;
-			JSONArray  json_array = new JSONArray();
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			JSONObject JSON_RESPONSE = new JSONObject();
@@ -444,20 +442,19 @@ public class EnumerationImpl implements IEnumeration{
 				ps = dbConn.prepareStatement(get_permission_query);
 				rs = ps.executeQuery();
 				
-				while (rs.next()) {
-					
-					json = new JSONObject();
-					json.put("code_number", rs.getString("CODE_NUMBER"));
-					json_array.add(json);
+				if (rs.next()) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("code_number", rs.getString("CODE_NUMBER"));
+				}else {
+					JSON_RESPONSE.put("status", "fail");
+					JSON_RESPONSE.put("message", "Error occured in generating code number !!!");
 				}
-				
-				JSON_RESPONSE.put("status", "success");
-				JSON_RESPONSE.put("CODE_NUMBER", json_array);
-				
 				
 			} catch (Exception e) { 
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				JSON_RESPONSE.put("status", "fail");
+				JSON_RESPONSE.put("message", "Error occured in generating code number !!!");
 			}finally {
 				DBManagerResourceRelease.close(rs);
 				DBManagerResourceRelease.close(ps);
@@ -611,6 +608,274 @@ public class EnumerationImpl implements IEnumeration{
 		}
 		return JSON_RESPONSE;
 	
+		}
+
+		@Override
+		public JSONObject getconsumerdetailsbyrrno(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			PreparedStatement ps1 = null;
+			ResultSet rs1= null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			JSONObject json = new JSONObject();
+			JSONArray array = new JSONArray();
+
+			try {
+				//dbConn = dbObject.getDatabaseConnection();
+
+					String sql2 = "  SELECT NVL(IM_CUSTOMER_NAME,'~') IM_CUSTOMER_NAME, NVL(IM_ADDRESS1,'~') IM_ADDRESS1,"
+							+ "  NVL(IM_ADDRESS2,'~') IM_ADDRESS2, NVL(IM_VILLAGE,'~')  IM_VILLAGE  "
+							+ "  FROM IP_MASTER  "
+							+ "  WHERE "
+							+ "  IM_LOCATION_CODE = '"+(String)object.get("location_code")+"' AND   "
+							+ "  IM_RR_NO = '"+(String)object.get("rr_number")+"' ";
+					
+					String sql1 = "  SELECT count(*) cnt  "
+							+ "  FROM IP_ENUMERATION  "
+							+ "  WHERE "
+							+ "  IE_SUBDIVISION_CODE = '"+(String)object.get("location_code")+"' AND   "
+							+ "  IE_RR_NO = '"+(String)object.get("rr_number")+"' ";
+					
+					System.out.println(sql1);
+
+					ps = dbConn.prepareStatement(sql1);
+					rs = ps.executeQuery();
+					
+					if(rs.next()){
+						if(rs.getInt("cnt") > 0) {
+							JSON_RESPONSE.put("status", "error");
+							JSON_RESPONSE.put("message", "Ipset already enumerated !!!");
+						}else {
+							ps1 = dbConn.prepareStatement(sql2);
+							rs1 = ps.executeQuery();
+							if(rs.next()){
+								JSON_RESPONSE.put("status", "success");
+								JSON_RESPONSE.put("status1", "found");
+								JSON_RESPONSE.put("customer_name", rs.getString("IM_CUSTOMER_NAME"));
+								JSON_RESPONSE.put("address1", rs.getString("IM_ADDRESS1"));
+								JSON_RESPONSE.put("address2", rs.getString("IM_ADDRESS2"));
+								JSON_RESPONSE.put("village", rs.getString("IM_VILLAGE"));
+							}else {
+								JSON_RESPONSE.put("status", "success");
+								JSON_RESPONSE.put("status1", "notfound");
+								JSON_RESPONSE.put("message", "IPset not enumerated. You may continue !!!");
+							}
+							
+						}
+					}else{
+						
+						JSON_RESPONSE.put("status", "fail");
+						JSON_RESPONSE.put("message", "No Details Found  !!!");
+					}
+
+					//ps.close();
+					//rs.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JSON_RESPONSE.put("status", "error");
+				JSON_RESPONSE.put("message", "Error Occured !!! ");
+			} finally {
+				//DBManagerResourceRelease.close(rs, ps, dbConn);
+				DBManagerResourceRelease.close(rs);
+				DBManagerResourceRelease.close(ps);
+				DBManagerResourceRelease.close(rs1);
+				DBManagerResourceRelease.close(ps1);
+			}
+			
+			return JSON_RESPONSE;
+		}
+
+		@Override
+		public JSONObject upsertipsetenumeration(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			CallableStatement calstmt = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			
+			try {
+				
+				 if(object.isEmpty()) {
+					 JSON_RESPONSE.put("status", "error");
+					 JSON_RESPONSE.put("message", "Invalid Object");
+				 }else {
+					
+					/*PROCEDURE UPSERT_IP_ENUMERATION(CUR OUT SYS_REFCURSOR, P_ROW_ID IN VARCHAR2, P_LOCATION_CODE IN VARCHAR2, P_STATION_CODE IN VARCHAR2, P_FEEDER_CODE IN VARCHAR2,
+					 *  P_TRANSFORMER_CODE IN VARCHAR2, 
+                                P_POLE_CODE IN VARCHAR2, P_RR_NO IN VARCHAR2, P_CUSTOMER_NAME IN VARCHAR2, P_ADDRESS1 IN VARCHAR2, P_ADDRESS2 IN VARCHAR2, P_VILLIAGE IN VARCHAR2, 
+                                P_LOAD_KW IN VARCHAR2, P_LOAD_HP IN VARCHAR2, P_SCHEME IN VARCHAR2, P_CONNECTION_TYPE IN VARCHAR2, P_CUSTOMER_STATUS IN VARCHAR2, 
+                                P_WATER_SOURCE IN VARCHAR2, P_SERVICE_DATE IN VARCHAR2, P_METER_FLAG IN VARCHAR2, P_CROP IN VARCHAR2, 
+                                P_VOLTAGE_RY IN VARCHAR2, P_VOLTAGE_RB IN VARCHAR2, P_VOLTAGE_BR IN VARCHAR2, P_CURRENT_R IN VARCHAR2, P_CURRENT_Y IN VARCHAR2, P_CURRENT_B IN VARCHAR2, 
+                                P_LONGITUDE IN VARCHAR2, P_LATTITUDE IN VARCHAR2, P_ALTITUDE IN VARCHAR2, P_REMARKS IN VARCHAR2, P_CREATED_UPDATED_BY IN VARCHAR2, 
+                                P_MTR_SLNO IN VARCHAR2, P_MTR_MAKE IN VARCHAR2, P_MTR_TYPE IN VARCHAR2, P_FINAL_READING IN VARCHAR2, P_CODE_NUMBER VARCHAR2, 
+                                P_PHONE_NUMBER IN VARCHAR2, P_PHASE IN VARCHAR2, P_IMAGE_PATH IN VARCHAR2) IS
+*/		
+					 String sql = "{ call UPSERT_IP_ENUMERATION(?,"
+							+ "'" + (String) object.get("rowid") + "'," + "'" + (String) object.get("location_code") + "'," + "'"
+							+ (String) object.get("stationcode") + "'," + "'" + (String) object.get("feedercode") + "','" 
+							+ (String) object.get("transformercode") + "'," + "'" + (String) object.get("polecode") + "','" 
+							+ (String) object.get("rrnumber") + "'," + "'" + (String) object.get("consumername") + "','" 
+							+ (String) object.get("address1") + "'," + "'" + (String) object.get("address2") + "','" 
+							+ (String) object.get("village") + "'," + "'" + (String) object.get("loadkw") + "'," + "'"
+							+ (String) object.get("loadhp") + "'," + "'" + (String) object.get("connectionscheme") + "'," + "'"
+							+ (String) object.get("connectiontypes") + "'," + "'" + (String) object.get("connectionstatus") + "'," + "'"
+							+ (String) object.get("watersource") + "'," + "'" + (String) object.get("servicedate") + "'," + "'"
+							+ (String) object.get("meterstatus") + "'," + "''," + "'"  //p_crop
+							+ (String) object.get("voltage1") + "'," + "'" + (String) object.get("voltage2") + "'," + "'"
+							+ (String) object.get("voltage3") + "'," + "'" + (String) object.get("current1") + "'," + "'"
+							+ (String) object.get("current2") + "'," + "'" + (String) object.get("current3") + "'," + "'"
+							+ (String) object.get("longitude") + "'," + "'" + (String) object.get("latitude") + "'," + "'"
+							+ (String) object.get("altitude") + "'," + "'" + (String) object.get("remarks") + "'," + "'"
+							+ (String) object.get("userid") + "'," + "'" + (String) object.get("meterslno") + "'," + "'"
+							+ (String) object.get("metermake") + "'," + "'" + (String) object.get("metertype") + "'," + "'"
+							+ (String) object.get("finalreading") + "'," + "'" + (String) object.get("codenumber") + "'," + "'"
+							+ (String) object.get("phone") + "'," + "'3'," + "'" + (String) object.get("imagepath") + "')}";
+
+					 System.out.println(sql);
+				calstmt = dbConn.prepareCall(sql);
+				calstmt.registerOutParameter(1,OracleTypes.CURSOR );
+				calstmt.executeUpdate();
+				
+				rs = (ResultSet) calstmt.getObject(1);
+				String result_proc = "";
+				if(rs.next()) {
+					result_proc = rs.getString("RESP");
+				}
+				
+				if(result_proc.equals("success")) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Ipset Enumeration Inserted/Updated sucessfully .");
+				}else {
+					JSON_RESPONSE.put("status", "fail");
+					JSON_RESPONSE.put("message", "Ipset Enumeration Inserted/Updated Failed !!!");
+				}
+
+				 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JSON_RESPONSE.put("status", "fail");
+			JSON_RESPONSE.put("message", "Ipset Enumeration Inserted/Updated Failed");
+		}finally {
+			DBManagerResourceRelease.close(ps);
+			DBManagerResourceRelease.close(calstmt);
+		}
+		return JSON_RESPONSE;
+		}
+
+		@Override
+		public JSONObject getipsetenumerationdetails(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			JSONObject json = new JSONObject();
+			JSONArray array = new JSONArray();
+
+			
+
+			try {
+				String sql =  " SELECT ROWIDTOCHAR (T.ROWID) ROW_ID,IE_SUBDIVISION_CODE , L1.LOCATION_NAME  SUBDIVISION_NAME, IE_OM_CODE, L2.LOCATION_NAME  OM_NAME ,"
+						    + "  IE_STATION_CODE, SM.SM_STATION_NAME   STATION_NAME, IE_FEEDER_CODE, FM.FM_FEEDER_NAME FEEDER_NAME, IE_TRANSFORMER_CODE,"
+							+ " IE_POLE_CODE, IE_RR_NO, IE_CUSTOMER_NAME, IE_ADDRESS1, IE_ADDRESS2, IE_VILLIAGE, IE_LOAD_KW, IE_LOAD_HP, IE_SCHEME, IE_CONNECTION_TYPE,"
+							+ " IE_CUSTOMER_STATUS, IE_WATER_SOURCE, IE_SERVICE_DATE, IE_INSPECTION_DATE, IE_METER_FLAG, IE_CROP, IE_VOLTAGE_RY, IE_VOLTAGE_RB, IE_VOLTAGE_BR, "
+							+ " IE_CURRENT_R, IE_CURRENT_Y, IE_CURRENT_B, IE_LONGITUDE, IE_LATTITUDE, IE_ALTITUDE, IE_SURVEYOR_NAME, IE_MTR_SLNO, IE_MTR_MAKE, IE_MTR_TYPE, "
+							+ " IE_FINAL_READING, IE_CODE_NUMBER, IE_PHONE_NUMBER, IE_PHASE, IE_IMAGE_PATH"
+							+ " nvl(IE_CREATED_BY, IE_UPDATED_BY) IE_UPDATED_BY, TO_CHAR(nvl(IE_UPDATED_ON,IE_CREATED_ON),'DD/MM/YYYY HH:MI:SS AM') IE_UPDATED_ON "
+							+ " FROM IP_ENUMERATION T "
+							+ " LEFT OUTER JOIN LOCATION L1 ON L1.LOCATION_CODE  = T.IE_SUBDIVISION_CODE "
+							+ " LEFT OUTER JOIN LOCATION L2 ON L2.LOCATION_CODE  = T.IE_OM_CODE "
+							+ "	LEFT OUTER JOIN STATION_MASTER SM ON SM.SM_LOCATION_CODE = T.IE_SUBDIVISION_CODE AND SM.SM_STATION_CODE = T.IE_STATION_CODE "
+							+ "	LEFT OUTER JOIN FEEDER_MASTER FM ON FM.FM_LOCATION_CODE = T.IE_SUBDIVISION_CODE AND FM.FM_STATION_CODE = T.IE_STATION_CODE AND FM.FM_FEEDER_CODE = T.IE_FEEDER_CODE  "
+							+ " WHERE IE_OM_CODE = '"+(String)object.get("location_code")+"' ";
+						
+					if(((String)object.get("station_code")).length() > 0) {
+						sql = sql + " AND IE_STATION_CODE = '"+(String)object.get("station_code")+"' " ;
+					}
+					if(((String)object.get("feeder_code")).length() > 0) {
+						sql = sql + " AND IE_FEEDER_CODE = '"+(String)object.get("feeder_code")+"' " ;
+					}
+					
+					sql = sql + " ORDER BY nvl(IE_UPDATED_ON,IE_CREATED_ON) " ;
+					
+					System.out.println(sql);
+
+					ps = dbConn.prepareStatement(sql);
+					rs = ps.executeQuery();
+					
+					while(rs.next()) {
+						
+						json = new JSONObject();
+						
+						json.put("row_id", (rs.getString("row_id") == null ? "" : rs.getString("row_id")));
+						json.put("IE_SUBDIVISION_CODE", (rs.getString("IE_SUBDIVISION_CODE") == null ? "" : rs.getString("IE_SUBDIVISION_CODE")));
+						json.put("SUBDIVISION_NAME", (rs.getString("SUBDIVISION_NAME") == null ? "" : rs.getString("SUBDIVISION_NAME")));
+						json.put("IE_OM_CODE", (rs.getString("IE_OM_CODE") == null ? "" : rs.getString("IE_OM_CODE")));
+						json.put("OM_NAME", (rs.getString("OM_NAME") == null ? "" : rs.getString("OM_NAME")));
+						json.put("IE_STATION_CODE", (rs.getString("IE_STATION_CODE") == null ? "" : rs.getString("IE_STATION_CODE")));
+						json.put("STATION_NAME", (rs.getString("STATION_NAME") == null ? "" : rs.getString("STATION_NAME")));
+						json.put("IE_FEEDER_CODE", (rs.getString("IE_FEEDER_CODE") == null ? "" : rs.getString("IE_FEEDER_CODE")));
+						json.put("FEEDER_NAME", (rs.getString("FEEDER_NAME") == null ? "" : rs.getString("FEEDER_NAME")));
+						json.put("IE_TRANSFORMER_CODE", (rs.getString("IE_TRANSFORMER_CODE") == null ? "" : rs.getString("IE_TRANSFORMER_CODE")));
+						json.put("IE_POLE_CODE", (rs.getString("IE_POLE_CODE") == null ? "" : rs.getString("IE_POLE_CODE")));
+						json.put("IE_RR_NO", (rs.getString("IE_RR_NO") == null ? "" : rs.getString("IE_RR_NO")));
+						json.put("IE_CUSTOMER_NAME", (rs.getString("IE_CUSTOMER_NAME") == null ? "" : rs.getString("IE_CUSTOMER_NAME")));
+						json.put("IE_ADDRESS1", (rs.getString("IE_ADDRESS1") == null ? "" : rs.getString("IE_ADDRESS1")));
+						json.put("IE_ADDRESS2", (rs.getString("IE_ADDRESS2") == null ? "" : rs.getString("IE_ADDRESS2")));
+						json.put("IE_VILLIAGE", (rs.getString("IE_VILLIAGE") == null ? "" : rs.getString("IE_VILLIAGE")));
+						json.put("IE_LOAD_KW", (rs.getString("IE_LOAD_KW") == null ? "" : rs.getString("IE_LOAD_KW")));
+						json.put("IE_LOAD_HP", (rs.getString("IE_LOAD_HP") == null ? "" : rs.getString("IE_LOAD_HP")));
+						json.put("IE_SCHEME", (rs.getString("IE_SCHEME") == null ? "" : rs.getString("IE_SCHEME")));
+						json.put("IE_CONNECTION_TYPE", (rs.getString("IE_CONNECTION_TYPE") == null ? "" : rs.getString("IE_CONNECTION_TYPE")));
+						json.put("IE_CUSTOMER_STATUS", (rs.getString("IE_CUSTOMER_STATUS") == null ? "" : rs.getString("IE_CUSTOMER_STATUS")));
+						json.put("IE_WATER_SOURCE", (rs.getString("IE_WATER_SOURCE") == null ? "" : rs.getString("IE_WATER_SOURCE")));
+						json.put("IE_SERVICE_DATE", (rs.getString("IE_SERVICE_DATE") == null ? "" : rs.getString("IE_SERVICE_DATE")));
+						json.put("IE_INSPECTION_DATE", (rs.getString("IE_INSPECTION_DATE") == null ? "" : rs.getString("IE_INSPECTION_DATE")));
+						json.put("IE_METER_FLAG", (rs.getString("IE_METER_FLAG") == null ? "" : rs.getString("IE_METER_FLAG")));
+						json.put("IE_CROP", (rs.getString("IE_CROP") == null ? "" : rs.getString("IE_CROP")));
+						json.put("IE_VOLTAGE_RY", (rs.getString("IE_VOLTAGE_RY") == null ? "" : rs.getString("IE_VOLTAGE_RY")));
+						json.put("IE_VOLTAGE_RB", (rs.getString("IE_VOLTAGE_RB") == null ? "" : rs.getString("IE_VOLTAGE_RB")));
+						json.put("IE_VOLTAGE_BR", (rs.getString("IE_VOLTAGE_BR") == null ? "" : rs.getString("IE_VOLTAGE_BR")));
+						json.put("IE_CURRENT_R", (rs.getString("IE_CURRENT_R") == null ? "" : rs.getString("IE_CURRENT_R")));
+						json.put("IE_CURRENT_Y", (rs.getString("IE_CURRENT_Y") == null ? "" : rs.getString("IE_CURRENT_Y")));
+						json.put("IE_CURRENT_B", (rs.getString("IE_CURRENT_B") == null ? "" : rs.getString("IE_CURRENT_B")));
+						json.put("IE_LONGITUDE", (rs.getString("IE_LONGITUDE") == null ? "" : rs.getString("IE_LONGITUDE")));
+						json.put("IE_LATTITUDE", (rs.getString("IE_LATTITUDE") == null ? "" : rs.getString("IE_LATTITUDE")));
+						json.put("IE_ALTITUDE", (rs.getString("IE_ALTITUDE") == null ? "" : rs.getString("IE_ALTITUDE")));
+						json.put("IE_SURVEYOR_NAME", (rs.getString("IE_SURVEYOR_NAME") == null ? "" : rs.getString("IE_SURVEYOR_NAME")));
+						json.put("IE_MTR_SLNO", (rs.getString("IE_MTR_SLNO") == null ? "" : rs.getString("IE_MTR_SLNO")));
+						json.put("IE_MTR_MAKE", (rs.getString("IE_MTR_MAKE") == null ? "" : rs.getString("IE_MTR_MAKE")));
+						json.put("IE_MTR_TYPE", (rs.getString("IE_MTR_TYPE") == null ? "" : rs.getString("IE_MTR_TYPE")));
+						json.put("IE_FINAL_READING", (rs.getString("IE_FINAL_READING") == null ? "" : rs.getString("IE_FINAL_READING")));
+						json.put("IE_CODE_NUMBER", (rs.getString("IE_CODE_NUMBER") == null ? "" : rs.getString("IE_CODE_NUMBER")));
+						json.put("IE_PHONE_NUMBER", (rs.getString("IE_PHONE_NUMBER") == null ? "" : rs.getString("IE_PHONE_NUMBER")));
+						json.put("IE_PHASE", (rs.getString("IE_PHASE") == null ? "" : rs.getString("IE_PHASE")));
+						json.put("IE_IMAGE_PATH", (rs.getString("IE_IMAGE_PATH") == null ? "" : rs.getString("IE_IMAGE_PATH")));
+						json.put("IE_UPDATED_BY", (rs.getString("IE_UPDATED_BY") == null ? "" : rs.getString("IE_UPDATED_BY")));
+						json.put("IE_UPDATED_ON", (rs.getString("IE_UPDATED_ON") == null ? "" : rs.getString("IE_UPDATED_ON")));
+						
+						array.add(json);
+					}
+
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("data", array);
+
+					//ps.close();
+					//rs.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JSON_RESPONSE.put("status", "error");
+				JSON_RESPONSE.put("data", "");
+			} finally {
+				//DBManagerResourceRelease.close(rs, ps, dbConn);
+				DBManagerResourceRelease.close(rs);
+				DBManagerResourceRelease.close(ps);
+			}
+			
+			return JSON_RESPONSE;
 		}
 
 

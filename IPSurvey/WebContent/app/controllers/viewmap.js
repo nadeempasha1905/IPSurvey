@@ -302,7 +302,7 @@ angular.module('ipsurveyapp.Controllers', [])
 		$scope.getenumeratedvillageslist = function(value){
 			$scope.getenumeratedvillages = [];
 			if($scope.search.omsection === undefined || $scope.search.omsection === null){
-				notify.warn("Please select O&M Section !!!");
+				//notify.warn("Please select O&M Section !!!");
 				return;
 			}
 			remote.load("getenumeratedvillageslist", function(response){
@@ -318,7 +318,7 @@ angular.module('ipsurveyapp.Controllers', [])
 		$scope.getenumeratedtransformerslist = function(value){
 			$scope.getenumeratedtransformers = [];
 			if($scope.search.omsection === undefined || $scope.search.omsection === null){
-				notify.warn("Please select O&M Section !!!");
+				//notify.warn("Please select O&M Section !!!");
 				return;
 			}
 			remote.load("getenumeratedtransformerslist", function(response){
@@ -352,6 +352,7 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		var markers = [];
 		var layerGroup;
+		var custLegendHtml,custLegendHtmlCtrl;
 		
 		$scope.init_leaflet = function(){
 			
@@ -442,7 +443,11 @@ angular.module('ipsurveyapp.Controllers', [])
 		$scope.getmappingpoints = function(){
 			
 			layerGroup.clearLayers();
+			if(custLegendHtmlCtrl){
+				map.removeControl(custLegendHtmlCtrl);
+			} 
 			$scope.mappingpoints = [];
+			custLegendHtml="<div style='background-color: #efe;font-size: small;'><table class='table table-condensed'>";
 			var lat_to_center = "",lng_to_center = ""
 			var icon_transformer 		= L.icon({iconUrl: 'app/images/map/powersubstation_black.png'});
 			var icon_transformer25 		= L.icon({iconUrl: 'app/images/map/powersubstation_blue_25.png'});
@@ -451,17 +456,20 @@ angular.module('ipsurveyapp.Controllers', [])
 			var icon_transformer160 		= L.icon({iconUrl: 'app/images/map/powersubstation_white_25.png'});
 			var icon_transformer250 		= L.icon({iconUrl: 'app/images/map/powersubstation_red_250.png'});
 			var icon_ipset 				= L.icon({iconUrl: 'app/images/map/information_red.png'});
+			var icon_ipset_black 			= L.icon({iconUrl: 'app/images/map/black_letter_i.png'});
+			var icon_ipset_red 			= L.icon({iconUrl: 'app/images/map/red_letter_i.png'});
+			var icon_ipset_yellow 			= L.icon({iconUrl: 'app/images/map/yellow_letter_i.png'});
 			var icon_village 			= L.icon({iconUrl: 'app/images/map/smallcity.png'});
-			
-			
 			
 			
 			remote.load("getmappingpoints", function(response){
 				$scope.mappingpoints = response.data;
 				
 				if($scope.mappingpoints.length == 0 ){
-					$scope.reset();
 					notify.error("No Records Found !!!!");
+					$timeout(function(){
+						$scope.reset();
+					},2000);
 					return;
 				}
 				
@@ -504,7 +512,7 @@ angular.module('ipsurveyapp.Controllers', [])
 							.addTo(layerGroup);
 						}
 
-						var html='<table class="table table-condensed table-bordered" id="tableId" style="font-size: 12px;">';
+						var html='<table class="table table-condensed table-bordered" id="tableId">';
 						html+="<tr>";
 						html+="<td colspan='6' style='width: 900px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>IP-Set Details</b></td>";
 						html+="</tr><tr><td ><b>O&M Section</b></td><td >"+e.OM_NAME+"</td><td ><b>Village Name</b></td><td >"+e.VILLAGE_NAME+"</td><td ><b>Station Name</b></td><td >"+e.STATION_NAME+"</td>";
@@ -518,9 +526,20 @@ angular.module('ipsurveyapp.Controllers', [])
 						html+="</tr><tr><td ><b>Remarks</b></td><td colspan='5'>"+e.REMARKS+"</td>";
 						
 						var linkFunction = $compile(angular.element(html));
-						console.log(linkFunction)
+						console.log(linkFunction);
 						
-						L.marker([e.IP_LATTITUDE, e.IP_LONGITUDE], {icon: icon_ipset})
+						var voltage_count = 0;
+						var ipsetcolorcode = "";
+						if(parseInt(e.VOLTAGE_BR) > 0){voltage_count++;}
+						if(parseInt(e.VOLTAGE_RB) > 0){voltage_count++;}
+						if(parseInt(e.VOLTAGE_RY) > 0){voltage_count++;}
+						
+						console.log("voltage_count",voltage_count);
+						if(voltage_count == 1){icon=icon_ipset_black }
+						else if(voltage_count == 3){icon=icon_ipset_red }
+						else{icon=icon_ipset_yellow }
+						
+						L.marker([e.IP_LATTITUDE, e.IP_LONGITUDE], {icon: icon})
 						.bindPopup(L.popup({minWidth: 400, maxWidth: 900}).setContent(linkFunction($scope)[0]))
 						.addTo(layerGroup);
 					
@@ -557,6 +576,56 @@ angular.module('ipsurveyapp.Controllers', [])
 					}
 					
 				});
+				
+				if($scope.modal.transformers != undefined || $scope.modal.transformers != null){
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/smallcity.png' style='height: 25px;'></td><td>Village</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_blue_25.png' style='height: 25px;'></td><td>Transformer-25 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_grey_63.png' style='height: 25px;'></td><td>Transformer-63 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_green_100.png' style='height: 25px;'></td><td>Transformer-100 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_white_25.png' style='height: 25px;'></td><td>Transformer-160 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_red_250.png' style='height: 25px;'></td><td>Transformer-250 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_black.png' style='height: 25px;'></td><td>Transformer Others</td></tr>";
+					//custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/information_red.png'></td><td>IPset</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/black_letter_i.png' style='height: 25px;'></td><td>IPSET - Single Phase</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/red_letter_i.png' style='height: 25px;'></td><td>IPSET - Three Phase</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/yellow_letter_i.png' style='height: 25px;'></td><td>IPSET - Dried/Shifted/DL</td></tr>";
+					
+				}else{
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_blue_25.png' style='height: 25px;'></td><td>Transformer-25 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_grey_63.png' style='height: 25px;'></td><td>Transformer-63 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_green_100.png' style='height: 25px;'></td><td>Transformer-100 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_white_25.png' style='height: 25px;'></td><td>Transformer-160 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_red_250.png' style='height: 25px;'></td><td>Transformer-250 KVA</td></tr>";
+					custLegendHtml=custLegendHtml+"<tr><td><img src='app/images/map/powersubstation_black.png' style='height: 25px;'></td><td>Transformer Others</td></tr>";
+				}
+				
+				custLegendHtml=custLegendHtml+"</table></div>";
+				custLegendHtmlCtrl=L.control.custom({
+					position: 'bottomright',
+					content :custLegendHtml,               
+					style :
+					{
+						margin: '5px',
+						padding: '0px 0 0 0',
+						cursor: 'pointer'
+					},
+					datas:
+					{
+						'foo': 'bar'
+					},
+					events:
+					{
+						click: function(data)
+						{
+						},
+						dblclick: function(data)
+						{
+						},
+						contextmenu: function(data)
+						{
+						}
+					}
+				}).addTo(map);
 				
 				map.setView(new L.LatLng(lat_to_center, lng_to_center),13);
 				

@@ -1,1 +1,614 @@
-<h2>Ipset Enum</h2>
+<style>
+ .thalign thead tr th{vertical-align: middle; }
+ .thalign tbody tr td{vertical-align: middle; }
+ 
+.modal-lg{
+	    max-width: 95%;
+}
+.modal-header{background-color: darkcyan;color: white;}
+		
+.modal_fixed_header_column table {position: relative;overflow: hidden;border-collapse: collapse;table-layout:fixed;}
+.modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
+.modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
+.modal_fixed_header_column thead th {min-width: 150px;width: 150px;color:white;border-color: #00bf8f !important;text-align: center;
+										font-size: 14px;height: 35px;word-wrap:break-word;}
+.modal_fixed_header_column tbody td {min-width: 150px;width: 150px;color: #353535;word-break: break-all;height: 35px;
+										word-wrap:break-word;font-weight: normal;}
+.modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
+
+.card-header {
+	background-color: teal;
+	color: white;
+    font-style: italic;
+    font-weight: 600;
+}
+ 
+</style>
+
+<div class="container-fluid" style="margin-top: 20px;">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card w-100">
+    			<div class="card-body">
+    				<div class="row">
+    					<div class="col-md-12">
+    						<div class="row">
+    							<div class="col-md-3">	
+    								<h5 class="card-title">Ipset Enumeration</h5>
+    								<hr/>
+    							</div>
+    						</div>
+    						<div class="row">
+    							<div class="col-md-2">
+				    		 		 <label for="searchzonelist">Zone</label>
+									    <select class="form-control" id="searchzonelist" 
+									    ng-model="search.zone"
+									    ng-options="u as u.value for u in searchzonelist" ng-change="getcircleList([],null,'search')" 
+									    ng-disabled="ZONEUSER || CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER">
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+   		 		   		 		<div class="col-md-2" >
+			    		 		 <label for="searchcirclelist">Circle</label>
+								    <select class="form-control" id="searchcirclelist" 
+								    ng-model="search.circle"
+								    ng-options="u as u.value for u in searchcirclelist" ng-change="getdivisionList([],null,'search')" 
+								    ng-disabled="CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchdivisionlist">Division</label>
+								    <select class="form-control" id="searchdivisionlist" 
+								    ng-model="search.division"
+								    ng-options="u as u.value for u in searchdivisionlist" ng-change="getsubdivisionList([],null,'search')" 
+								    ng-disabled="DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2"  >
+			    		 		 <label for="searchsubdivisionlist">Sub-Division</label>
+								    <select class="form-control" id="searchsubdivisionlist" 
+								    ng-model="search.subdivision"
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList('search');" 
+								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchomsectionlist">O&M Section</label>
+								    <select class="form-control" id="searchomsectionlist" 
+								    ng-model="search.omsection"
+								    ng-options="u as u.value for u in searchomsectionlist" 
+								    ng-disabled="OMSECTIONUSER"  
+								    ng-change="getenumeratedvillageslist('','search');getenumeratedtransformerslist('','search');"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 			</div>
+    						</div>	
+    						
+    						<div class="row mt-3">
+	    						<div class="col-md-2"  >
+				    		 		 <label for="searchstationlist">Station</label>
+									    <select class="form-control" id="searchstationlist" 
+									    ng-model="search.station"
+									    ng-options="u as u.value for u in searchstationlist" ng-change="getFeederList('search')" 
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		 <label for="searchfeederlist">Feeder</label>
+									    <select class="form-control" id="searchfeederlist" 
+									    ng-model="search.feeder"
+									    ng-options="u as u.value for u in searchfeederlist" 
+									   
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		  <label for="searchvillageslist">Villages</label>
+									    <select class="form-control" id="searchvillageslist"  
+									    ng-model="search.village"
+									    ng-options="u as u.value for u in getenumeratedvillages"  
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		 <label for="searchtransformerslist">Transformers</label>
+									    <select class="form-control" id="searchtransformerslist" 
+									    ng-model="search.transformers"
+									    ng-options="u as u.value for u in getenumeratedtransformers"  
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+   								<div class="col-md-2" style="margin-top: 25px;">
+				   		 			<button class="btn btn-sm btn-primary" ng-click="SearchIpsetEnumDetails()">Search</button>
+				   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
+				   		 		</div>
+    						</div>
+    						<!-- <div class="row mt-3">
+    							<div class="col-md-2">
+    								<label for="autocompletevillagename">Village<span style="color: red;">&nbsp;(Search here ...)</span></label>
+							      	<autocomplete class="form-control" placeholder="Search here..." ng-model="search.autocompletevillagename" data="SEARCHED_VILLAGE_MASTER_DATA" on-type="updateVillages"></autocomplete>
+							    </div>
+    						</div> -->
+    						<div class="row mt-4">
+    							<div class="col-md-2">
+		    						<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" 
+		    							data-target=".ipsetenumerate-addedit-modal" ng-click="addeditIPsetEnumeration(null,'add')">
+		    							<i class="fa fa-plus"></i>&nbsp;Add Enumeration Data</button>
+    							</div>
+    						</div>	
+    						<div class="row mt-3">
+    							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
+    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
+									  <thead>
+									    <tr>
+											<th></th>
+											<th>Sub Division</th>
+											<th>O&M Section</th>
+											<th>Station</th>
+											<th>Feeder</th>
+											<th>Transformer</th>
+											<th>Village</th>
+											<th>RR number</th>
+											<th>Ip Code Number</th>
+											<th>Consumer Name</th>
+											<th>Address1</th>
+											<th>Address2</th>
+											<th>Phone</th>
+											<th>Connection Type</th>
+											<th>Connection Status</th>
+											<th>Water Source</th>
+											<th>Scheme</th>
+											<th>Meter Status</th>
+											<th>Meter Make</th>
+											<th>Meter Type</th>
+											<th>Meter Sl. No.</th>
+											<th>Final Reading</th>
+											<th>Load (KW)</th>
+											<th>Load (HP)</th>
+											<th>Voltage-1</th>
+											<th>Voltage-2</th>
+											<th>Voltage-2</th>
+											<th>Current-1</th>
+											<th>Current-2</th>
+											<th>Current-2</th>
+											<th>Latitude</th>
+											<th>Longitude</th>
+											<th>Altitude</th>
+											<th>Remarks</th>
+											<th>Updated By</th>
+											<th>Updated On</th>
+											</tr>
+									  </thead>
+									  <tbody>
+									  	<tr ng-repeat="data in TRANSFORMER_ENUM_DATA">
+									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".ipsetenumerate-addedit-modal" 
+									  			ng-click="addeditIPsetEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>{{data.SUBDIVISION_NAME}}</td>
+									  		<td>{{data.OM_NAME}}</td>
+									  		<td>{{data.STATION_NAME}}</td>
+									  		<td>{{data.FEEDER_NAME}}</td>
+									  		<td>{{data.TE_TRANSFORMER_NAME}}</td>
+									  		<td>{{data.TE_TIMS_CODE}}</td>
+									  		<td>{{data.TE_CAPACITY_KVA}}</td>
+									  		<td>{{data.TE_VILLAGE}}</td>
+									  		<td>{{data.TE_LATTITUDE}}</td>
+									  		<td>{{data.TE_LONGITUDE}}</td>
+									  		<td>{{data.TE_ALTITUDE}}</td>
+									  		<td>{{data.TE_REMARKS}}</td>
+									  		<td>{{data.TE_UPDATED_BY}}</td>
+									  		<td>{{data.TE_UPDATED_ON}}</td>
+									  	</tr>
+									  </tbody>
+									</table>
+    							</div>
+    						</div>
+    					</div>
+    				</div>	
+    			</div>
+    		</div>
+    	</div>
+    </div>			
+ </div>   	
+ 
+ <div class="modal fade ipsetenumerate-addedit-modal" id="ipsetenumerate-addedit-modal" tabindex="-1" role="dialog"
+	style="z-index: 2026;" aria-hidden="true" data-backdrop="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{modal_heading}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+        
+        <div class="row">
+        	<div class="col-md-10">
+        	
+        	<div class="row mt-3" >
+   		 		<div class="col-md-12">
+	   		 		<div class="card">
+	   		 			<div class="card-header">Location Details</div>
+					  <div class="card-body">
+        	
+        	<div class="row mt-3" >
+	        	<div class="col-md-3">
+	    		 		 <label for="modalomsectionlist">O&M Section</label>
+						    <select class="form-control" id="modalomsectionlist" 
+						    ng-model="modal.omsection"
+						    ng-options="u as u.value for u in modalomsectionlist"  
+						     ng-change="getenumeratedvillageslist('','modal');getenumeratedtransformerslist('','modal');"
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	   		 		</div>
+	   		 		<div class="col-md-3">
+	    		 		 <label for="modalstationlist">Station</label>
+						    <select class="form-control" id="modalstationlist" 
+						    ng-model="modal.station"
+						    ng-options="u as u.value for u in modalstationlist"  
+						    ng-change="getFeederList()" 
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	   		 		</div>
+	   		 		<div class="col-md-3">
+	    		 		 <label for="modalfeederlist">Feeder</label>
+						    <select class="form-control" id="modalfeederlist" 
+						    ng-model="modal.feeder"
+						    ng-options="u as u.value for u in modalfeederlist"  
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	   		 		</div>
+	   		 		<div class="col-md-3">
+	    		 		 <label for="modalvillageslist">Villages</label>
+						    <select class="form-control" id="modalvillageslist" 
+						    ng-model="modal.village"
+						    ng-options="u as u.value for u in getmodalenumeratedvillages"  
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	   		 		</div>
+	   		 		<div class="col-md-3 mt-3" >
+	    		 		 <label for="searchtransformerslist">Transformers</label>
+						    <select class="form-control" id="searchtransformerslist" 
+						    ng-model="modal.transformers"
+						    ng-options="u as u.value for u in getmodalenumeratedtransformers"  
+						    >
+						      <option value="">------Select------</option>
+						    </select>
+	   		 		</div>
+   		 	</div>	
+   		 	
+   		 	</div>
+   		 	</div>
+   		 	</div>
+   		 	</div>
+   		 	
+   		 	<div class="row mt-3" >
+   		 		<div class="col-md-12">
+	   		 		<div class="card">
+	   		 			<div class="card-header">Consumer Details</div>
+					  <div class="card-body">
+					    <div class="row mt-3">
+					    	<div class="col-md-3">
+			   		 			<label for="rrnumber">RR Number<span style="color: red;" ng-show="action == 'add'">&nbsp;(Type & press enter)</span></label>
+			    		 		<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="action == 'edit' || !newuseridexists" 
+			    		 			ng-enter="VerifyRRNumber()" >
+			   		 		</div>
+			   		 		<div class="col-md-3">
+			    		 		<label for="codenumber">Code Number</label>
+								 <input class="form-control" type="text" ng-model="modal.codenumber" autocomplete="off" ng-readonly="true">
+			    		 	</div>
+			   		 		<div class="col-md-3">
+			    		 		<label for="consumername">Consumer Name</label>
+								 <input class="form-control" type="text" ng-model="modal.consumername" autocomplete="off" ng-readonly="newuseridexists">
+			    		 	</div>
+			    		 	<div class="col-md-3">
+			    		 		<label for="address1">Address 1</label>
+								 <input class="form-control" type="text" ng-model="modal.address1" autocomplete="off" ng-readonly="newuseridexists">
+			    		 	</div>
+					    </div>
+					     <div class="row mt-3">
+					     	<div class="col-md-3">
+					     		<label for="address2">Address 2</label>
+							 	<input class="form-control" type="text" ng-model="modal.address2" autocomplete="off" ng-readonly="newuseridexists">
+							 </div>	
+							 <div class="col-md-3">
+							 	 <label for="connectiontypes">Connection Types</label>
+								    <select class="form-control" id="connectiontypes" 
+								    ng-model="modal.connectiontypes"
+								    ng-options="u as u.value for u in modalconnectiontypes" 
+								    ng-disabled="newuseridexists" 
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							  <div class="col-md-3">
+							 	 <label for="connectionstatus">Connection Status</label>
+								    <select class="form-control" id="connectionstatus" 
+								    ng-model="modal.connectionstatus"
+								    ng-options="u as u.value for u in modalconnectionstatus"  
+								    ng-disabled="newuseridexists"
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							 <div class="col-md-3">
+					     		<label for="phone">Phone</label>
+							 	<input class="form-control" type="text" ng-model="modal.phone" autocomplete="off" ng-readonly="newuseridexists">
+							 </div>	
+					     </div>
+					  </div>
+				</div>
+ 			</div>
+   		 </div>
+   		 
+   		 
+   		 
+   		 <div class="row mt-3" >
+   		 		<div class="col-md-12">
+	   		 		<div class="card">
+	   		 			<div class="card-header">Connection Details</div>
+					  <div class="card-body">
+					     <div class="row mt-3">
+							 <div class="col-md-3">
+							 	 <label for="watersource">Water Source</label>
+								    <select class="form-control" id="watersource" 
+								    ng-model="modal.watersource"
+								    ng-options="u as u.value for u in modalwatersource" 
+								    ng-disabled="newuseridexists" 
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							  <div class="col-md-3">
+							 	 <label for="connectionscheme">Scheme</label>
+								    <select class="form-control" id="connectionscheme" 
+								    ng-model="modal.connectionscheme"
+								    ng-options="u as u.value for u in modalconnectionscheme"  
+								    ng-disabled="newuseridexists"
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							 	<div class="form-inline form-compact col-md-3">
+									<label for="servicedate" class="labelchange">Service Date</label>
+									<div class=' form-inline input-group input-append date dsfromdate'
+										data-provide="datepicker">
+										<input type='text' class="form-control" id="servicedate"
+											readonly="readonly" name="servicedate" ng-model="modal.servicedate"
+											ng-required="true"> <span
+											class="input-group-addon datepicker"> <span
+											class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
+								</div>
+							 	<div class="form-inline form-compact col-md-3">
+									<label for="servicedate" class="labelchange">Inspection Date</label>
+									<div class=' form-inline input-group input-append date dsfromdate'
+										data-provide="datepicker">
+										<input type='text' class="form-control" id="inspectiondate"
+											readonly="readonly" name="inspectiondate" ng-model="modal.inspectiondate"
+											ng-required="true"> <span
+											class="input-group-addon datepicker"> <span
+											class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
+								</div>
+					     </div>
+   					     <div class="row mt-3">
+							 <div class="col-md-3">
+							 	 <label for="meterstatus">Meter Status</label>
+								    <select class="form-control" id="meterstatus" 
+								    ng-model="modal.meterstatus"
+								    ng-options="u as u.value for u in modalmeterstatus" 
+								    ng-disabled="newuseridexists" 
+								    ng-change="enablemetermakeandtype()"
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							  <div class="col-md-3">
+							 	 <label for="meterstatus">Meter Make</label>
+								    <select class="form-control" id="metermake" 
+								    ng-model="modal.metermake"
+								    ng-options="u as u.value for u in modalmetermake" 
+								    ng-disabled="meterstatusdisable" 
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							 <div class="col-md-3">
+							 	 <label for="meterstatus">Meter Type</label>
+								    <select class="form-control" id="metertype" 
+								    ng-model="modal.metertype"
+								    ng-options="u as u.value for u in modalmetertype" 
+								    ng-disabled="meterstatusdisable" 
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>
+							
+					     </div>
+					      <div class="row mt-3">
+					       <div class="col-md-3">
+							 	 <label for="meterslno">Meter Sl. No.</label>
+								   <input class="form-control" type="text" ng-model="modal.meterslno" autocomplete="off" ng-disabled="meterstatusdisable" >
+							 </div>
+							 <div class="col-md-3">
+							 	 <label for="finalreading">Final Reading</label>
+								   <input class="form-control" type="text" ng-model="modal.finalreading" autocomplete="off" ng-disabled="meterstatusdisable" >
+							 </div>
+						  </div>	 
+					  </div>
+				</div>
+ 			</div>
+   		 </div>
+   		 
+   		 
+   		 <div class="row mt-3" >
+   		 		<div class="col-md-12">
+	   		 		<div class="card">
+	   		 			<div class="card-header">Power Details</div>
+					  		<div class="card-body">
+						      <div class="row mt-3">
+						       <div class="col-md-3">
+								 	 <label for="loadkw">Load (KW)</label>
+									   <input class="form-control" type="text" ng-model="modal.loadkw" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+								 <div class="col-md-3">
+								 	 <label for="loadhp">Load (HP)</label>
+									   <input class="form-control" type="text" ng-model="modal.loadhp" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+							  </div>	
+							  <div class="row mt-3">
+						       <div class="col-md-3">
+								 	 <label for="voltage1">Voltage 1</label>
+									   <input class="form-control" type="text" ng-model="modal.voltage1" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+								<div class="col-md-3">
+								 	 <label for="voltage2">Voltage 2</label>
+									   <input class="form-control" type="text" ng-model="modal.voltage2" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+								 <div class="col-md-3">
+								 	 <label for="voltage3">Voltage 3</label>
+									   <input class="form-control" type="text" ng-model="modal.voltage3" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+							  </div>
+							  <div class="row mt-3">
+						       <div class="col-md-3">
+								 	 <label for="current1">Current 1</label>
+									   <input class="form-control" type="text" ng-model="modal.current1" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+								<div class="col-md-3">
+								 	 <label for="current2">Current 2</label>
+									   <input class="form-control" type="text" ng-model="modal.current2" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+								 <div class="col-md-3">
+								 	 <label for="current3">Current 3</label>
+									   <input class="form-control" type="text" ng-model="modal.current3" autocomplete="off" ng-readonly="newuseridexists">
+								 </div>
+							  </div>	 
+					 	 </div>
+					</div>
+ 				</div>
+   			 </div>
+   			 
+   			  <div class="row mt-3" >
+   		 		<div class="col-md-12">
+	   		 		<div class="card">
+	   		 			<div class="card-header">Geo-Coordinates</div>
+					  		<div class="card-body">
+							 <div class="row mt-3" >
+					   		 		<div class="col-md-4">
+					   		 			<label for="modallatitude">Latitude</label>
+					   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists">
+					   		 		</div>
+					   		 		<div class="col-md-4">
+					   		 			<label for="modallongitude">Longitude</label>
+					   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists">
+					   		 		</div>
+					   		 		<div class="col-md-4">
+					   		 			<label for="modalaltitude">Altitude</label>
+					   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists">
+					   		 		</div>
+					   		 	</div>
+					 	 </div>
+					</div>
+ 				</div>
+   			 </div>
+   		 <div class="row mt-3" >
+  		 		<div class="col-md-12">
+  		 			<label for="modalremerks">Remarks</label>
+  		 			<input class="form-control" type="text" ng-model="modal.remarks" id="modalremerks" ng-readonly="newuseridexists">
+  		 		</div>
+  		 	</div> 
+    		 
+    		 	
+   		 	<div class="row mt-3" >
+   		 	 <div class="col-md-4" ng-show="action === 'edit'" >
+	    		 	<div class="form-check" style="margin-top: 20px;">
+					    <input type="checkbox" class="form-check-input" id="exampleCheck1" ng-model="modal.changeimage" ng-disabled="newuseridexists">
+					    <label class="form-check-label" for="exampleCheck1">Change Image</label>
+					  </div>
+	    		 </div>
+   		 		<div class="col-md-8" ng-show="action === 'add' || modal.changeimage">
+   		 		<label for="modalchooseimage">Choose Image</label>
+   		 			<input type="file" class="btn alert-info btn-md btn-block" id="modalchooseimage" name="modalchooseimage"  ng-disabled="newuseridexists" 
+								    		ng-model="modal.chooseimage" onchange="readURL(this);">
+   		 		</div>
+   		 	</div>	
+    		   <div class="row mt-3" >
+    		  		<div class="col-md-3">
+    		 		 <button type="button" class="btn btn-md btn-success btn-block" ng-click="SaveRecord()" ng-disabled="newuseridexists">Save</button>
+    		 		 </div>
+	    		 	<div class="col-md-3" ng-show="action == 'add'">		 
+	    		 		 <button type="button" class="btn btn-outline-secondary btn-block" ng-click="addeditVillageEnumeration(null,'add')">Reset</button>
+	    		 		</div>
+	    		  </div>
+	        </div>
+	        <div class="col-md-2">
+	        	<img alt="No Image" ng-src="data:image/png;base64,{{imagedata}}" width="100%" height="290px">
+	        	<br/>
+	        	<br/>
+	        	<img id="uploadPreview" style="width: 100%; height: 120px;">
+	        </div>
+        </div>
+        
+        
+
+        	</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+ <script>
+ 
+ $('.dsfromdate').datetimepicker({
+		format : 'dd/mm/yyyy',
+		minView : 2,
+		autoclose : 1,
+		//startDate : new Date(new Date().setDate(new Date().getDate() - 15)),
+		//endDate : new Date(),
+		showClear: false
+	});
+ 
+ function readURL(input) {
+	    if (input.files && input.files[0]) {
+	        var reader = new FileReader();
+
+	        reader.onload = function (e) {
+	            $('#uploadPreview')
+	            .attr('src', e.target.result);
+	        };
+
+	        reader.readAsDataURL(input.files[0]);
+	    }
+	}
+
+</script>

@@ -134,6 +134,16 @@ public class ServiceRouter {
 	}
 	
 	@POST
+	@Path("/getcodedetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getcodedetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		System.out.println("hi....."+object);
+		return utilObj.getcodedetails(object,ipAdress);
+	}
+	
+	@POST
 	@Path("/getuserdetailslist")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
@@ -248,6 +258,41 @@ public class ServiceRouter {
 		return enumObj.upserttransformerenumeration(object,ipAdress);
 	}
 	
+	@POST
+	@Path("/getipcodenumber")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getipcodenumber(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getipcodenumber(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getconsumerdetailsbyrrno")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getconsumerdetailsbyrrno(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getconsumerdetailsbyrrno(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/upsertipsetenumeration")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject upsertipsetenumeration(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.upsertipsetenumeration(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getipsetenumerationdetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getipsetenumerationdetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getipsetenumerationdetails(object,ipAdress);
+	}
 	
 	/**********************************/
 	//View Map

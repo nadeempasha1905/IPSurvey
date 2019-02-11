@@ -35,5 +35,11 @@ public interface IEnumeration {
 	JSONObject validatetransformerdetails(JSONObject object, String ipAdress);
 
 	JSONObject upserttransformerenumeration(JSONObject object, String ipAdress);
+
+	JSONObject getconsumerdetailsbyrrno(JSONObject object, String ipAdress);
+
+	JSONObject upsertipsetenumeration(JSONObject object, String ipAdress);
+
+	JSONObject getipsetenumerationdetails(JSONObject object, String ipAdress);
 	
 }
