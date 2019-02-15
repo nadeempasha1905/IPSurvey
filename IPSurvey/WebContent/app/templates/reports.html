@@ -1,1 +1,187 @@
-<h2>Reports</h2>
+<style>
+ .thalign thead tr th{vertical-align: middle; }
+ .thalign tbody tr td{vertical-align: middle; }
+ 
+.modal-lg{
+	    max-width: 95%;
+}
+.modal-header{background-color: darkcyan;color: white;}
+		
+.modal_fixed_header_column table {position: relative;overflow: hidden;border-collapse: collapse;table-layout:fixed;}
+.modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
+.modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
+.modal_fixed_header_column thead th {min-width: 150px;width: 150px;color:white;border-color: #00bf8f !important;text-align: center;
+										font-size: 14px;height: 35px;word-wrap:break-word;}
+.modal_fixed_header_column tbody td {min-width: 150px;width: 150px;color: #353535;word-break: break-all;height: 35px;
+										word-wrap:break-word;font-weight: normal;}
+.modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
+
+.card-header {
+	background-color: teal;
+	color: white;
+    font-style: italic;
+    font-weight: 600;
+}
+ 
+</style>
+
+<div class="container-fluid" style="margin-top: 20px;">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card w-100">
+    			<div class="card-body">
+    				<div class="row">
+    					<div class="col-md-12">
+    						<div class="row">
+    							<div class="col-md-3">	
+    								<h5 class="card-title">Reports</h5>
+    								<hr/>
+    							</div>
+    						</div>
+    						<div class="row mt-3">
+    							<div class="col-md-2">
+				    		 		 <label for="reports">Report Type</label>
+									    <select class="form-control" id="reports" 
+									    ng-model="search.reports"
+									    ng-options="u as u.value for u in reportslist"  
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+    						</div>
+    						
+    						<div class="row">
+    							<div class="col-md-2">
+				    		 		 <label for="searchzonelist">Zone</label>
+									    <select class="form-control" id="searchzonelist" 
+									    ng-model="search.zone"
+									    ng-options="u as u.value for u in searchzonelist" ng-change="getcircleList([],null,'search')" 
+									    ng-disabled="ZONEUSER || CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER">
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+   		 		   		 		<div class="col-md-2" >
+			    		 		 <label for="searchcirclelist">Circle</label>
+								    <select class="form-control" id="searchcirclelist" 
+								    ng-model="search.circle"
+								    ng-options="u as u.value for u in searchcirclelist" ng-change="getdivisionList([],null,'search')" 
+								    ng-disabled="CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchdivisionlist">Division</label>
+								    <select class="form-control" id="searchdivisionlist" 
+								    ng-model="search.division"
+								    ng-options="u as u.value for u in searchdivisionlist" ng-change="getsubdivisionList([],null,'search')" 
+								    ng-disabled="DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2"  >
+			    		 		 <label for="searchsubdivisionlist">Sub-Division</label>
+								    <select class="form-control" id="searchsubdivisionlist" 
+								    ng-model="search.subdivision"
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList('search');" 
+								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchomsectionlist">O&M Section</label>
+								    <select class="form-control" id="searchomsectionlist" 
+								    ng-model="search.omsection"
+								    ng-options="u as u.value for u in searchomsectionlist" 
+								    ng-disabled="OMSECTIONUSER"  
+								    ng-change="getenumeratedvillageslist('','search');getenumeratedtransformerslist('','search');"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 			</div>
+    						</div>	
+    						
+    						<div class="row mt-3">
+	    						<div class="col-md-2"  >
+				    		 		 <label for="searchstationlist">Station</label>
+									    <select class="form-control" id="searchstationlist" 
+									    ng-model="search.station"
+									    ng-options="u as u.value for u in searchstationlist" ng-change="getFeederList('search')" 
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		 <label for="searchfeederlist">Feeder</label>
+									    <select class="form-control" id="searchfeederlist" 
+									    ng-model="search.feeder"
+									    ng-options="u as u.value for u in searchfeederlist" 
+									   
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		  <label for="searchvillageslist">Village</label>
+									    <select class="form-control" id="searchvillageslist"  
+									    ng-model="search.village"
+									    ng-options="u as u.value for u in getenumeratedvillages"  
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="col-md-2" >
+				    		 		 <label for="searchtransformerslist">Transformers</label>
+									    <select class="form-control" id="searchtransformerslist" 
+									    ng-model="search.transformers"
+									    ng-options="u as u.value for u in getenumeratedtransformers"  
+									    >
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+				   		 		<div class="form-inline form-compact col-md-2">
+									<label for="servicedate" class="labelchange">Date</label>
+									<div class=' form-inline input-group input-append date dsfromdate'
+										data-provide="datepicker">
+										<input type='text' class="form-control" id="reportdate"
+											readonly="readonly" name="reportdate" ng-model="search.reportdate"
+											ng-required="true"> <span
+											class="input-group-addon datepicker"> <span
+											class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div>
+								</div>
+   								<div class="col-md-2" style="margin-top: 25px;">
+				   		 			<button class="btn btn-sm btn-primary" ng-click="downloadreport()">Search</button>
+				   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
+				   		 		</div>
+    						</div>
+    						</div>	
+    					</div>
+    				</div>	
+    			</div>
+    		</div>
+    	</div>
+ </div>   	
+ 
+ <script>
+ 
+ $('.dsfromdate').datetimepicker({
+		format : 'dd/mm/yyyy',
+		minView : 2,
+		autoclose : 1,
+		//startDate : new Date(new Date().setDate(new Date().getDate() - 15)),
+		//endDate : new Date(),
+		showClear: false
+	});
+ 
+</script>

@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -20,6 +22,8 @@ import com.ipsurvey.enumeration.EnumerationImpl;
 import com.ipsurvey.enumeration.IEnumeration;
 import com.ipsurvey.map.IViewMap;
 import com.ipsurvey.map.ViewMapImpl;
+import com.ipsurvey.reports.IReportController;
+import com.ipsurvey.reports.ReportController;
 import com.ipsurvey.user.IUserManagement;
 import com.ipsurvey.user.UserManagementImpl;
 import com.ipsurvey.util.IUtility;
@@ -42,6 +46,7 @@ public class ServiceRouter {
 	IUserManagement userObj = new UserManagementImpl();
 	IEnumeration enumObj =  new EnumerationImpl();
 	IViewMap mapObj =  new ViewMapImpl();
+	IReportController reportObj =  new ReportController();
 	
 	@POST
 	@Path("/signin_pc")
@@ -360,6 +365,17 @@ public class ServiceRouter {
 		System.out.println("Fetching Image Data.......");
 		
 		return enumObj.getimagedata(object,request);
+	}
+	
+	@GET
+	@Path("/downloadreport")
+	/*@Consumes({MediaType.APPLICATION_JSON})*/
+	/*@Produces({MediaType.APPLICATION_OCTET_STREAM} )*/
+	@Produces("application/pdf")
+	public Response downloadreport(@Context HttpServletRequest request, @Context HttpServletResponse response){
+		System.out.println("downloading report......."+request.getParameter("location"));
+		
+		return reportObj.downloadreport(request,response);
 	}
 	
 			

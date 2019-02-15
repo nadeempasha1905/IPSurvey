@@ -6,6 +6,7 @@ package com.ipsurvey.enumeration;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -41,5 +42,6 @@ public interface IEnumeration {
 	JSONObject upsertipsetenumeration(JSONObject object, String ipAdress);
 
 	JSONObject getipsetenumerationdetails(JSONObject object, String ipAdress);
+
 	
 }
