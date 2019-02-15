@@ -1,1 +1,220 @@
-<h2>Station Master</h2>
+<style>
+ .thalign thead tr th{vertical-align: middle; }
+ .thalign tbody tr td{vertical-align: middle; }
+ 
+.modal-lg{
+	    max-width: 40%;
+}
+.modal-header{background-color: darkcyan;color: white;}
+		
+.modal_fixed_header_column table {position: relative;overflow: hidden;border-collapse: collapse;table-layout:fixed;}
+.modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
+.modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
+.modal_fixed_header_column thead th {min-width: 100px;width: 100px;color:white;border-color: #00bf8f !important;text-align: center;
+										font-size: 14px;height: 35px;word-wrap:break-word;}
+.modal_fixed_header_column tbody td {min-width: 100px;width: 100px;color: #353535;word-break: break-all;height: 35px;
+										word-wrap:break-word;font-weight: normal;}
+.modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(3){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(3){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(4){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(4){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(5){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(5){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(7){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(7){ min-width: 200px; width : 200px;word-wrap:break-word;}
+ 
+</style>
+
+<div class="container-fluid" style="margin-top: 20px;">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card w-100">
+    			<div class="card-body">
+    				<div class="row">
+    					<div class="col-md-12">
+    						<div class="row">
+    							<div class="col-md-2">	
+    								<h5 class="card-title">Station Master</h5>
+    								<hr/>
+    							</div>
+    						</div>
+    						<div class="row">
+    							<div class="col-md-2">
+				    		 		 <label for="searchzonelist">Zone</label>
+									    <select class="form-control" id="searchzonelist" 
+									    ng-model="search.zone"
+									    ng-options="u as u.value for u in searchzonelist" ng-change="getcircleList([],null,'search')" 
+									    ng-disabled="ZONEUSER || CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER">
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+   		 		   		 		<div class="col-md-2" >
+			    		 		 <label for="searchcirclelist">Circle</label>
+								    <select class="form-control" id="searchcirclelist" 
+								    ng-model="search.circle"
+								    ng-options="u as u.value for u in searchcirclelist" ng-change="getdivisionList([],null,'search')" 
+								    ng-disabled="CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2" >
+			    		 		 <label for="searchdivisionlist">Division</label>
+								    <select class="form-control" id="searchdivisionlist" 
+								    ng-model="search.division"
+								    ng-options="u as u.value for u in searchdivisionlist" ng-change="getsubdivisionList([],null,'search')" 
+								    ng-disabled="DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-2"  >
+			    		 		 <label for="searchsubdivisionlist">Sub-Division</label>
+								    <select class="form-control" id="searchsubdivisionlist" 
+								    ng-model="search.subdivision"
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search')" 
+								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		
+			   		 		<div class="col-md-2" style="margin-top: 25px;">
+			   		 			<button class="btn btn-sm btn-primary" ng-click="searchstationmasterdetails()">Search</button>
+			   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
+			   		 		</div>
+    						</div>
+    							
+    						<div class="row mt-4">
+    							<div class="col-md-2">
+		    						<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" 
+		    							data-target=".stationmaster-addedit-modal" ng-click="addeditstationmaster(null,'add')">
+		    							<i class="fa fa-plus"></i>&nbsp;Add Station</button>
+    							</div>
+    						</div>	
+    						<div class="row mt-3">
+    							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
+    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
+									  <thead>
+									    <tr>
+									      <th></th>
+									      <th>Sub-Division Name</th>
+									      <th>Station Code</th>
+									      <th>Station Name</th>
+									      <th>Station Type</th>
+									      <th>Updated By</th>
+									      <th>Updated On</th>
+									    </tr>
+									  </thead>
+									  <tbody>
+									  	<tr ng-repeat="data in STATION_MASTER_DATA">
+									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".stationmaster-addedit-modal" 
+									  			ng-click="addeditstationmaster(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>{{data.SUBDIV_NAME}}</td>
+									  		<td>{{data.STATION_CODE}}</td>
+									  		<td>{{data.STATION_NAME}}</td>
+									  		<td>{{data.STATION_TYPE_DESCR}}</td>
+									  		<td>{{data.UPDATED_BY}}</td>
+									  		<td>{{data.UPDATED_ON}}</td>
+									  	</tr>
+									  </tbody>
+									</table>
+    							</div>
+    						</div>
+    					</div>
+    				</div>	
+    			</div>
+    		</div>
+    	</div>
+    </div>			
+ </div>   	
+ 
+ <div class="modal fade stationmaster-addedit-modal" id="stationmaster-addedit-modal" tabindex="-1" role="dialog"
+	style="z-index: 2026;" aria-hidden="true" data-backdrop="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{modal_heading}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+        
+        <div class="row">
+        	<div class="col-md-12">
+   		 	<div class="row mt-3" >
+   		 		<div class="col-md-6">
+    		 		 <label for="modalsubdivision">Sub Division</label>
+					    <select class="form-control" id="modalsubdivision" 
+					    ng-model="modal.subdivision"
+					    ng-options="u as u.value for u in modalsubdivisionlist"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
+   		 		<div class="col-md-6">
+    		 		 <label for="modalstationtype">Station Type</label>
+					    <select class="form-control" id="modalstationtype" 
+					    ng-model="modal.stationtype"
+					    ng-options="u as u.value for u in modalstationtypes"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
+			 </div>
+    		 <div class="row mt-3" >
+   		 		<div class="col-md-6">
+   		 			<label for="modalstationcode">Station Code</label>
+   		 			<input class="form-control" type="text" ng-model="modal.stationcode" id="modalstationcode" >
+   		 		</div>
+   		 		<div class="col-md-6">
+   		 			<label for="modalstationname">Station Name</label>
+   		 			<input class="form-control" type="text" ng-model="modal.stationname" id="modalstationname" >
+   		 		</div>
+   		 	</div>
+    		   <div class="row mt-3" >
+    		  		<div class="col-md-3">
+    		 		 <button type="button" class="btn btn-md btn-success btn-block" ng-click="SaveRecord()" >Save</button>
+    		 		 </div>
+	    		 	<div class="col-md-3" ng-show="action == 'add'">		 
+	    		 		 <button type="button" class="btn btn-outline-secondary btn-block" ng-click="addeditstationmaster(null,'add')">Reset</button>
+	    		 		</div>
+	    		  </div>
+	        </div>
+        </div>
+        
+        
+
+        	</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+ <script>
+ function readURL(input) {
+	    if (input.files && input.files[0]) {
+	        var reader = new FileReader();
+
+	        reader.onload = function (e) {
+	            $('#uploadPreview')
+	            .attr('src', e.target.result);
+	        };
+
+	        reader.readAsDataURL(input.files[0]);
+	    }
+	}
+  </script>

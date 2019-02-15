@@ -34,6 +34,7 @@ import oracle.jdbc.driver.OracleTypes;
  * @author Nadeem
  *
  */
+ 
 
 
 public class EnumerationImpl implements IEnumeration{
@@ -900,6 +901,270 @@ public class EnumerationImpl implements IEnumeration{
 			
 			return JSON_RESPONSE;
 		}
+		
+		@Override
+		public JSONObject getstationmasterdetails(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			JSONObject json = new JSONObject();
+			JSONArray array = new JSONArray();
+
+			try {
+				
+				String sql = " SELECT ROWIDTOCHAR (S.ROWID) ROW_ID,"
+						   + " SM_LOCATION_CODE SUBDIV_CODE, LOCATION_NAME SUBDIV_NAME, "
+						   + " SM_STATION_CODE STATION_CODE, SM_STATION_NAME STATION_NAME,"
+						   + " SM_STATION_TYPE STATION_TYPE, FN_GET_CODE_NAME(SM_STATION_TYPE,'ST_TYPE') STATION_TYPE_DESCR,"
+						   + " NVL(SM_UPDATED_BY,SM_CREATED_BY) UPDATED_BY, TO_CHAR(NVL(SM_UPDATED_ON,SM_CREATED_ON),'DD/MM/YYYY HH:MI:SS AM') UPDATED_ON"
+						   + " FROM STATION_MASTER S"
+						   + " LEFT OUTER JOIN LOCATION ON LOCATION_CODE = SM_LOCATION_CODE"
+						   + " WHERE SM_LOCATION_CODE='"+(String)object.get("location_code")+"'"
+						   + " ORDER BY SM_STATION_CODE";
+
+
+					System.out.println(sql);
+
+					ps = dbConn.prepareStatement(sql);
+					rs = ps.executeQuery();
+					
+					while(rs.next()) {
+						
+						json = new JSONObject();
+						
+						json.put("row_id", (rs.getString("row_id") == null ? "" : rs.getString("row_id")));
+						json.put("SUBDIV_CODE", (rs.getString("SUBDIV_CODE") == null ? "" : rs.getString("SUBDIV_CODE")));
+						json.put("SUBDIV_NAME", (rs.getString("SUBDIV_NAME") == null ? "" : rs.getString("SUBDIV_NAME")));
+						json.put("STATION_CODE", (rs.getString("STATION_CODE") == null ? "" : rs.getString("STATION_CODE")));
+						json.put("STATION_NAME", (rs.getString("STATION_NAME") == null ? "" : rs.getString("STATION_NAME")));
+						json.put("STATION_TYPE", (rs.getString("STATION_TYPE") == null ? "" : rs.getString("STATION_TYPE")));
+						json.put("STATION_TYPE_DESCR", (rs.getString("STATION_TYPE_DESCR") == null ? "" : rs.getString("STATION_TYPE_DESCR")));
+						json.put("UPDATED_BY", (rs.getString("UPDATED_BY") == null ? "" : rs.getString("UPDATED_BY")));
+						json.put("UPDATED_ON", (rs.getString("UPDATED_ON") == null ? "" : rs.getString("UPDATED_ON")));
+						
+						array.add(json);
+					}
+
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("data", array);
+
+					//ps.close();
+					//rs.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JSON_RESPONSE.put("status", "error");
+				JSON_RESPONSE.put("data", "");
+			} finally {
+				//DBManagerResourceRelease.close(rs, ps, dbConn);
+				DBManagerResourceRelease.close(rs);
+				DBManagerResourceRelease.close(ps);
+			}
+			
+			return JSON_RESPONSE;
+		}
+		
+		@Override
+		public JSONObject upsertstationmaster(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			CallableStatement calstmt = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			
+			try {
+				
+				 if(object.isEmpty()) {
+					 JSON_RESPONSE.put("status", "error");
+					 JSON_RESPONSE.put("message", "Invalid Object");
+				 }else {
+					
+					 String sql = "{ call UPSERT_STATION_MASTER(?,"
+							+ "'" + (String) object.get("rowid") + "'," + "'" + (String) object.get("location_code") + "'," + "'"
+							+ (String) object.get("stationcode") + "'," + "'" + (String) object.get("stationname") + "','" 
+							+ (String) object.get("stationtype") + "'," + "'" + (String) object.get("userid")  + "')}";
+
+					 System.out.println(sql);
+				calstmt = dbConn.prepareCall(sql);
+				calstmt.registerOutParameter(1,OracleTypes.CURSOR );
+				calstmt.executeUpdate();
+				
+				rs = (ResultSet) calstmt.getObject(1);
+				String result_proc = "";
+				if(rs.next()) {
+					result_proc = rs.getString("RESP");
+				}
+				
+				if(result_proc.equals("success")) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Station Inserted/Updated sucessfully .");
+				}else if(result_proc.equals("stncode_exists")) {
+					
+					JSON_RESPONSE.put("status", "error");
+					JSON_RESPONSE.put("message", "Station Code Already Exists !!!");
+					
+				}else if(result_proc.equals("stnname_exists")) {
+					
+					JSON_RESPONSE.put("status", "error");
+					JSON_RESPONSE.put("message", "Station Name Already Exists !!!");
+					
+				}
+				else {
+					JSON_RESPONSE.put("status", "fail");
+					JSON_RESPONSE.put("message", "Station Inserted/Updated Failed !!!");
+				}
+
+				 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JSON_RESPONSE.put("status", "fail");
+			JSON_RESPONSE.put("message", "Station Inserted/Updated Failed");
+		}finally {
+			DBManagerResourceRelease.close(ps);
+			DBManagerResourceRelease.close(calstmt);
+		}
+		return JSON_RESPONSE;
+		}
+		
+		@Override
+		public JSONObject getfeedermasterdetails(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			JSONObject json = new JSONObject();
+			JSONArray array = new JSONArray();
+
+			try {
+				
+				String sql = " SELECT ROWIDTOCHAR (F.ROWID) ROW_ID,"
+						   + " FM_LOCATION_CODE SUBDIV_CODE, LOCATION_NAME SUBDIV_NAME, "
+						   + " FM_STATION_CODE STATION_CODE, SM_STATION_NAME STATION_NAME,"
+						   + " FM_FEEDER_CODE FEEDER_CODE, FM_FEEDER_NAME FEEDER_NAME,"
+						   + " FM_STATUS FEEDER_STATUS, CASE WHEN NVL(FM_STATUS,'Y')='Y' THEN 'Active' ELSE 'Inactive' END FEEDER_STATUS_DESCR,"
+						   + " NVL(FM_UPDATED_BY,FM_CREATED_BY) UPDATED_BY, TO_CHAR(NVL(FM_UPDATED_ON,FM_CREATED_ON),'DD/MM/YYYY HH:MI:SS AM') UPDATED_ON"
+						   + " FROM FEEDER_MASTER F"
+						   + " LEFT OUTER JOIN STATION_MASTER ON SM_LOCATION_CODE = FM_LOCATION_CODE AND SM_STATION_CODE = FM_STATION_CODE"
+						   + " LEFT OUTER JOIN LOCATION ON LOCATION_CODE = FM_LOCATION_CODE"
+						   + " WHERE FM_LOCATION_CODE='"+(String)object.get("location_code")+"'";
+						   
+							
+						if(((String)object.get("stationcode")).length() > 0) {
+								sql = sql + " AND FM_STATION_CODE = '"+(String)object.get("stationcode")+"' " ;
+							}
+								
+						sql = sql + " ORDER BY FM_LOCATION_CODE, FM_STATION_CODE, FM_FEEDER_CODE " ;	
+
+
+					System.out.println(sql);
+
+					ps = dbConn.prepareStatement(sql);
+					rs = ps.executeQuery();
+					
+					while(rs.next()) {
+						
+						json = new JSONObject();
+						
+						json.put("row_id", (rs.getString("row_id") == null ? "" : rs.getString("row_id")));
+						json.put("SUBDIV_CODE", (rs.getString("SUBDIV_CODE") == null ? "" : rs.getString("SUBDIV_CODE")));
+						json.put("SUBDIV_NAME", (rs.getString("SUBDIV_NAME") == null ? "" : rs.getString("SUBDIV_NAME")));
+						json.put("STATION_CODE", (rs.getString("STATION_CODE") == null ? "" : rs.getString("STATION_CODE")));
+						json.put("STATION_NAME", (rs.getString("STATION_NAME") == null ? "" : rs.getString("STATION_NAME")));
+						json.put("FEEDER_CODE", (rs.getString("FEEDER_CODE") == null ? "" : rs.getString("FEEDER_CODE")));
+						json.put("FEEDER_NAME", (rs.getString("FEEDER_NAME") == null ? "" : rs.getString("FEEDER_NAME")));
+						json.put("FEEDER_STATUS", (rs.getString("FEEDER_STATUS") == null ? "" : rs.getString("FEEDER_STATUS")));
+						json.put("FEEDER_STATUS_DESCR", (rs.getString("FEEDER_STATUS_DESCR") == null ? "" : rs.getString("FEEDER_STATUS_DESCR")));
+						json.put("UPDATED_BY", (rs.getString("UPDATED_BY") == null ? "" : rs.getString("UPDATED_BY")));
+						json.put("UPDATED_ON", (rs.getString("UPDATED_ON") == null ? "" : rs.getString("UPDATED_ON")));
+						
+						array.add(json);
+					}
+
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("data", array);
+
+					//ps.close();
+					//rs.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JSON_RESPONSE.put("status", "error");
+				JSON_RESPONSE.put("data", "");
+			} finally {
+				//DBManagerResourceRelease.close(rs, ps, dbConn);
+				DBManagerResourceRelease.close(rs);
+				DBManagerResourceRelease.close(ps);
+			}
+			
+			return JSON_RESPONSE;
+		}
+		
+		@Override
+		public JSONObject upsertfeedermaster(JSONObject object, String ipAdress) {
+			// TODO Auto-generated method stub
+			PreparedStatement ps = null;
+			CallableStatement calstmt = null;
+			ResultSet rs = null;
+			JSONObject JSON_RESPONSE = new JSONObject();
+			
+			try {
+				
+				 if(object.isEmpty()) {
+					 JSON_RESPONSE.put("status", "error");
+					 JSON_RESPONSE.put("message", "Invalid Object");
+				 }else {
+					
+					 String sql = "{ call UPSERT_FEEDER_MASTER(?,"
+							+ "'" + (String) object.get("rowid") + "'," + "'" + (String) object.get("location_code") + "'," + "'"
+							+ (String) object.get("stationcode") + "'," + "'" + (String) object.get("feedercode") + "','" 
+							+ (String) object.get("feedername") + "','"  + (String) object.get("feederstatus") + "'," + "'" 
+							+ (String) object.get("userid")  + "')}";
+
+					 System.out.println(sql);
+				calstmt = dbConn.prepareCall(sql);
+				calstmt.registerOutParameter(1,OracleTypes.CURSOR );
+				calstmt.executeUpdate();
+				
+				rs = (ResultSet) calstmt.getObject(1);
+				String result_proc = "";
+				if(rs.next()) {
+					result_proc = rs.getString("RESP");
+				}
+				
+				if(result_proc.equals("success")) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Feeder Inserted/Updated sucessfully .");
+				}else if(result_proc.equals("fdrcode_exists")) {
+					
+					JSON_RESPONSE.put("status", "error");
+					JSON_RESPONSE.put("message", "Feeder Code Already Exists !!!");
+					
+				}else if(result_proc.equals("fdrname_exists")) {
+					
+					JSON_RESPONSE.put("status", "error");
+					JSON_RESPONSE.put("message", "Feeder Name Already Exists !!!");
+					
+				}
+				else {
+					JSON_RESPONSE.put("status", "fail");
+					JSON_RESPONSE.put("message", "Feeder Inserted/Updated Failed !!!");
+				}
+
+				 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JSON_RESPONSE.put("status", "fail");
+			JSON_RESPONSE.put("message", "Feeder Inserted/Updated Failed");
+		}finally {
+			DBManagerResourceRelease.close(ps);
+			DBManagerResourceRelease.close(calstmt);
+		}
+		return JSON_RESPONSE;
+		}
+
 
 
 }
