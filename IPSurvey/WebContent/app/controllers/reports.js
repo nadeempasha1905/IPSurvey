@@ -18,6 +18,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			$scope.userinfo = store.get('userinfo');
 		}
 		
+		$scope.search.reportdate = moment(new Date()).format("DD/MM/YYYY").toString();
 		$scope.modal.servicedate = moment(new Date()).format("DD/MM/YYYY").toString();
 		$scope.modal.inspectiondate = moment(new Date()).format("DD/MM/YYYY").toString();
 		
@@ -386,13 +387,38 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			//$http.get($rootScope.serviceURL+'downloadreport', {responseType : 'arraybuffer'}).then(handleResponse1);
 			
-			$http.get($rootScope.serviceURL+'downloadreport?location=12345',{ responseType : 'arraybuffer'}).then(handleResponse)
+			var search_location = "",zone="",circle="",division="",subdivision="",omsection="",station="",feeder="",transformer="",village="";
+			if($scope.search.zone != undefined || $scope.search.zone != null){zone = $scope.search.zone.key; search_location = $scope.search.zone.key;}
+			if($scope.search.circle != undefined || $scope.search.circle != null){circle = $scope.search.circle.key; search_location = $scope.search.circle.key;}
+			if($scope.search.division != undefined || $scope.search.division != null){division = $scope.search.division.key; search_location = $scope.search.division.key;}
+			if($scope.search.subdivision != undefined || $scope.search.subdivision != null){subdivision = $scope.search.subdivision.key; search_location = $scope.search.subdivision.key;}
+			if($scope.search.omsection != undefined || $scope.search.omsection != null){omsection = $scope.search.omsection.key; search_location = $scope.search.omsection.key;}
+			if($scope.search.station != undefined || $scope.search.station != null){station = $scope.search.station.key;}
+			if($scope.search.feeder != undefined || $scope.search.feeder != null){feeder = $scope.search.feeder.key;}
+			if($scope.search.transformers != undefined || $scope.search.transformers != null){transformer = $scope.search.transformers.key;}
+			if($scope.search.village != undefined || $scope.search.village != null){village = $scope.search.village.key;}
+			
+			$('#loading').show();
+			$http.get($rootScope.serviceURL+'downloadreport?location_code='+search_location
+					+"&zone="+zone
+					+"&circle="+circle
+					+"&division="+division
+					+"&subdivision="+subdivision
+					+"&omsection="+omsection
+					+"&station="+station
+					+"&feeder="+feeder
+					+"&transformer="+transformer
+					+"&village="+village
+					+"&reportdate="+$scope.search.reportdate
+					+"&report_type="+$scope.search.reports.key
+					,{ responseType : 'arraybuffer'}).then(handleResponse)
 			
 		};
 		
 		function handleResponse(response){
 	       	var pdfFile = new Blob([response.data], { type : 'application/pdf' });	
 	       	var downloadURL = URL.createObjectURL(pdfFile);
+	       	$('#loading').hide();
 	       		$window.open(downloadURL);
 	     	  }
 		
