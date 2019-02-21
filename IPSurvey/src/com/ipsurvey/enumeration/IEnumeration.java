@@ -43,5 +43,12 @@ public interface IEnumeration {
 
 	JSONObject getipsetenumerationdetails(JSONObject object, String ipAdress);
 
+	JSONObject getstationmasterdetails(JSONObject object, String ipAdress);
+
+	JSONObject upsertstationmaster(JSONObject object, String ipAdress);
+
+	JSONObject upsertfeedermaster(JSONObject object, String ipAdress);
+
+	JSONObject getfeedermasterdetails(JSONObject object, String ipAdress);
 	
 }

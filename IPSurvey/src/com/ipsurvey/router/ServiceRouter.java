@@ -298,6 +298,7 @@ public class ServiceRouter {
 		return enumObj.upsertipsetenumeration(object,ipAdress);
 	}
 	
+	
 	@POST
 	@Path("/getipsetenumerationdetails")
 	@Consumes({MediaType.APPLICATION_JSON})
@@ -305,6 +306,43 @@ public class ServiceRouter {
 	public JSONObject getipsetenumerationdetails(final JSONObject object, @Context HttpServletRequest request){
 		String ipAdress = request.getRemoteHost();
 		return enumObj.getipsetenumerationdetails(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getstationmasterdetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getstationmasterdetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getstationmasterdetails(object,ipAdress);
+	}
+	
+	
+	@POST
+	@Path("/upsertstationmaster")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject upsertstationmaster(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.upsertstationmaster(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getfeedermasterdetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getfeedermasterdetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getfeedermasterdetails(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/upsertfeedermaster")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject upsertfeedermaster(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.upsertfeedermaster(object,ipAdress);
 	}
 	
 	/**********************************/
