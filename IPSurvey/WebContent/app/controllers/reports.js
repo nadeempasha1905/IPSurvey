@@ -34,7 +34,12 @@ angular.module('ipsurveyapp.Controllers', [])
 			{key:"5",value:"Progress - Section Wise"},
 			{key:"6",value:"Progress - User Wise"},
 			{key:"11",value:"New Progress - Section Wise"},
-			{key:"15",value:"KERC Progress"}
+			/*{key:"21",value:"Annexure-1"},
+			{key:"22",value:"Annexure-2"},
+			{key:"23",value:"Annexure-3"},
+			{key:"24",value:"Annexure-4"},
+			{key:"25",value:"Annexure-5"}*/
+			
 		];
 		
 		$scope.ZONEUSER = false;

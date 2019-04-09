@@ -124,6 +124,21 @@ public class ReportController implements IReportController {
 				report = "KERC";
 				report_title = "Details Of KERC";
 			}
+			else if(report_type.equals("21")){
+				fileName = "annex1";
+			}
+			else if(report_type.equals("22")){
+				fileName = "annex2";
+			}
+			else if(report_type.equals("23")){
+				fileName = "annex3";
+			}
+			else if(report_type.equals("24")){
+				fileName = "annex4";
+			}
+			else if(report_type.equals("25")){
+				fileName = "annex5";
+			}
 
 	        try {
 	        	String contextPath = request.getServletContext().getRealPath("ReportController.java");
