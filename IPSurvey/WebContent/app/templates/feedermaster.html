@@ -1,4 +1,10 @@
 <style>
+
+i
+{
+	cursor: pointer;
+}
+
  .thalign thead tr th{vertical-align: middle; }
  .thalign tbody tr td{vertical-align: middle; }
  
@@ -102,7 +108,7 @@
 			   		 		
 			   		 		<div class="col-md-2" style="margin-top: 25px;">
 			   		 			<button class="btn btn-sm btn-primary" ng-click="searchfeedermasterdetails()">Search</button>
-			   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
+			   		 			<button class="btn btn-sm btn-secondary" ng-click="Reset()">Reset</button>
 			   		 		</div>
     						</div>
     							
@@ -115,14 +121,15 @@
     						</div>	
     						<div class="row mt-3">
     							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
-    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
-									  <thead>
+    								<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 100%;">
+									  <thead style="background-color: #007bff;color: white;">
 									    <tr>
 									      <th></th>
 									      <th>Sub-Division Name</th>
 									      <th>Station</th>
 									      <th>Feeder Code</th>
 									      <th>Feeder Name</th>
+									      <th>Feeder Type</th>
 									      <th>Status</th>
 									      <th>Updated By</th>
 									      <th>Updated On</th>
@@ -130,12 +137,18 @@
 									  </thead>
 									  <tbody>
 									  	<tr ng-repeat="data in FEEDER_MASTER_DATA">
-									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".feedermaster-addedit-modal" 
-									  			ng-click="addeditfeedermaster(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>
+									  			<!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".feedermaster-addedit-modal" 
+									  			ng-click="addeditfeedermaster(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button> -->
+									  			
+									  			<i class="fa fa-edit"  ng-click="addeditfeedermaster(data,'edit')"data-toggle="modal" data-target=".feedermaster-addedit-modal" ></i>&nbsp;&nbsp;
+									  			<i class="fa fa-trash" ng-click="addeditfeedermaster(data,'delete')"></i>
+									  			</td>
 									  		<td>{{data.SUBDIV_NAME}}</td>
 									  		<td>{{data.STATION_NAME}}</td>
 									  		<td>{{data.FEEDER_CODE}}</td>
 									  		<td>{{data.FEEDER_NAME}}</td>
+									  		<td>{{data.FEEDER_TYPE_DESCR}}</td>
 									  		<td>{{data.FEEDER_STATUS_DESCR}}</td>
 									  		<td>{{data.UPDATED_BY}}</td>
 									  		<td>{{data.UPDATED_ON}}</td>
@@ -174,6 +187,7 @@
 					    ng-model="modal.subdivision"
 					    ng-options="u as u.value for u in modalsubdivisionlist"  
 					    ng-change="getStationList('modal')"
+					    ng-disabled = "action === 'add'"
 					    >
 					      <option value="">------Select------</option>
 					    </select>
@@ -191,11 +205,20 @@
     		 <div class="row mt-3" >
    		 		<div class="col-md-6">
    		 			<label for="modalfeedercode">Feeder Code</label>
-   		 			<input class="form-control" type="text" ng-model="modal.feedercode" id="modalfeedercode" >
+   		 			<input class="form-control" type="text" ng-model="modal.feedercode" id="modalfeedercode"   ng-disabled = "action === 'edit'" >
    		 		</div>
    		 		<div class="col-md-6">
    		 			<label for="modalfeedername">Feeder Name</label>
    		 			<input class="form-control" type="text" ng-model="modal.feedername" id="modalfeedername" >
+   		 		</div>
+   		 		<div class="col-md-6">
+    		 		 <label for="modalfeedertype">Feeder Type</label>
+					    <select class="form-control" id="modalfeedertype" 
+					    ng-model="modal.feedertype"
+					    ng-options="u as u.value for u in modalfeedertypes"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
    		 		</div>
    		 		<div class="col-md-6">
     		 		 <label for="modalfeederstatus">Status</label>

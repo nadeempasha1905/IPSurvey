@@ -7,8 +7,12 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("Viewmap Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		if(!store.get('userinfo')){
 			$rootScope.logout();
+			//$state.go("login");
 		}else{
 			$rootScope.IsLoggedIn = true;
 		}
@@ -31,7 +35,7 @@ angular.module('ipsurveyapp.Controllers', [])
 		$scope.OMSECTIONUSER = false;
 		
 		var LOCATION_CODE = $scope.userinfo.location_code;
-		var loc_zone= "",loc_circle= "",loc_division= "",loc_subdivision= "",loc_omsection = "";
+		var loc_company= "",loc_zone= "",loc_circle= "",loc_division= "",loc_subdivision= "",loc_omsection = "";
 		var loc_usertype = 0;
 		var loc_arr = [];
 		
@@ -54,15 +58,25 @@ angular.module('ipsurveyapp.Controllers', [])
 	      };
 		
 		$scope.initialize = function(){
-			if(LOCATION_CODE.length == 2){loc_zone=LOCATION_CODE.substr(0,2);loc_usertype=1;}
-			if(LOCATION_CODE.length == 3){loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_usertype=2;}
-			if(LOCATION_CODE.length == 5){loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_division=LOCATION_CODE.substr(0,5);loc_usertype=3;}
-			if(LOCATION_CODE.length == 7){loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_division=LOCATION_CODE.substr(0,5);loc_subdivision=LOCATION_CODE.substr(0,7);loc_usertype=4;}
-			if(LOCATION_CODE.length == 9){loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_division=LOCATION_CODE.substr(0,5);loc_subdivision=LOCATION_CODE.substr(0,7);loc_omsection=LOCATION_CODE.substr(0,9);loc_usertype=5;}
+			if(LOCATION_CODE.length == 1){loc_company=LOCATION_CODE.substr(0,1);loc_usertype=0;}
+			if(LOCATION_CODE.length == 2){loc_company=LOCATION_CODE.substr(0,1);loc_zone=LOCATION_CODE.substr(0,2);loc_usertype=1;}
+			if(LOCATION_CODE.length == 3){loc_company=LOCATION_CODE.substr(0,1);loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_usertype=2;}
+			if(LOCATION_CODE.length == 5){loc_company=LOCATION_CODE.substr(0,1);loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_division=LOCATION_CODE.substr(0,5);loc_usertype=3;}
+			if(LOCATION_CODE.length == 7){loc_company=LOCATION_CODE.substr(0,1);loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_division=LOCATION_CODE.substr(0,5);loc_subdivision=LOCATION_CODE.substr(0,7);loc_usertype=4;}
+			if(LOCATION_CODE.length == 9){loc_company=LOCATION_CODE.substr(0,1);loc_zone=LOCATION_CODE.substr(0,2);loc_circle=LOCATION_CODE.substr(0,3);loc_division=LOCATION_CODE.substr(0,5);loc_subdivision=LOCATION_CODE.substr(0,7);loc_omsection=LOCATION_CODE.substr(0,9);loc_usertype=5;}
 			
 
+			if (loc_usertype == 0) {
+				var loc_arr = [ loc_company ];
+				$scope.ZONEUSER = false;
+				$scope.CIRCLEUSER = false;
+				$scope.DIVISIONUSER = false;
+				$scope.SUBDIVISIONUSER = false;
+				$scope.OMSECTIONUSER = false;
+				$scope.getzonelist(loc_arr, loc_usertype, 'search');
+			}
 			if (loc_usertype == 1) {
-				var loc_arr = [ loc_zone ];
+				var loc_arr = [ loc_company,loc_zone ];
 				$scope.ZONEUSER = true;
 				$scope.CIRCLEUSER = false;
 				$scope.DIVISIONUSER = false;
@@ -71,7 +85,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.getzonelist(loc_arr, loc_usertype, 'search');
 			}
 			if (loc_usertype == 2) {
-				var loc_arr = [ loc_zone, loc_circle ];
+				var loc_arr = [ loc_company,loc_zone, loc_circle ];
 				$scope.ZONEUSER = false;
 				$scope.CIRCLEUSER = true;
 				$scope.DIVISIONUSER = false;
@@ -80,7 +94,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.getzonelist(loc_arr, loc_usertype, 'search');
 			}
 			if (loc_usertype == 3) {
-				var loc_arr = [ loc_zone, loc_circle, loc_division ];
+				var loc_arr = [ loc_company,loc_zone, loc_circle, loc_division ];
 				$scope.ZONEUSER = false;
 				$scope.CIRCLEUSER = false;
 				$scope.DIVISIONUSER = true;
@@ -89,7 +103,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.getzonelist(loc_arr, loc_usertype, 'search');
 			}
 			if (loc_usertype == 4) {
-				var loc_arr = [ loc_zone, loc_circle, loc_division,
+				var loc_arr = [ loc_company, loc_zone, loc_circle, loc_division,
 						loc_subdivision ];
 				$scope.ZONEUSER = false;
 				$scope.CIRCLEUSER = false;
@@ -99,7 +113,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.getzonelist(loc_arr, loc_usertype, 'search');
 			}
 			if (loc_usertype == 5) {
-				var loc_arr = [ loc_zone, loc_circle, loc_division,
+				var loc_arr = [ loc_company, loc_zone, loc_circle, loc_division,
 						loc_subdivision, loc_omsection ];
 				$scope.ZONEUSER = false;
 				$scope.CIRCLEUSER = false;
@@ -115,10 +129,13 @@ angular.module('ipsurveyapp.Controllers', [])
 				remote.load("getzonelist", function(response){
 					$scope.searchzonelist = response.ZONE_LIST;
 					if(arr.length > 0){
-						$scope.search.zone = $filter('filter')($scope.searchzonelist,{key:arr[0]},true)[0];
+						
+						
 						if(usertype > 1){
+							$scope.search.zone = $filter('filter')($scope.searchzonelist,{key:arr[1]},true)[0];
 							$scope.getcircleList(arr,usertype,'search');
-						}else{
+						}else if(usertype == 1){
+							$scope.search.zone = $filter('filter')($scope.searchzonelist,{key:arr[1]},true)[0];
 							remote.load("getcirclelist", function(response){
 								$scope.searchcirclelist = response.CIRCLE_LIST;
 							},{
@@ -139,7 +156,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				remote.load("getcirclelist", function(response){
 					$scope.searchcirclelist = response.CIRCLE_LIST;
 					if(arr.length > 0){
-						$scope.search.circle = $filter('filter')($scope.searchcirclelist,{key:arr[1]},true)[0];
+						$scope.search.circle = $filter('filter')($scope.searchcirclelist,{key:arr[2]},true)[0];
 						if(usertype > 2){
 							$scope.getdivisionList(arr,usertype,'search');
 						}else{
@@ -165,7 +182,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				remote.load("getdivisionlist", function(response){
 					$scope.searchdivisionlist = response.DIVISION_LIST;
 					if(arr.length > 0){
-						$scope.search.division = $filter('filter')($scope.searchdivisionlist,{key:arr[2]},true)[0];
+						$scope.search.division = $filter('filter')($scope.searchdivisionlist,{key:arr[3]},true)[0];
 						if(usertype > 3){
 							$scope.getsubdivisionList(arr,usertype,'search');
 						}else{
@@ -189,7 +206,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				remote.load("getsubdivisionlist", function(response){
 					$scope.searchsubdivisionlist = response.SUBDIVISION_LIST;
 					if(arr.length > 0){
-						$scope.search.subdivision = $filter('filter')($scope.searchsubdivisionlist,{key:arr[3]},true)[0];
+						$scope.search.subdivision = $filter('filter')($scope.searchsubdivisionlist,{key:arr[4]},true)[0];
 						$scope.getStationList('search');
 						if(usertype > 4){
 							$scope.getomsectionList(arr,usertype,'search');
@@ -217,7 +234,7 @@ angular.module('ipsurveyapp.Controllers', [])
 					remote.load("getomsectionlist", function(response){
 						$scope.searchomsectionlist = response.OMSECTION_LIST;
 						if(arr.length > 0){
-							$scope.search.omsection = $filter('filter')($scope.searchomsectionlist,{key:arr[4]},true)[0];
+							$scope.search.omsection = $filter('filter')($scope.searchomsectionlist,{key:arr[5]},true)[0];
 					}
 					},{
 						location_code:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key)
@@ -324,7 +341,9 @@ angular.module('ipsurveyapp.Controllers', [])
 			remote.load("getenumeratedtransformerslist", function(response){
 				$scope.getenumeratedtransformers = response.TRANSFORMER_ENUM_DATA;
 			},{
-				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key)
+				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key),
+				station_code:($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key),
+				feeder_code:($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key)
 			}, 'POST');
 		};
 		
@@ -389,6 +408,12 @@ angular.module('ipsurveyapp.Controllers', [])
 				position: 'bottomright'
 			}).addTo(map);
 			
+			/*L.easyPrint({
+				title: 'My awesome print button',
+				position: 'bottomright',
+				sizeModes: ['A4Portrait', 'A4Landscape']
+			}).addTo(map);*/
+			
 			
 			layerGroup = L.layerGroup().addTo(map)
 			
@@ -430,8 +455,14 @@ angular.module('ipsurveyapp.Controllers', [])
 		};
 		
 		$scope.applyfiletrs = function(){
+		
+			if($scope.search.search_rrnumber){
+				if($scope.search.subdivision === undefined || $scope.search.subdivision === null){notify.warn("Please select Sub Division !!!");return;}
+			}else{
+				if($scope.search.omsection === undefined || $scope.search.omsection === null){notify.warn("Please select O&M Section !!!");return;}
+			}
 			
-			if($scope.search.omsection === undefined || $scope.search.omsection === null){notify.warn("Please select O&M Section !!!");return;}
+			
 			
 			//$scope.gettransformerpoints();
 			$scope.getmappingpoints();
@@ -465,17 +496,29 @@ angular.module('ipsurveyapp.Controllers', [])
 			remote.load("getmappingpoints", function(response){
 				$scope.mappingpoints = response.data;
 				
+				localStorage.setItem("MAP_DETAILS", JSON.stringify($scope.mappingpoints)); 
+				localStorage.setItem("userinfo", JSON.stringify(store.get('userinfo'))); 
+				var temp_obj = {
+						station_code :($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.value),
+						feeder_code  :($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.value) 
+				} 
+				localStorage.setItem("station_details", JSON.stringify(temp_obj)); 
+				
 				if($scope.mappingpoints.length == 0 ){
 					notify.error("No Records Found !!!!");
-					$timeout(function(){
+					/*$timeout(function(){
 						$scope.reset();
-					},2000);
+					},2000);*/
 					return;
 				}
 				
 				$scope.mappingpoints.map(function(e,index){
 					
-					if($scope.modal.transformers != undefined || $scope.modal.transformers != null){
+					//if(($scope.modal.transformers != undefined || $scope.modal.transformers != null)
+						//	|| ($scope.search.search_rrnumber != undefined || search.search_rrnumber  != null )
+					if(	$scope.search.search_rrnumber || $scope.modal.transformers	){
+						
+						localStorage.setItem("print_map_type", "IPSET");
 						
 						if(index === 0){
 							lat_to_center = e.TC_LATTITUDE;
@@ -504,7 +547,7 @@ angular.module('ipsurveyapp.Controllers', [])
 							lng_to_center = e.VILLAGE_LONGITUDE;
 							html='<table class="table table-condensed table-bordered" id="tableId" style="font-size: 12px;">';
 							html+="<tr>";
-							html+="<td colspan='4' style='width: 300px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>Transformer Details</b></td>";
+							html+="<td colspan='4' style='width: 300px;background-color:aliceblue;vertical-align:middle;text-align:center;'><b>Village Details</b></td>";
 							html+="</tr><tr><td ><b>O&M Section</b></td><td >"+e.OM_NAME+"</td><td ><b>Village Name</b></td><td >"+e.VILLAGE_NAME+"</td>";
 							linkFunction = $compile(angular.element(html));
 							L.marker([e.VILLAGE_LATTITUDE, e.VILLAGE_LONGITUDE], {icon: icon_village})
@@ -545,6 +588,8 @@ angular.module('ipsurveyapp.Controllers', [])
 					
 						
 					}else{
+						
+						localStorage.setItem("print_map_type", "TRANSFORMER");
 						
 						//if(index === 0){
 							lat_to_center = e.TC_LATTITUDE;
@@ -630,18 +675,19 @@ angular.module('ipsurveyapp.Controllers', [])
 				map.setView(new L.LatLng(lat_to_center, lng_to_center),13);
 				
 			},{
+				subdivisioncode:($scope.search.subdivision === undefined || $scope.search.subdivision === null ? '' : $scope.search.subdivision.key),
 				location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key),
 				station_code :($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key),
 				feeder_code  :($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key),
 				village      :($scope.modal.village === undefined || $scope.modal.village === null ? '' : $scope.modal.village.key),
-				transformer_code:($scope.modal.transformers === undefined || $scope.modal.transformers === null ? '' : $scope.modal.transformers.key)
+				transformer_code:($scope.modal.transformers === undefined || $scope.modal.transformers === null ? '' : $scope.modal.transformers.key),
+				search_rrnumber:($scope.search.search_rrnumber === undefined || $scope.search.search_rrnumber === null ? '' : $scope.search.search_rrnumber)
 			}, 'POST');
 			
 			
 		};
 		
 		$scope.reset = function(){
-			
 			layerGroup.clearLayers();
 			$scope.mappingpoints = [];
 			map.setView(new L.LatLng(12.91723, 74.85603),5);
@@ -688,8 +734,11 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		//sidebar.open('search');
 		
+		$scope.printmap = function(){
+			
+			window.open("printmap.html","_blank");
+			
+		};
 		
-		
-
 		
 	});

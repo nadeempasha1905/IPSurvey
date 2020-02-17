@@ -1,4 +1,10 @@
 <style>
+
+
+i
+{
+	cursor: pointer;
+}
  .thalign thead tr th{vertical-align: middle; }
  .thalign tbody tr td{vertical-align: middle; }
  
@@ -20,8 +26,8 @@
 .modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
 .modal_fixed_header_column thead tr th:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
 .modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 180px; width : 180px;word-wrap:break-word;}
-.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 200px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 200px; width : 200px;word-wrap:break-word;}
 
 .card-header {
 	background-color: teal;
@@ -29,7 +35,7 @@
     font-style: italic;
     font-weight: 600;
 }
- 
+
 </style>
 
 <div class="container-fluid" style="margin-top: 20px;">
@@ -113,6 +119,7 @@
 									    <select class="form-control" id="searchfeederlist" 
 									    ng-model="search.feeder"
 									    ng-options="u as u.value for u in searchfeederlist" 
+									    ng-change="getenumeratedtransformerslist('','search');"
 									   
 									    >
 									      <option value="">------Select------</option>
@@ -159,9 +166,9 @@
     							</div>
     						</div>	
     						<div class="row mt-3">
-    							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
-    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
-									  <thead>
+    							<div class="col-md-12" style="width: 100%;overflow-x: scroll;height: 500px;">
+    								<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 6000px;">
+									  <thead style="background-color: #007bff;color: white;">
 									    <tr>
 											<th></th>
 											<th>Sub Division</th>
@@ -176,6 +183,9 @@
 											<th>Address1</th>
 											<th>Address2</th>
 											<th>Phone</th>
+											<th>Caste Category</th>
+											<th>Aadhaar Number</th>
+											<th>Khata/Survey Number</th>
 											<th>Connection Type</th>
 											<th>Connection Status</th>
 											<th>Water Source</th>
@@ -204,13 +214,17 @@
 									  </thead>
 									  <tbody>
 									  	<tr ng-repeat="data in IPSET_ENUM_DATA">
-									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".ipsetenumerate-addedit-modal" 
-									  			ng-click="addeditIPsetEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>
+									  		<!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".ipsetenumerate-addedit-modal" 
+									  			ng-click="addeditIPsetEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button> -->
+									  			<i class="fa fa-edit"  ng-click="addeditIPsetEnumeration(data,'edit')"  data-toggle="modal" data-target=".ipsetenumerate-addedit-modal" ></i>&nbsp;&nbsp;
+									  			<i class="fa fa-trash" ng-click="addeditIPsetEnumeration(data,'delete')"></i>
+									  			</td>
 									  		<td>{{data.SUBDIVISION_NAME}}</td>
 									  		<td>{{data.OM_NAME}}</td>
 									  		<td>{{data.STATION_NAME}}</td>
 									  		<td>{{data.FEEDER_NAME}}</td>
-									  		<td>{{data.IE_TRANSFORMER_CODE}}</td>
+									  		<td>{{data.TE_TRANSFORMER_NAME}}</td>
 									  		<td>{{data.IE_VILLIAGE}}</td>
 									  		<td>{{data.IE_RR_NO}}</td>
 									  		<td>{{data.IE_CODE_NUMBER}}</td>
@@ -218,6 +232,9 @@
 									  		<td>{{data.IE_ADDRESS1}}</td>
 									  		<td>{{data.IE_ADDRESS2}}</td>
 									  		<td>{{data.IE_PHONE_NUMBER}}</td>
+									  		<td>{{data.CATEGORYNAME}}</td>
+									  		<td>{{data.IE_AADHAR_NUMBER}}</td>
+									  		<td>{{data.IE_PROPERTY_SURVEY_NUMBER}}</td>
 									  		<td>{{data.IE_CONNECTION_TYPE_DESCR}}</td>
 									  		<td>{{data.IE_CUSTOMER_STATUS_DESCR}}</td>
 									  		<td>{{data.IE_WATER_SOURCE_DESCR}}</td>
@@ -255,7 +272,7 @@
     </div>			
  </div>   	
  
- <div class="modal fade ipsetenumerate-addedit-modal" id="ipsetenumerate-addedit-modal" tabindex="-1" role="dialog"
+ <div class="modal fade ipsetenumerate-addedit-modal" id="ipsetenumerate_addedit_modal" tabindex="-1" role="dialog"
 	style="z-index: 2026;" aria-hidden="true" data-backdrop="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -303,11 +320,12 @@
 						    <select class="form-control" id="modalfeederlist" 
 						    ng-model="modal.feeder"
 						    ng-options="u as u.value for u in modalfeederlist"  
+						    ng-change="getenumeratedtransformerslist('','modal');"
 						    >
 						      <option value="">------Select------</option>
 						    </select>
 	   		 		</div>
-	   		 		<div class="col-md-3 mt-3" >
+	   		 		<div class="col-md-3" >
 	    		 		 <label for="searchtransformerslist">Transformers</label>
 						    <select class="form-control" id="searchtransformerslist" 
 						    ng-model="modal.transformers"
@@ -340,26 +358,31 @@
 								      <option value="">------Select------</option>
 							    	</select>
 							 </div>
+
+							 
+ 					    	<div class="col-md-3">
+			   		 			<label for="rrnumber">RR Number<span style="color: red;" ng-show="action == 'add'">&nbsp;(Type & press enter)</span></label>
+			    		 		<!-- <input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="action == 'edit' || !newuseridexists || modal.connectionstatus || modal.connectiontypes" 
+			    		 			ng-enter="VerifyRRNumber()" > -->
+			    		 			
+			    		 			<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off"  
+			    		 			ng-enter="VerifyRRNumber(true)"
+			    		 			ng-disabled="disable_rrnumber || !newuseridexists"
+			    		 			 >
+			   		 		</div>
+					  	</div>
+					    <div class="row mt-3">
 							  <div class="col-md-3">
 							 	 <label for="connectionstatus">Connection Status</label>
 								    <select class="form-control" id="connectionstatus" 
 								    ng-model="modal.connectionstatus"
 								    ng-options="u as u.value for u in modalconnectionstatus"  
 								    ng-disabled="newuseridexists"
+								    ng-change="blockVoltagesCurrents()"
 								    >
 								      <option value="">------Select------</option>
 							    	</select>
 							 </div>
-					  	</div>
-					    <div class="row mt-3">
-					    	<div class="col-md-3">
-			   		 			<label for="rrnumber">RR Number<span style="color: red;" ng-show="action == 'add'">&nbsp;(Type & press enter)</span></label>
-			    		 		<!-- <input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off" ng-readonly="action == 'edit' || !newuseridexists || modal.connectionstatus || modal.connectiontypes" 
-			    		 			ng-enter="VerifyRRNumber()" > -->
-			    		 			
-			    		 			<input class="form-control" type="text" ng-model="modal.rrnumber" autocomplete="off"  
-			    		 			ng-enter="VerifyRRNumber()" >
-			   		 		</div>
 			   		 		<div class="col-md-3">
 			    		 		<label for="codenumber">Code Number</label>
 								 <input class="form-control" type="text" ng-model="modal.codenumber" autocomplete="off" ng-readonly="true">
@@ -383,14 +406,39 @@
 								    <select class="form-control" id="modalvillageslist" 
 								    ng-model="modal.village"
 								    ng-options="u as u.value for u in getmodalenumeratedvillages"  
+								    ng-disabled="newuseridexists" 
 								    >
 								      <option value="">------Select------</option>
 								    </select>
 			   		 		</div>
 							 <div class="col-md-3">
 					     		<label for="phone">Phone</label>
-							 	<input class="form-control" type="text" ng-model="modal.phone" autocomplete="off" ng-readonly="newuseridexists">
+							 	<input class="form-control" type="text" ng-model="modal.phone" autocomplete="off" 
+							 	ng-readonly="newuseridexists" numbers-only maxlength="10">
 							 </div>	
+							 <div class="col-md-3">
+					     		<label for="khatanumber">Caste Category</label>
+							 	<select class="form-control" id="castecategory" 
+								    ng-model="modal.castecategory"
+								    ng-options="u as u.value for u in modalcastecategory" 
+								    ng-disabled="newuseridexists" 
+								    >
+								      <option value="">------Select------</option>
+							    	</select>
+							 </div>	
+					     </div>
+					     <div class="row mt-3">
+					     	<div class="col-md-3">
+					     		<label for="aadharnumber">Aadhaar Number</label>
+							 	<input class="form-control" type="text" ng-model="modal.aadhaarnumber" autocomplete="off"
+							 	 maxlength="20" ng-readonly="newuseridexists">
+							 </div>	
+							 <div class="col-md-3">
+					     		<label for="khatanumber">Khata/Survey Number</label>
+							 	<input class="form-control" type="text" ng-model="modal.surveynumber" autocomplete="off" 
+							 	ng-readonly="newuseridexists"  maxlength="30">
+							 </div>
+							 
 					     </div>
 					  </div>
 				</div>
@@ -425,9 +473,9 @@
 								      <option value="">------Select------</option>
 							    	</select>
 							 </div>
-							 	<div class="form-inline form-compact col-md-3">
+							 	<div class="col-md-3">
 									<label for="servicedate" class="labelchange">Service Date</label>
-									<div class=' form-inline input-group input-append date dsfromdate'
+									<!-- <div class=' form-inline input-group input-append date dsservicedate' id="div-dsservicedate"
 										data-provide="datepicker">
 										<input type='text' class="form-control" id="servicedate"
 											readonly="readonly" name="servicedate" ng-model="modal.servicedate"
@@ -435,11 +483,17 @@
 											class="input-group-addon datepicker"> <span
 											class="glyphicon glyphicon-calendar"></span>
 										</span>
-									</div>
+									</div> -->
+									
+									<input type="text" class="form-control" 
+										style="background: url(app/img/calendarIcon.png) no-repeat scroll 7px 10px;padding-left:30px;" 
+										data-date-format="dd/mm/yyyy" id="servicedate" placeholder="" 
+										value="" ng-model="modal.servicedate"  ng-readonly="true" >
+										
 								</div>
-							 	<div class="form-inline form-compact col-md-3">
+							 	<div class="col-md-3">
 									<label for="servicedate" class="labelchange">Inspection Date</label>
-									<div class=' form-inline input-group input-append date dsfromdate'
+									<!-- <div class=' form-inline input-group input-append date dsinspectiondate'  id="div-dsinspectiondate"
 										data-provide="datepicker">
 										<input type='text' class="form-control" id="inspectiondate"
 											readonly="readonly" name="inspectiondate" ng-model="modal.inspectiondate"
@@ -447,7 +501,13 @@
 											class="input-group-addon datepicker"> <span
 											class="glyphicon glyphicon-calendar"></span>
 										</span>
-									</div>
+									</div> -->
+									
+									<input type="text" class="form-control" 
+										style="background: url(app/img/calendarIcon.png) no-repeat scroll 7px 10px;padding-left:30px;" 
+										data-date-format="dd/mm/yyyy" id="inspectiondate" placeholder="" 
+										value="" ng-model="modal.inspectiondate"  ng-readonly="true" >
+										
 								</div>
 					     </div>
    					     <div class="row mt-3">
@@ -518,29 +578,35 @@
 							  <div class="row mt-3">
 						       <div class="col-md-3">
 								 	 <label for="voltage1">Voltage 1</label>
-									   <input class="form-control" type="text" ng-model="modal.voltage1" autocomplete="off" ng-readonly="newuseridexists">
+									   <input class="form-control" type="text" ng-model="modal.voltage1" autocomplete="off" 
+									   ng-readonly="newuseridexists" ng-disabled="blockcurrentvoltgae"  decimal-numbers-only>
 								 </div>
 								<div class="col-md-3">
 								 	 <label for="voltage2">Voltage 2</label>
-									   <input class="form-control" type="text" ng-model="modal.voltage2" autocomplete="off" ng-readonly="newuseridexists">
+									   <input class="form-control" type="text" ng-model="modal.voltage2" autocomplete="off" 
+									   ng-readonly="newuseridexists"  ng-disabled="blockcurrentvoltgae"  decimal-numbers-only>
 								 </div>
 								 <div class="col-md-3">
 								 	 <label for="voltage3">Voltage 3</label>
-									   <input class="form-control" type="text" ng-model="modal.voltage3" autocomplete="off" ng-readonly="newuseridexists">
+									   <input class="form-control" type="text" ng-model="modal.voltage3" autocomplete="off"
+									    ng-readonly="newuseridexists"  ng-disabled="blockcurrentvoltgae"  decimal-numbers-only>
 								 </div>
 							  </div>
 							  <div class="row mt-3">
 						       <div class="col-md-3">
 								 	 <label for="current1">Current 1</label>
-									   <input class="form-control" type="text" ng-model="modal.current1" autocomplete="off" ng-readonly="newuseridexists">
+									   <input class="form-control" type="text" ng-model="modal.current1" autocomplete="off" 
+									   ng-readonly="newuseridexists"  ng-disabled="blockcurrentvoltgae"  decimal-numbers-only>
 								 </div>
 								<div class="col-md-3">
 								 	 <label for="current2">Current 2</label>
-									   <input class="form-control" type="text" ng-model="modal.current2" autocomplete="off" ng-readonly="newuseridexists">
+									   <input class="form-control" type="text" ng-model="modal.current2" autocomplete="off"
+									    ng-readonly="newuseridexists" ng-disabled="blockcurrentvoltgae"  decimal-numbers-only>
 								 </div>
 								 <div class="col-md-3">
 								 	 <label for="current3">Current 3</label>
-									   <input class="form-control" type="text" ng-model="modal.current3" autocomplete="off" ng-readonly="newuseridexists">
+									   <input class="form-control" type="text" ng-model="modal.current3" autocomplete="off"
+									    ng-readonly="newuseridexists" ng-disabled="blockcurrentvoltgae"  decimal-numbers-only>
 								 </div>
 							  </div>	 
 					 	 </div>
@@ -556,15 +622,15 @@
 							 <div class="row mt-3" >
 					   		 		<div class="col-md-4">
 					   		 			<label for="modallatitude">Latitude</label>
-					   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists">
+					   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists" decimal-numbers-only>
 					   		 		</div>
 					   		 		<div class="col-md-4">
 					   		 			<label for="modallongitude">Longitude</label>
-					   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists">
+					   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists" decimal-numbers-only >
 					   		 		</div>
 					   		 		<div class="col-md-4">
 					   		 			<label for="modalaltitude">Altitude</label>
-					   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists">
+					   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists" decimal-numbers-only >
 					   		 		</div>
 					   		 	</div>
 					 	 </div>
@@ -622,14 +688,43 @@
  
  <script>
  
- $('.dsfromdate').datetimepicker({
+ 
+/*  $('.dsfromdate').datetimepicker({
 		format : 'dd/mm/yyyy',
 		minView : 2,
 		autoclose : 1,
-		//startDate : new Date(new Date().setDate(new Date().getDate() - 15)),
-		//endDate : new Date(),
 		showClear: false
 	});
+ 
+  $('.dsservicedate').datetimepicker({
+		format : 'dd/mm/yyyy',
+		minView : 2,
+		autoclose : 1,
+		showClear: false
+	});
+ 
+ $('.dsinspectiondate').datetimepicker({
+		format : 'dd/mm/yyyy',
+		minView : 2,
+		autoclose : 1,
+		showClear: false
+	});  */
+	
+	 $('#servicedate').datepicker({
+	        weekStart: 1,
+	        daysOfWeekHighlighted: "6,0",
+	        autoclose: false,
+	        todayHighlight: true,
+	    });
+	 //   $('#servicedate').datepicker("setDate", new Date());
+	    
+	    $('#inspectiondate').datepicker({
+	    	weekStart: 1,
+	        daysOfWeekHighlighted: "6,0",
+	        autoclose: false,
+	        todayHighlight: true
+	    });
+	//    $('#inspectiondate').datepicker("setDate", new Date());
  
  function readURL(input) {
 	    if (input.files && input.files[0]) {

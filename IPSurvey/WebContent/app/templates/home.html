@@ -1,1 +1,439 @@
-<h2>Home</h2>
+<style>
+	.fontbig{font-weight: bolder;}
+	.fontbold{font-weight: bold;}
+	.fontnormal{font-weight: normal;}
+	
+	.card1{text-align: center;border-radius: 3px;}
+	.card1 .topsection{background-color: #ea8703;color:#fff;}	
+	.card1 .bottomsection{/* background-color: #ffd6a0; */background-color: #fff;color:#000;}
+	
+	.card2{text-align: center;border-radius: 3px;}
+	.card2 .topsection{background-color: #d9534f;color:#fff;}	
+	.card2 .bottomsection{/* background-color: #76d4c1; */background-color: #fff;color:#000;}
+	
+	.card3{text-align: center;border-radius: 3px;}
+	.card3 .topsection{background-color: #f94f62;color:#fff;}	
+	.card3 .bottomsection{/* background-color: #f39da6; */background-color: #fff;color:#000;}
+	
+	.card4{text-align: center;border-radius: 3px;}
+	.card4 .topsection{background-color: #f0ad4e;color:#fff;}	
+	.card4 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card5{text-align: center;border-radius: 3px;}
+	.card5 .topsection{background-color: #337ab7;color:#fff;}	
+	.card5 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card6{text-align: center;border-radius: 3px;}
+	.card6 .topsection{background-color: #5cb85c;color:#fff;}	
+	.card6 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card7{text-align: center;border-radius: 3px;}
+	.card7 .topsection{background-color: rgb(130,40,73);color:#fff;}	
+	.card7 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card8{text-align: center;border-radius: 3px;}
+	.card8 .topsection{background-color: #81911e;color:#fff;}	
+	.card8 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card9{text-align: center;border-radius: 3px;}
+	.card9 .topsection{background-color: #1f4037;color:#fff;}	
+	.card9 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card10{text-align: center;border-radius: 3px;}
+	.card10 .topsection{background-color: #4b134f;color:#fff;}	
+	.card10 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card11{text-align: center;border-radius: 3px;}
+	.card11 .topsection{background-color: #6D6027;color:#fff;}	
+	.card11 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+	
+	.card12{text-align: center;border-radius: 3px;}
+	.card12 .topsection{background-color: #CB356B;color:#fff;}	
+	.card12 .bottomsection{/* background-color: #d4af5d; */background-color: #fff;color:#000;}
+
+	#summaryview a{
+		text-decoration: none;
+		color:#000;
+	}
+	
+	label {
+	
+		color: white;
+	
+	}
+	
+	.modal-header{background-color: darkcyan;color: white;}
+		
+.modal_fixed_header_column table {position: relative;overflow: hidden;border-collapse: collapse;table-layout:fixed;}
+.modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
+.modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
+.modal_fixed_header_column thead th {min-width: 100px;width: 100px;color:white;border-color: #00bf8f !important;text-align: center;
+										font-size: 14px;height: 35px;word-wrap:break-word;}
+.modal_fixed_header_column tbody td {min-width: 100px;width: 100px;color: #353535;word-break: break-all;height: 35px;
+										word-wrap:break-word;font-weight: normal;}
+.modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width:  90px; width :  90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width:  90px; width :  90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(3){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(3){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(4){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(4){ min-width: 300px; width : 300px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(5){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(5){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(6){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(6){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(7){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(7){ min-width: 200px; width : 200px;word-wrap:break-word;}
+ 
+	
+	</style>
+	
+	<div class="container-fluid" style="margin-top: 20px;">
+	
+		<div id="contentWrapper">
+
+		<div id="contentLeft" style="display: block;">
+			
+			<div class="row" style="padding: 10px;">
+    							<div class="col-md-12 mb-1">
+				    		 		 <label for="searchzonelist">Zone</label>
+									    <select class="form-control" id="searchzonelist" 
+									    ng-model="search.zone"
+									    ng-options="u as u.value for u in searchzonelist" ng-change="getcircleList([],null,'search')" 
+									    ng-disabled="ZONEUSER || CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER">
+									      <option value="">------Select------</option>
+									    </select>
+				   		 		</div>
+   		 		   		 		<div class="col-md-12 mb-1" >
+			    		 		 <label for="searchcirclelist">Circle</label>
+								    <select class="form-control" id="searchcirclelist" 
+								    ng-model="search.circle"
+								    ng-options="u as u.value for u in searchcirclelist" ng-change="getdivisionList([],null,'search')" 
+								    ng-disabled="CIRCLEUSER || DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-12 mb-1" >
+			    		 		 <label for="searchdivisionlist">Division</label>
+								    <select class="form-control" id="searchdivisionlist" 
+								    ng-model="search.division"
+								    ng-options="u as u.value for u in searchdivisionlist" ng-change="getsubdivisionList([],null,'search')" 
+								    ng-disabled="DIVISIONUSER || SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-12 mb-1"  >
+			    		 		 <label for="searchsubdivisionlist">Sub-Division</label>
+								    <select class="form-control" id="searchsubdivisionlist" 
+								    ng-model="search.subdivision"
+								    ng-options="u as u.value for u in searchsubdivisionlist" ng-change="getomsectionList([],null,'search');getStationList('search');" 
+								    ng-disabled="SUBDIVISIONUSER || OMSECTIONUSER"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 		</div>
+			   		 		<div class="col-md-12 mb-1" >
+			    		 		 <label for="searchomsectionlist">O&M Section</label>
+								    <select class="form-control" id="searchomsectionlist" 
+								    ng-model="search.omsection"
+								    ng-options="u as u.value for u in searchomsectionlist" 
+								    ng-disabled="OMSECTIONUSER"  
+								    ng-change="getenumeratedvillageslist('','search');getenumeratedtransformerslist('','search');"
+								    >
+								      <option value="">------Select------</option>
+								    </select>
+			   		 			</div>
+			   		 			
+			   		 			<div class="col-md-6 mb-1" >
+			   		 				<button type="button" class="btn btn-success btn-block" ng-click="load_maindashboard()"> Apply Filter </button>
+			   		 			</div>
+    						</div>	
+
+		</div>
+
+		<div id="menulistclick_div">
+			<span style="font-size: 30px; cursor: pointer; color: #283c51;"
+				onclick="openNav()">&#9776;</span>
+		</div>
+
+		<div id="contentRight" style="    margin-top: -34px;padding-left: 20px;">
+				<div class="row">
+		<div class="col-md-12">
+			<div class="card w-100" style="background-color: #e0e0e0;">
+    			<div class="card-body">
+    				<div class="row">
+    					<div class="col-md-12">
+    							<div class="row">
+				<div class="col-md-2">
+					<div class="wrimagecard wrimagecard-topimage">
+						<a href=""
+							ng-click="activaTab('bill_eff_tab')">
+							<div class="wrimagecard-topimage_title card1 topsection">
+								<div style="float: left; width: 100%;text-align: left;padding:10px;">
+									<span class="h3 text-primary">{{MAINDASHBOARD[0].NOOFFDRS}}</span> <br>
+									<span class="h6">Feeders</span>
+								</div>
+								<!-- <div style="float: right; width: 50%;">
+									<span class="h1">{{bill_eff_card_overall.notbilled}}</span> <br>
+									<span class="h4">Not Billed</span>
+								</div> -->
+
+							</div>
+							<div class="wrimagecard-topimage_header card1 bottomsection">
+								<span class="h3"></span> <br>
+								<span class="h4"></span>
+							</div>
+						</a>
+					</div>
+				</div>
+				
+								<div class="col-md-2">
+					<div class="wrimagecard wrimagecard-topimage">
+						<a href=""
+							ng-click="activaTab('bill_eff_tab')">
+							<div class="wrimagecard-topimage_title card1 topsection">
+								<div style="float: left; width: 100%;text-align: left;padding:10px;">
+									<span class="h3 text-info">{{MAINDASHBOARD[0].NOOFTCS}}</span> <br>
+									<span class="h6">Transformers</span>
+								</div>
+								<!-- <div style="float: right; width: 50%;">
+									<span class="h1">{{bill_eff_card_overall.notbilled}}</span> <br>
+									<span class="h4">Not Billed</span>
+								</div> -->
+
+							</div>
+							<div class="wrimagecard-topimage_header card1 bottomsection">
+								<span class="h3"></span> <br>
+								<span class="h4"></span>
+							</div>
+						</a>
+					</div>
+				</div>
+				
+				<div class="col-md-2">
+					<div class="wrimagecard wrimagecard-topimage">
+						<a href=""
+							ng-click="activaTab('bill_eff_tab')">
+							<div class="wrimagecard-topimage_title card1 topsection">
+								<div style="float: left; width: 100%;text-align: left;padding:10px;">
+									<span class="h3 text-danger" >{{MAINDASHBOARD[0].TOTINTL}}</span> <br>
+									<span class="h6">IPsets</span>
+								</div>
+								<!-- <div style="float: right; width: 50%;">
+									<span class="h1">{{bill_eff_card_overall.notbilled}}</span> <br>
+									<span class="h4">Not Billed</span>
+								</div> -->
+
+							</div>
+							<div class="wrimagecard-topimage_header card1 bottomsection">
+								<span class="h3"></span> <br>
+								<span class="h4"></span>
+							</div>
+						</a>
+					</div>
+				</div>
+				
+								<div class="col-md-2">
+					<div class="wrimagecard wrimagecard-topimage">
+						<a href=""
+							ng-click="activaTab('coll_eff_tab')">
+							<div class="wrimagecard-topimage_title card1 topsection">
+								<div style="float: left; width: 100%;text-align: left;padding:10px;">
+									<span class="h3 text-success"> {{MAINDASHBOARD[0].AUTHORIZED}}</span> <br>
+									<span class="h6">Authorized</span>
+								</div>
+								<!-- <div style="float: right; width: 50%;">
+									<span class="h1">{{bill_eff_card_overall.notbilled}}</span> <br>
+									<span class="h4">Not Billed</span>
+								</div> -->
+
+							</div>
+							<div class="wrimagecard-topimage_header card1 bottomsection">
+								<span class="h3"></span> <br>
+								<span class="h4"></span>
+							</div>
+						</a>
+					</div>
+				</div>
+				
+				<div class="col-md-2">
+					<div class="wrimagecard wrimagecard-topimage">
+						<a href=""
+							ng-click="activaTab('coll_eff_tab')">
+							<div class="wrimagecard-topimage_title card1 topsection">
+								<div style="float: left; width: 100%;text-align: left;padding:10px;">
+									<span class="h3 text-warning"> {{MAINDASHBOARD[0].UNAUTHORIZED}}</span> <br>
+									<span class="h6">Unauthorized</span>
+								</div>
+								<!-- <div style="float: right; width: 50%;">
+									<span class="h1">{{bill_eff_card_overall.notbilled}}</span> <br>
+									<span class="h4">Not Billed</span>
+								</div> -->
+
+							</div>
+							<div class="wrimagecard-topimage_header card1 bottomsection">
+								<span class="h3"></span> <br>
+								<span class="h4"></span>
+							</div>
+						</a>
+					</div>
+				</div>
+				
+												<div class="col-md-2">
+					<div class="wrimagecard wrimagecard-topimage">
+						<a href=""
+							ng-click="activaTab('coll_eff_tab')">
+							<div class="wrimagecard-topimage_title card1 topsection">
+								<div style="float: left; width: 100%;text-align: left;padding:10px;">
+									<span class="h3 text-info"> {{MAINDASHBOARD[0].HP10ABOVE}}</span> <br>
+									<span class="h6">Above 10HP</span>
+								</div>
+								<!-- <div style="float: right; width: 50%;">
+									<span class="h1">{{bill_eff_card_overall.notbilled}}</span> <br>
+									<span class="h4">Not Billed</span>
+								</div> -->
+
+							</div>
+							<div class="wrimagecard-topimage_header card1 bottomsection">
+								<span class="h3"></span> <br>
+								<span class="h4"></span>
+							</div>
+						</a>
+					</div>
+				</div>
+				
+								
+			</div>
+    					</div>
+    				</div>	
+    				
+    				<div class="row">
+								<div class="col-md-4">
+									<div id="chart1" style="height: 300px;"></div>
+								</div>
+								<div class="col-md-4">
+									<div id="chart2" style="height: 300px;"></div>
+								</div>
+								<div class="col-md-4">
+									<div id="chart3" style="height: 300px;"></div>
+								</div>
+							</div>
+							
+		<div class="row mt-4" >
+			
+			<div class="col-md-12" style="width: 100%;overflow-x: scroll">
+				<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 100%;">
+	  <thead style="    background-color: #003e82; color: #ffffff;">
+	    <tr>
+	      <th>{{MAINDASHBOARD[1].GROUPNAME}}</th>
+	      <th ng-hide="MAINDASHBOARD[0].LOCATION_CODE.length === 9">Total Feeders</th>
+	      <th>Total Transformers</th>
+	      <th>Total IPsets</th>
+	      <th>Authorized</th>
+	      <th>Unauthorized</th>
+	      <th>In-Use</th>
+	      <th>Not In Use</th>
+	      <th>Dry</th>
+	      <th>10HP And Below</th>
+	      <th>10HP Above</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  	<tr ng-repeat="data in MAINDASHBOARD" ng-if="$index > 0">
+	  		<td>{{data.LOCATION}}</td>
+	  		<td ng-hide="MAINDASHBOARD[0].LOCATION_CODE.length === 9">{{data.NOOFFDRS}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.NOOFTCS}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.TOTINTL}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.AUTHORIZED}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.UNAUTHORIZED}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.INUSE}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.NOTINUSE}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.DRY}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.HP10ANDBELOW}}</td>
+	  		<td align="right" style="padding: 0px 20px 0px 10px;">{{data.HP10ABOVE}}</td>
+	  	</tr>
+	  </tbody>
+	</table>
+			</div>
+	
+			
+		</div>
+							
+    			</div>
+    		</div>
+    	</div>
+    </div>
+		</div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+			
+ </div>   
+ 
+ <script>
+
+ 
+/*  $(function() {
+
+		console.log("init");
+	    var verticalNavigation = new SSDSystem.VerticalNavigation();
+	    verticalNavigation.init();
+
+	}); */
+ 
+//for close, opened dropdown.
+/* $(".nav a").click(function () {
+    if ($(".navbar-collapse").hasClass("in")) {
+        $('[data-toggle="collapse"]').click();
+    }
+}); */
+
+/* $("#home a").click(function(event){
+	 event.preventDefault();
+	});
+	 */
+	 
+
+
+/* 		$( "a" ).click(function( event ) {
+			  event.preventDefault();
+			  $( "<div>" )
+			    .append( "default " + event.type + " prevented" )
+			    .appendTo( "#log" );
+			}); */
+			
+		function openNav(){
+			 document.getElementById("contentLeft").style.display = "block";
+		}
+
+
+		  $('#contentRight').click(function(evt) {
+			    if($(evt.target).parents('#contentLeft').length==0) {
+			        $('#contentLeft').hide();
+			    }
+			});
+		  
+		  $('#contentLeft').hide();
+		  
+		/*   $(function() {
+
+				console.log("init");
+			    var verticalNavigation = new SSDSystem.VerticalNavigation();
+			    verticalNavigation.init();
+
+			}); */
+</script>
+			

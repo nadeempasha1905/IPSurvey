@@ -1,0 +1,199 @@
+<style>
+ .thalign thead tr th{vertical-align: middle; }
+ .thalign tbody tr td{vertical-align: middle; }
+ 
+.modal-lg{
+	    max-width: 80%;
+}
+.modal-header{background-color: darkcyan;color: white;}
+		
+.modal_fixed_header_column table {position: relative;overflow: hidden;border-collapse: collapse;table-layout:fixed;}
+.modal_fixed_header_column thead {position: relative;display: block;overflow: visible; background: #00bf8f;
+		    background: -webkit-linear-gradient(to right, #001510, #00bf8f);background: linear-gradient(to right, #001510, #00bf8f);}
+.modal_fixed_header_column tbody {position: relative; display: block;height: 500px;overflow: scroll;font-size: 14px;font-weight:normal;}
+.modal_fixed_header_column thead th {min-width: 100px;width: 100px;color:white;border-color: #00bf8f !important;text-align: center;
+										font-size: 14px;height: 35px;word-wrap:break-word;}
+.modal_fixed_header_column tbody td {min-width: 100px;width: 100px;color: #353535;word-break: break-all;height: 35px;
+										word-wrap:break-word;font-weight: normal;}
+.modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(2){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(3){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(3){ min-width: 200px; width : 200px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(8){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(8){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(9){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(9){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(10){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(10){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(11){ min-width: 150px; width : 150px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(11){ min-width: 150px; width : 150px;word-wrap:break-word;}
+ 
+ .card-header {
+	background-color: teal;
+	color: white;
+    font-style: italic;
+    font-weight: 600;
+}
+ 
+</style>
+
+<div class="container-fluid" style="margin-top: 20px;">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card w-100">
+    			<div class="card-body">
+					<div class="row mt-3">
+						<div class="col-md-2"></div>
+						<div class="col-md-8">
+							<div class="card">
+								<div class="card-header">Transformer Transfer</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-6">
+											<h3 class="text-success">Transfer From</h3>
+											<div class="col-md-12" >
+						    		 		 <label for="transfer_from_omsectionlist">O&M Section</label>
+											    <select class="form-control" id="transfer_from_omsectionlist" 
+												    ng-model="transfer_from.omsection"
+												    ng-options="u as u.value for u in transfer_from_omsectionlist" 
+												    ng-disabled="OMSECTIONUSER"  
+												    ng-change="getenumeratedtransformerslist('transfer_from');"
+												    >
+											      <option value="">------Select------</option>
+											    </select>
+						   		 			</div>
+						   		 			<div class="col-md-12"  >
+							    		 		 <label for="transfer_from_stationlist">Station</label>
+												    <select class="form-control" id="transfer_from_stationlist" 
+												    ng-model="transfer_from.station"
+												    ng-options="u as u.value for u in transfer_from_stationlist" ng-change="getFeederList('transfer_from')" 
+												    >
+												      <option value="">------Select------</option>
+												    </select>
+							   		 		</div>
+							   		 		<div class="col-md-12" >
+							    		 		 <label for="transfer_from_feederlist">Feeder</label>
+												    <select class="form-control" id="transfer_from_feederlist" 
+												    ng-model="transfer_from.feeder"
+												    ng-options="u as u.value for u in transfer_from_getFeederList" 
+												    ng-change="getenumeratedtransformerslist('transfer_from');"
+												    >
+												      <option value="">------Select------</option>
+												    </select>
+							   		 		</div>
+							   		 		<div class="col-md-12" >
+							    		 		 <label for="transfer_from_transformerslist">Transformers</label>
+												    <select class="form-control" id="transfer_from_transformerslist" 
+												    ng-model="transfer_from.transformers"
+												    ng-options="u as u.value for u in getenumeratedtransformers_transfer_from"  
+												    ng-change="to_transfer_autoselect()"
+												    >
+												      <option value="">------Select------</option>
+												    </select>
+							   		 		</div>
+									</div>
+									<div class="col-md-6">
+									<h3 class="text-danger">Transfer To</h3>
+										<div class="col-md-12" >
+						    		 		 <label for="transfer_to_omsectionlist">O&M Section</label>
+											   <!--  <select class="form-control" id="transfer_to_omsectionlist" 
+												    ng-model="transfer_to.omsection"
+												    ng-options="u as u.value for u in transfer_to_omsectionlist" 
+												    ng-disabled="OMSECTIONUSER"  
+												    ng-change="getenumeratedtransformerslist('transfer_to');"
+												    >
+											      <option value="">------Select------</option>
+											    </select> -->
+											     <select class="form-control" id="transfer_to_omsectionlist" 
+												    ng-model="transfer_to.omsection"
+												    ng-options="u as u.value for u in transfer_to_omsectionlist" 
+												    ng-disabled="OMSECTIONUSER"  
+												   
+												    >
+											      <option value="">------Select------</option>
+											    </select>
+						   		 			</div>
+						   		 			<div class="col-md-12"  >
+							    		 		 <label for="transfer_to_stationlist">Station</label>
+												    <select class="form-control" id="transfer_to_stationlist" 
+												    ng-model="transfer_to.station"
+												    ng-options="u as u.value for u in transfer_to_stationlist" ng-change="getFeederList('transfer_to')" 
+												    >
+												      <option value="">------Select------</option>
+												    </select>
+							   		 		</div>
+							   		 		<div class="col-md-12" >
+							    		 		 <label for="transfer_to_feederlist">Feeder</label>
+												   <!--  <select class="form-control" id="transfer_to_feederlist" 
+												    ng-model="transfer_to.feeder"
+												    ng-options="u as u.value for u in transfer_to_getFeederList" 
+												   ng-change="getenumeratedtransformerslist('transfer_to');"
+												    >
+												      <option value="">------Select------</option>
+												    </select> -->
+												     <select class="form-control" id="transfer_to_feederlist" 
+												    ng-model="transfer_to.feeder"
+												    ng-options="u as u.value for u in transfer_to_getFeederList" 
+												   
+												    >
+												      <option value="">------Select------</option>
+												    </select>
+							   		 		</div>
+							   		 		<div class="row" >
+								   		 		<div class="col-md-10" style="margin-left: 15px;">
+							    		 		 <label for="transfer_to_transformerslist">Transformers</label>
+												    <select class="form-control" id="transfer_to_transformerslist" 
+												    ng-model="transfer_to.transformers"
+												    ng-options="u as u.value for u in getenumeratedtransformers_transfer_to"  
+												    
+												    >
+												      <option value="">------Select------</option>
+												    </select>
+												    
+							   		 		</div>
+							   		 		<div class="col-md-1"  style="margin-top: 28px;">
+							   		 			<a  ng-click="getenumeratedtransformerslist('transfer_to');" style="font-size: larger;">
+											          <span class="glyphicon glyphicon-refresh"></span>
+											        </a>
+							   		 		</div>
+							   		 		</div>
+
+									</div>
+									</div>
+									<div class="row mt-4"  >
+										<div class="col-md-2">
+											<button type="button" class="btn btn-primary btn-block" ng-click="transfertransformer()">Transfer</button>
+										</div>
+										<div class="col-md-2">
+											<button type="button" class="btn btn-info btn-block" ng-click="clear()">Clear</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						  </div>
+						<div class="col-md-2"></div>
+					</div>
+				</div>
+    		</div>
+    	</div>
+    </div>			
+ </div>   	
+ 
+ 
+ <script>
+ function readURL(input) {
+	    if (input.files && input.files[0]) {
+	        var reader = new FileReader();
+
+	        reader.onload = function (e) {
+	            $('#uploadPreview')
+	            .attr('src', e.target.result);
+	        };
+
+	        reader.readAsDataURL(input.files[0]);
+	    }
+	}
+  </script>

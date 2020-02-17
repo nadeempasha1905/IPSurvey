@@ -8,6 +8,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("villageenumeration Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		$scope.modal={};
@@ -261,13 +264,16 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			$scope.ROWID = "";
 			$scope.imagedata = "";
-			 $('#uploadPreview').attr('src', null);
-			 $scope.modal.changeimage = false;
-			 $scope.modal.chooseimage = null;
-			 $('#modalchooseimage').val('');
+			
 			 
 			$scope.getomsectionList([],null,'modal');
 			if(action === 'add'){
+				
+				 $('#uploadPreview').attr('src', null);
+				 $scope.modal.changeimage = false;
+				 $scope.modal.chooseimage = null;
+				 $('#modalchooseimage').val('');
+				 
 				$scope.action = 'add';
 				
 				$scope.modal_heading = "Add Village Enumeration Data";
@@ -280,8 +286,13 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.altitude = '';
 				$scope.modal.remarks = '';
 				
-			}else{
+			}else if(action === 'edit'){
 				
+				 $('#uploadPreview').attr('src', null);
+				 $scope.modal.changeimage = false;
+				 $scope.modal.chooseimage = null;
+				 $('#modalchooseimage').val('');
+				 
 				console.log(record);
 				$scope.ROWID = record.row_id;
 				$scope.action = 'edit';
@@ -304,6 +315,44 @@ angular.module('ipsurveyapp.Controllers', [])
 						filename:record.VE_IMAGE_PATH
 					}, 'POST');
 				}
+			}else if(action === 'delete'){
+				
+				console.log("record",record);
+				
+				$scope.ROWID = record.row_id;
+				
+				var sts = confirm("Are You Sure To Delete ?");
+				console.log("sts",sts);
+				
+				if(sts){
+					
+					var request = {
+							rowid:$scope.ROWID,
+							location_code:record.VE_LOCATION_CODE,
+							village_name:record.VE_VILLAGE_NAME,
+							latitude:record.VE_LATTITUDE,
+							longitude:record.VE_LONGITUDE,
+							altitude:record.VE_ALTITUDE,
+							remarks:record.VE_REMARKS,
+							userid:$scope.userinfo.username,
+							deleteflag:'Y',
+							imagepath:record.VE_IMAGE_PATH,
+							status:record.VE_STATUS
+					};
+					
+					
+					
+					remote.load("upsertvillageenumeration", function(response){
+						console.log("upsertvillageenumeration",response);
+						if(response.status === 'success'){
+							$timeout(function(){
+								//$('#stationmaster-addedit-modal').modal('toggle');
+								$scope.SearchVillageEnumDetails();
+							},2000);
+						}
+					},request, 'POST');
+				}
+				
 			}
 			
 		};
@@ -368,6 +417,7 @@ angular.module('ipsurveyapp.Controllers', [])
 					altitude:$scope.modal.altitude,
 					remarks:($scope.modal.remarks === undefined || $scope.modal.remarks === null ? '' : $scope.modal.remarks),
 					userid:$scope.userinfo.username,
+					deleteflag:'N',
 					imagepath:(imagepath == null || imagepath == '' || imagepath == undefined ? '' : imagepath)	
 			};
 			
@@ -431,6 +481,12 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 		};
 		
+		
+		$scope.ResetUserDetails = function(){
+			$scope.VILLAGE_ENUM_DATA = [];
+			$scope.initialize();
+			
+		};
 	})
 	
 .factory('VillageMasterData', function($http, $q, $timeout){

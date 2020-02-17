@@ -30,6 +30,13 @@
     font-weight: 600;
 }
  
+  <style> 
+          
+        .date-input { 
+            width: 80%;
+   			 float: left
+        } 
+    
 </style>
 
 <div class="container-fluid" style="margin-top: 20px;">
@@ -148,17 +155,25 @@
 									      <option value="">------Select------</option>
 									    </select>
 				   		 		</div>
-				   		 		<div class="form-inline form-compact col-md-2">
+				   		 		<div class="col-md-2">
 									<label for="servicedate" class="labelchange">Date</label>
-									<div class=' form-inline input-group input-append date dsfromdate'
+									
+									
+									
+										<input type="text" class="form-control" 
+										style="background: url(app/img/calendarIcon.png) no-repeat scroll 7px 10px;padding-left:30px;" 
+										data-date-format="dd/mm/yyyy" id="reportdateid" placeholder="" 
+										value="" ng-model="reportdate"  ng-readonly="true" >
+									
+<!-- 									<div class=' form-inline input-group input-append date dsfromdate'
 										data-provide="datepicker">
 										<input type='text' class="form-control" id="reportdate"
-											readonly="readonly" name="reportdate" ng-model="search.reportdate"
+											readonly="readonly" name="reportdate" ng-model="search.reportdate" ng-blur="setvalue(this)"
 											ng-required="true"> <span
 											class="input-group-addon datepicker"> <span
 											class="glyphicon glyphicon-calendar"></span>
 										</span>
-									</div>
+									</div> -->
 								</div>
    								<div class="col-md-2" style="margin-top: 25px;">
 				   		 			<button class="btn btn-sm btn-primary" ng-click="downloadreport()">Show Report</button>
@@ -166,6 +181,14 @@
     						</div>
     						</div>	
     					</div>
+    					
+    					
+    					<div class="row">
+    						<div class="col-md-12">
+    							
+    						</div>
+    					</div>
+    					
     				</div>	
     			</div>
     		</div>
@@ -174,13 +197,19 @@
  
  <script>
  
- $('.dsfromdate').datetimepicker({
+/*  $('.dsfromdate').datetimepicker({
 		format : 'dd/mm/yyyy',
 		minView : 2,
 		autoclose : 1,
-		//startDate : new Date(new Date().setDate(new Date().getDate() - 15)),
-		//endDate : new Date(),
 		showClear: false
-	});
+	}); */
+	
+    $('#reportdateid').datepicker({
+        weekStart: 1,
+        daysOfWeekHighlighted: "6,0",
+        autoclose: true,
+        todayHighlight: true,
+    });
+    $('#reportdateid').datepicker("setDate", new Date());
  
 </script>

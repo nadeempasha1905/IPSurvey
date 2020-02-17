@@ -7,6 +7,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("Station Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		$scope.modal={};
@@ -88,15 +91,32 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		$scope.getcodedetails = function(value,searchtype){
 			
-			$scope.modalconnectiontypes = [];
-			remote.load("getcodedetails", function(response){
-				$scope.modalstationtypelist = response.CODES_LIST;
-				if(value != null || value.length >0){
-					$scope.modal.stationtype =  $filter('filter')($scope.modalstationtypelist,{key:value},true)[0];
-				}
-			},{
-				code_type:'ST_TYPE'
-			}, 'POST');
+			
+			if(searchtype === 'ST_TYPE'){
+				$scope.modalstationtypes = [];
+				remote.load("getcodedetails", function(response){
+					$scope.modalstationtypes = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.stationtype =  $filter('filter')($scope.modalstationtypes,{key:value},true)[0];
+					}
+				},{
+					code_type:'ST_TYPE'
+				}, 'POST');
+			}
+			
+			if(searchtype === 'STN_SUB_TYPE'){
+				$scope.modalstationsubtypelist = [];
+				remote.load("getcodedetails", function(response){
+					$scope.modalstationsubtypelist = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.stationsubtype =  $filter('filter')($scope.modalstationsubtypelist,{key:value},true)[0];
+					}
+				},{
+					code_type:'STN_SUB_TYPE'
+				}, 'POST');
+				
+			}
+			
 		};
 		
 		
@@ -192,6 +212,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 				remote.load("getsubdivisionlist", function(response){
 					$scope.modalsubdivisionlist = response.SUBDIVISION_LIST;
+					$scope.modal.subdivision = $filter('filter')($scope.modalsubdivisionlist,{key:$scope.userinfo.location_code},true)[0];
 				},{
 					location_code:($scope.search.division === undefined || $scope.search.division === null ? '' : $scope.search.division.key)
 				}, 'POST');
@@ -230,7 +251,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 		};
 		
-		$scope.getcodedetails = function(value,searchtype){
+/*		$scope.getcodedetails = function(value,searchtype){
 			
 			if(searchtype === 'ST_TYPE'){
 				$scope.modalstationtypes = [];
@@ -244,7 +265,17 @@ angular.module('ipsurveyapp.Controllers', [])
 				}, 'POST');
 			}
 			
-		};
+			if(searchtype === 'STN_SUB_TYPE'){
+				
+				remote.load("getcodedetails", function(response){
+					$scope.modalstationsubtypelist = response.CODES_LIST;
+				},{
+					code_type:'STN_SUB_TYPE'
+				}, 'POST');
+				
+			}
+			
+		};*/
 		
 		
 		$scope.ROWID = "";
@@ -257,6 +288,8 @@ angular.module('ipsurveyapp.Controllers', [])
 			if(action === 'add'){
 				
 				$scope.getcodedetails('','ST_TYPE');
+				$scope.getcodedetails('','STN_SUB_TYPE');
+				
 				$scope.action = 'add';
 				
 				$scope.modal_heading = "Add Station Master";
@@ -265,7 +298,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.stationcode = '' ;
 				$scope.modal.stationname = '' ;
 				
-			}else{
+			}else if(action === 'edit'){
 				
 				console.log(record);
 				$scope.ROWID = record.row_id;
@@ -274,6 +307,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal_heading = "Edit Station Master";
 				
 				$scope.getcodedetails(record.STATION_TYPE,'ST_TYPE');
+				$scope.getcodedetails(record.STATION_SUB_TYPE,'STN_SUB_TYPE');
 				
 				$timeout(function(){
 					$scope.modal.subdivision = $filter('filter')($scope.modalsubdivisionlist,{key:record.SUBDIV_CODE},true)[0];
@@ -281,6 +315,39 @@ angular.module('ipsurveyapp.Controllers', [])
 				
 				$scope.modal.stationcode = record.STATION_CODE;
 				$scope.modal.stationname = record.STATION_NAME;
+			}else if(action === 'delete'){
+				
+				
+				$scope.ROWID = record.row_id;
+				
+				var sts = confirm("Are You Sure To Delete ?");
+				console.log("sts",sts);
+				
+				if(sts){
+					var request = {
+							rowid:$scope.ROWID,
+							location_code:record.SUBDIV_CODE,
+							stationtype:record.STATION_TYPE,
+							stationsubtype:record.STATION_SUB_TYPE,
+							stationcode:record.STATION_CODE,
+							stationname:record.STATION_NAME,
+							deleteflag:'Y',
+							userid:$scope.userinfo.username
+					};
+					
+					console.log("request",request);
+					
+					remote.load("upsertstationmaster", function(response){
+						console.log("upsertstationmaster",response);
+						if(response.status === 'success'){
+							$timeout(function(){
+								//$('#stationmaster-addedit-modal').modal('toggle');
+								$scope.searchstationmasterdetails();
+							},2000);
+						}
+					},request, 'POST');
+				}
+				
 			}
 			
 		};
@@ -292,6 +359,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			if($scope.modal.subdivision === undefined || $scope.modal.subdivision === null){notify.warn("Please Select Subdivision");return;}
 			if($scope.modal.stationtype === undefined || $scope.modal.stationtype === null){notify.warn("Please Select Station type");return;}
+			if($scope.modal.stationsubtype === undefined || $scope.modal.stationsubtype === null){notify.warn("Please Select Station Sub type");return;}
 			if($scope.modal.stationcode === undefined || $scope.modal.stationcode === null){notify.warn("Please Enter Station Code");return;}
 			if($scope.modal.stationname === undefined || $scope.modal.stationname === null){notify.warn("Please Enter Station Name");return;}
 			
@@ -300,8 +368,10 @@ angular.module('ipsurveyapp.Controllers', [])
 					rowid:$scope.ROWID,
 					location_code:$scope.modal.subdivision.key,
 					stationtype:$scope.modal.stationtype.key,
+					stationsubtype:$scope.modal.stationsubtype.key,
 					stationcode:($scope.modal.stationcode === undefined || $scope.modal.stationcode === null ? '' : $scope.modal.stationcode),
 					stationname:($scope.modal.stationname === undefined || $scope.modal.stationname === null ? '' : $scope.modal.stationname),
+					deleteflag:'N',
 					userid:$scope.userinfo.username
 			};
 			
@@ -319,6 +389,18 @@ angular.module('ipsurveyapp.Controllers', [])
 		};
 		
 		
-		
+		$scope.Reset = function(){
+			$scope.STATION_MASTER_DATA = [];
+			$scope.search = {};
+			$scope.userinfo = {};
+			$scope.modal={};
+			$scope.ZONEUSER = false;
+			$scope.CIRCLEUSER = false;
+			$scope.DIVISIONUSER = false;
+			$scope.SUBDIVISIONUSER = false;
+			$scope.OMSECTIONUSER = false;
+			$scope.initialize();
+			
+		};
 			
 	});

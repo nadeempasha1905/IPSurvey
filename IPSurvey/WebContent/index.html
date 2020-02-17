@@ -13,6 +13,9 @@
     
     <link rel="stylesheet" type="text/css" href="app/css/bootstrap.min.css">
     
+     <link rel="stylesheet" type="text/css" href="assets/date/bootstrap-datepicker.min.css">
+   
+    
     <link href="assets/leaflet/leaflet.css" type="text/css" rel="stylesheet" media="screen,projection" />
 	<link href="assets/leaflet/Leaflet.Dialog.css" type="text/css" rel="stylesheet" media="screen,projection" />
 	<link href="assets/leaflet/easy-button.css" type="text/css" rel="stylesheet" media="screen,projection" />
@@ -21,7 +24,6 @@
 	<link href="assets/leaflet/MarkerCluster.css" type="text/css" rel="stylesheet"	media="screen,projection" />
 	<link href="assets/leaflet/MarkerCluster.Default.css" type="text/css" 	rel="stylesheet" media="screen,projection" />
     
-    <link rel="stylesheet" type="text/css" href="assets/js/bootstrap-datetimepicker.min.css">
     
     <link rel="stylesheet" type="text/css" href="app/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="app/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
@@ -33,6 +35,11 @@
 	
 	<link href="assets/autocomplete/autocomplete.css" rel="stylesheet" type="text/css" />
 	<!-- <link href="assets/autocomplete/angular-auto-complete.css" rel="stylesheet" type="text/css" /> -->
+	
+	<link rel="stylesheet" type="text/css" href="app/css/cards.css">
+	<link rel="stylesheet" type="text/css" href="assets/chart/c3.css">
+	<link rel="stylesheet" type="text/css" href="assets/chart/left_nav.css">
+	
     <title>IPSurvey</title>
     
     <style>
@@ -48,9 +55,15 @@
 		.collapse ul>li {
 			padding: 0px 10px 0px 10px;
 		}
+		
+		.zoom{
+			zoom : 90%;
+			/* transform: scale(1); */
+			/* transform-origin: top left; */
+			}
 </style>
   </head>
-  <body ng-controller="navCtrl">
+  <body ng-controller="navCtrl" class="zoom">
   <div id="loading">
 			<div class="loader">Loading...</div>
 		</div>
@@ -67,47 +80,73 @@
     	<!-- <li class="nav-item" ui-sref-active="active">
         	<a class="nav-link" ui-sref="home">Home <span class="sr-only">(current)</span></a>
       </li> -->
-      <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown">
+      
+       <li class="nav-item" ui-sref-active="active">
+        <a class="nav-link" ui-sref="home" ui-sref-opts="{reload: true}">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown" ng-if="LOCATION_CODE === 'SUBDIVISION' || LOCATION_CODE === 'OMSECTION'">
         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Master
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" ui-sref="stationmaster">Station</a>
-          <a class="dropdown-item" ui-sref="feedermaster">Feeder</a>
+          <a class="dropdown-item" ui-sref="stationmaster"   ui-sref-opts="{reload: true}">Station</a>
+          <a class="dropdown-item" ui-sref="feedermaster"  ui-sref-opts="{reload: true}">Feeder</a>
          <!--  <a class="dropdown-item" ui-sref="transformermaster">Transformer</a>
           <a class="dropdown-item" ui-sref="villagemaster">Village</a> -->
         </div>
       </li>
-      <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown">
+      <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown" ng-if="LOCATION_CODE === 'SUBDIVISION'  || LOCATION_CODE === 'OMSECTION'">
         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Enumeration
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-         <a class="dropdown-item" ui-sref="villageenumeration">Village</a>
-          <a class="dropdown-item" ui-sref="transformerenumeration">Transformer</a>
-          <a class="dropdown-item" ui-sref="ipsetenumeration">IP-Set</a>
+         <a class="dropdown-item" ui-sref="villageenumeration" ui-sref-opts="{reload: true}">Village</a>
+          <a class="dropdown-item" ui-sref="transformerenumeration" ui-sref-opts="{reload: true}">Transformer</a>
+          <a class="dropdown-item" ui-sref="ipsetenumeration" ui-sref-opts="{reload: true}">IP-Set</a>
+        </div>
+      </li>
+        <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown" ng-if="LOCATION_CODE === 'SUBDIVISION' || LOCATION_CODE === 'OMSECTION'">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Transfer
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" ui-sref="transformertransfer" ui-sref-opts="{reload: true}">Transformer Transfer</a>
+          <a class="dropdown-item" ui-sref="ipsettransfer" ui-sref-opts="{reload: true}">IP-Set Transfer</a>
         </div>
       </li>
        <li class="nav-item" ui-sref-active="active">
-        <a class="nav-link" ui-sref="viewmap">View Map <span class="sr-only">(current)</span></a>
+        <a class="nav-link" ui-sref="viewmap" ui-sref-opts="{reload: true}">View Map <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item" ui-sref-active="active">
-        <a class="nav-link" ui-sref="reports">Reports <span class="sr-only">(current)</span></a>
+        <a class="nav-link" ui-sref="reports" ui-sref-opts="{reload: true}">Reports <span class="sr-only">(current)</span></a>
       </li>
-      <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown">
+      <li  class="dropdown" ui-sref-active="active"  class="nav-item dropdown" ng-show="NAVIGATE_FROM === 'IISPL'">
         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           User
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" ui-sref="usermanagement">User Management</a>
-          <a class="dropdown-item" ui-sref="changepassword">Change Password</a>
+          <a class="dropdown-item" ui-sref="usermanagement" ui-sref-opts="{reload: true}">User Management</a>
+          <a class="dropdown-item" ui-sref="changepassword"  ui-sref-opts="{reload: true}" ng-show="NAVIGATE_FROM === 'IISPL'">Change Password</a>
         </div>
       </li>
     </ul>
   </div>
-  <div style="float: right;"><button type="button" class="btn btn-light btn-sm" ng-click="logout()">Sign Out</button></div>
+  <div style="float: right;"><button type="button" 
+  	class="btn btn-light btn-sm" ng-click="logout()" 
+  	ng-show="NAVIGATE_FROM === 'IISPL'"> Sign Out</button>
+  	
+  	</div>
 </nav>
-	<div ui-view></div>
+	<div style="padding-left: 34px;background-color: goldenrod;" ng-if="IsLoggedIn">
+	<table style="width: 50%;">
+		<tr>
+			<td>Location Code : &nbsp;<strong>{{USER_INFO.location_code}}</strong></td>
+			<td>Location Name : &nbsp;<strong>{{USER_INFO.location_name}}</strong></td>
+		</tr>
+	</table>
+	</div>
+	
+	<div ui-view > </div>
   </body>
   
     <!-- Optional JavaScript -->
@@ -121,19 +160,25 @@
        <script type="text/javascript" src="assets/jquery/js/popper.min.js"></script> -->
        
        <!-- <script type="text/javascript" src="assets/jquery/js/jquery-2.1.1.min.js"></script> -->
+       
+       
+       
        <script type="text/javascript" src="assets/jquery/js/jquery-3.2.1.min.js"></script>
 		<script type="text/javascript" src="assets/jquery-ui/js/jquery-ui.min.js"></script>
       <script type="text/javascript" src="assets/jquery/js/bootstrap.min.js"></script>
+      
+      <script type="text/javascript" src="assets/date/bootstrap-datepicker.min.js"></script>
      
     <script type="text/javascript" src="assets/angularjs1_6/angular.min.js"></script>
-    <script type="text/javascript" src="assets/angularjs1_6/angular-ui-router.min.js"></script>	
     <script type="text/javascript" src="assets/angularjs1_6/angular-animate.min.js"></script>
     <script type="text/javascript" src="assets/angularjs1_6/angular-aria.min.js"></script>
     <script type="text/javascript" src="assets/angularjs1_6/angular-cookies.min.js"></script>
     <script type="text/javascript" src="assets/angularjs1_6/angular-sanitize.min.js"></script>
     <script type="text/javascript" src="assets/angularjs1_6/angular-touch.min.js"></script>	
-    <script type="text/javascript" src="assets/angularjs1_6/angular-resource.min.js"></script>	
     <script type="text/javascript" src="assets/angularjs1_6/ocLazyLoad.min.js"></script>	
+    <script type="text/javascript" src="assets/angularjs1_6/angular-resource.min.js"></script>	
+    <script type="text/javascript" src="assets/angularjs1_6/angular-route.min.js"></script>        
+    <script type="text/javascript" src="assets/angularjs1_6/angular-ui-router.min.js"></script>	
     <script type="text/javascript" src="assets/angularjs1_6/angular-storage.min.js"></script>	
     
     <script src="assets/leaflet/leaflet.js"></script>
@@ -148,18 +193,28 @@
 	<script src="assets/leaflet/leaflet.markercluster-src.js"></script>
 	<script src="assets/leaflet/leaflet-heat.js"></script>
 	<script src="assets/leaflet/esri-leaflet.js"></script>
+	<script src="assets/leaflet/bundle.js"></script>
 	
-     <script type="text/javascript" src="assets/js/moment.min.js"></script>
-     <script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+    
      
      <script src="http://maps.googleapis.com/maps/api/js?libraries=places&language=en-US&key=AIzaSyAjY-7_O0St6p0iwEuGEP4mhhN4il1CSto"></script>
 	 <script src="assets/map/maplabel-compiled.js"></script> 
     
-    <script type="text/javascript" src="app/modules/app.js"></script>	
-    <script type="text/javascript" src="app/modules/utility.js"></script>
+    
     
     <script type="text/javascript" src="assets/autocomplete/autocomplete.js"></script>
     <!-- <script type="text/javascript" src="assets/autocomplete/angular-auto-complete.js"></script> -->
+    
+    <script type="text/javascript" src="assets/chart/d3-5.4.0.min.js"></script>
+    <script type="text/javascript" src="assets/chart/c3.min.js"></script>
+    
+ <!--    <script type="text/javascript" src="assets/chart/left_nav.js"></script> -->
+    
+		 <script type="text/javascript" src="assets/js/moment.min.js"></script>
+		 
+		 <script type="text/javascript" src="app/modules/app.js"></script>	
+    <script type="text/javascript" src="app/modules/utility.js"></script>
+     
     
     <script type="text/javascript">
 	   /*  var domain = location.origin,

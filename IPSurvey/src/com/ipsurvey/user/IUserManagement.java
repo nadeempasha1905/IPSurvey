@@ -26,4 +26,6 @@ public interface IUserManagement {
 	
 	JSONObject chnagepassword(JSONObject object, HttpServletRequest request, HttpServletResponse response);
 
+	JSONObject signin_location_object(JSONObject object, HttpServletRequest request);
+
 }

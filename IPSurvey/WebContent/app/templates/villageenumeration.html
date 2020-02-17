@@ -1,4 +1,8 @@
 <style>
+i
+{
+	cursor: pointer;
+}
  .thalign thead tr th{vertical-align: middle; }
  .thalign tbody tr td{vertical-align: middle; }
  
@@ -116,9 +120,9 @@
     							</div>
     						</div>	
     						<div class="row mt-3">
-    							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
-    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
-									  <thead>
+    							<div class="col-md-12" style="width: 100%;overflow-x: scroll;height: 500px;">
+    								<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 100%;">
+									  <thead style="background-color: #007bff;color: white;">
 									    <tr>
 									      <th></th>
 									      <th>Location Name</th>
@@ -135,8 +139,14 @@
 									  </thead>
 									  <tbody>
 									  	<tr ng-repeat="data in VILLAGE_ENUM_DATA">
-									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".villageenumerate-addedit-modal" 
-									  			ng-click="addeditVillageEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>
+									  		<!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".villageenumerate-addedit-modal" 
+									  			ng-click="addeditVillageEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button> -->
+									  			
+									  			<i class="fa fa-edit"  ng-click="addeditVillageEnumeration(data,'edit')" data-toggle="modal" data-target=".villageenumerate-addedit-modal"></i>&nbsp;&nbsp;
+									  			<i class="fa fa-trash" ng-click="addeditVillageEnumeration(data,'delete')"></i>
+									  			
+									  			</td>
 									  		<td>{{data.VE_LOCATION_name}}</td>
 									  		<td>{{data.VE_VILLAGE_NAME}}</td>
 									  		<td>{{data.VE_LATTITUDE}}</td>
@@ -195,15 +205,15 @@
     		 <div class="row mt-3" >
    		 		<div class="col-md-4">
    		 			<label for="modallatitude">Latitude</label>
-   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists">
+   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists" decimal-numbers-only>
    		 		</div>
    		 		<div class="col-md-4">
    		 			<label for="modallongitude">Longitude</label>
-   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists">
+   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists" decimal-numbers-only>
    		 		</div>
    		 		<div class="col-md-4">
    		 			<label for="modalaltitude">Altitude</label>
-   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists">
+   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists" decimal-numbers-only>
    		 		</div>
    		 	</div>
    		 	<div class="row mt-3" >

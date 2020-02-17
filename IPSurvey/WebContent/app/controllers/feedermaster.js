@@ -3,6 +3,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("Feeder Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		$scope.modal={};
@@ -88,6 +91,24 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			
 		}
+		
+		$scope.getcodedetails = function(value,searchtype){
+		
+			
+			if(searchtype === 'FDR_TYPE'){
+				$scope.modalfeedertypes = [];
+				remote.load("getcodedetails", function(response){
+					$scope.modalfeedertypes = response.CODES_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.feedertype =  $filter('filter')($scope.modalfeedertypes,{key:value},true)[0];
+					}
+				},{
+					code_type:'FDR_TYPE'
+				}, 'POST');
+			}
+			
+		};
+		
 		
 		$scope.getzonelist = function(arr,usertype,searchtype){
 				$scope.searchzonelist=[];$scope.searchcirclelist=[];$scope.searchdivisionlist=[];$scope.searchsubdivisionlist=[];$scope.searchomsectionlist=[];
@@ -182,6 +203,8 @@ angular.module('ipsurveyapp.Controllers', [])
 				}
 				remote.load("getsubdivisionlist", function(response){
 					$scope.modalsubdivisionlist = response.SUBDIVISION_LIST;
+					$scope.modal.subdivision = $filter('filter')($scope.modalsubdivisionlist,{key:$scope.userinfo.location_code},true)[0];
+					$scope.getStationList('modal');
 				},{
 					location_code:($scope.search.division === undefined || $scope.search.division === null ? '' : $scope.search.division.key)
 				}, 'POST');
@@ -257,11 +280,11 @@ angular.module('ipsurveyapp.Controllers', [])
 			
 			$scope.ROWID = "";
 			 
-			$scope.getsubdivisionList([],null,'modal');
-			
 			if(action === 'add'){
 				
-				//$scope.getcodedetails('','ST_TYPE');
+				$scope.getsubdivisionList([],null,'modal');
+				
+				$scope.getcodedetails('','FDR_TYPE');
 				$scope.action = 'add';
 				
 				$scope.modal_heading = "Add Feeder Master";
@@ -273,7 +296,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				
 				$scope.getStationList('modal');
 				
-			}else{
+			}else if(action === 'edit'){
+				
+				$scope.getsubdivisionList([],null,'modal');
 				
 				console.log(record);
 				$scope.ROWID = record.row_id;
@@ -281,7 +306,7 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.newuseridexists = false;
 				$scope.modal_heading = "Edit Feeder Master";
 				
-				//$scope.getcodedetails(record.STATION_TYPE,'ST_TYPE');
+				$scope.getcodedetails(record.FEEDER_TYPE,'FDR_TYPE');
 				
 				$timeout(function(){
 					$scope.modal.subdivision = $filter('filter')($scope.modalsubdivisionlist,{key:record.SUBDIV_CODE},true)[0];
@@ -297,8 +322,38 @@ angular.module('ipsurveyapp.Controllers', [])
 				
 				$scope.modal.feedercode = record.FEEDER_CODE;
 				$scope.modal.feedername = record.FEEDER_NAME;
+				
+			}else if(action === 'delete'){
+				
+				$scope.ROWID = record.row_id;
+				
+				var sts = confirm("Are You Sure To Delete ?");
+				console.log("sts",sts);
+				
+				if(sts){
+					var request = {
+							rowid:$scope.ROWID,
+							location_code:record.SUBDIV_CODE,
+							stationcode:record.STATION_CODE,
+							feedercode:record.FEEDER_CODE,
+							feedername:record.FEEDER_NAME,
+							feederstatus:record.FEEDER_STATUS,
+							feedertype:record.FEEDER_TYPE,
+							deleteflag:'Y',
+							userid:$scope.userinfo.username
+					};
+					console.log("request",request);
+					remote.load("upsertfeedermaster", function(response){
+						console.log("upsertfeedermaster",response);
+						if(response.status === 'success'){
+							$timeout(function(){
+								//$('#feedermaster-addedit-modal').modal('toggle');
+								$scope.searchfeedermasterdetails();
+							},2000);
+						}
+					},request, 'POST');
+				}
 			}
-			
 		};
 		
 		$scope.SaveRecord = function(){
@@ -310,6 +365,7 @@ angular.module('ipsurveyapp.Controllers', [])
 			if($scope.modal.station === undefined || $scope.modal.station === null){notify.warn("Please Select Station");return;}
 			if($scope.modal.feedercode === undefined || $scope.modal.feedercode === null){notify.warn("Please Enter Feeder Code");return;}
 			if($scope.modal.feedername === undefined || $scope.modal.feedername === null){notify.warn("Please Enter Feeder Name");return;}
+			if($scope.modal.feedertype === undefined || $scope.modal.feedertype === null){notify.warn("Please Select Feeder type");return;}
 			if($scope.modal.feederstatus === undefined || $scope.modal.feederstatus === null){notify.warn("Please Select Feeder Status");return;}
 			
 			
@@ -320,6 +376,8 @@ angular.module('ipsurveyapp.Controllers', [])
 					feedercode:($scope.modal.feedercode === undefined || $scope.modal.feedercode === null ? '' : $scope.modal.feedercode),
 					feedername:($scope.modal.feedername === undefined || $scope.modal.feedername === null ? '' : $scope.modal.feedername),
 					feederstatus:$scope.modal.feederstatus.key,
+					feedertype:$scope.modal.feedertype.key,
+					deleteflag:'N',
 					userid:$scope.userinfo.username
 			};
 			
@@ -337,6 +395,18 @@ angular.module('ipsurveyapp.Controllers', [])
 		};
 		
 		
-		
+		$scope.Reset = function(){
+			$scope.FEEDER_MASTER_DATA = [];
+			$scope.search = {};
+			$scope.userinfo = {};
+			$scope.modal={};
+			$scope.ZONEUSER = false;
+			$scope.CIRCLEUSER = false;
+			$scope.DIVISIONUSER = false;
+			$scope.SUBDIVISIONUSER = false;
+			$scope.OMSECTIONUSER = false;
+			$scope.initialize();
+			
+		};
 			
 	});

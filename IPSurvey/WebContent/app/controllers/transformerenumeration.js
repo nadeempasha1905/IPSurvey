@@ -7,6 +7,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("transformerenumeration Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		$scope.modal={};
@@ -374,7 +377,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.timscode = '';
 				$scope.modal.capacitykva = '';
 				
-			}else{
+			}else if(action === 'edit'){
+				
+				console.log("record",record);
 				
 				$scope.getomsectionList([],null,'modal');
 				$timeout(function(){
@@ -409,6 +414,50 @@ angular.module('ipsurveyapp.Controllers', [])
 					}
 					
 					$scope.NEW_TC_CODE = record.TE_TRANSFORMER_CODE;
+				
+			}else if(action === 'delete'){
+				
+				console.log("record",record);
+				
+				$scope.ROWID = record.row_id;
+				
+				var sts = confirm("Are You Sure To Delete ?");
+				console.log("sts",sts);
+				
+				if(sts){
+					
+					var request = {
+							rowid:$scope.ROWID,
+							location_code:record.TE_OM_CODE,
+							stationcode:record.TE_STATION_CODE,
+							feedercode:record.TE_FEEDER_CODE,
+							transformercode:record.TE_TRANSFORMER_CODE,
+							transformername:record.TE_TRANSFORMER_NAME,
+							timscode:record.TE_TIMS_CODE,
+							capacitykva:record.TE_CAPACITY_KVA,
+							connectedloadkva:record.TE_CAPACITY_KVA,
+							village_name:record.TE_VILLAGE,
+							latitude:record.TE_LATTITUDE,
+							longitude:record.TE_LONGITUDE,
+							altitude:record.TE_ALTITUDE,
+							remarks:record.TE_REMARKS,
+							userid:$scope.userinfo.username,
+							deleteflag:'Y',
+							imagepath:record.TE_IMAGE_PATH	
+					};
+					
+					
+					
+					remote.load("upserttransformerenumeration", function(response){
+						console.log("upserttransformerenumeration",response);
+						if(response.status === 'success'){
+							$timeout(function(){
+								//$('#stationmaster-addedit-modal').modal('toggle');
+								$scope.SearchTransformerEnumDetails();
+							},2000);
+						}
+					},request, 'POST');
+				}
 				
 			}
 			
@@ -520,6 +569,7 @@ angular.module('ipsurveyapp.Controllers', [])
 					altitude:$scope.modal.altitude,
 					remarks:($scope.modal.remarks === undefined || $scope.modal.remarks === null ? '' : $scope.modal.remarks),
 					userid:$scope.userinfo.username,
+					deleteflag:'N',
 					imagepath:(imagepath == null || imagepath == '' || imagepath == undefined ? '' : imagepath)	
 			};
 			
@@ -557,6 +607,12 @@ angular.module('ipsurveyapp.Controllers', [])
 		};
 		
 		$scope.initialize();
+		
+		$scope.ResetUserDetails = function(){
+			$scope.TRANSFORMER_ENUM_DATA = [];
+			$scope.initialize();
+			
+		};
 		
 	})
 	

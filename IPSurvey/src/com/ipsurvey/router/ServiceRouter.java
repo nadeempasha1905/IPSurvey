@@ -59,6 +59,16 @@ public class ServiceRouter {
 	}
 	
 	@POST
+	@Path("/signin_location_object")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject signin_location_object(final JSONObject object, @Context HttpServletRequest request){
+		//String ipAdress = request.getRemoteHost();
+		System.out.println("signin_pc....."+object);
+		return userObj.signin_location_object(object,request);
+	}
+	
+	@POST
 	@Path("/signout")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
@@ -146,6 +156,16 @@ public class ServiceRouter {
 		String ipAdress = request.getRemoteHost();
 		System.out.println("hi....."+object);
 		return utilObj.getcodedetails(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getcastecategory")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getcastecategory(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		System.out.println("hi....."+object);
+		return utilObj.getcastecategory(object,ipAdress);
 	}
 	
 	@POST
@@ -345,6 +365,44 @@ public class ServiceRouter {
 		return enumObj.upsertfeedermaster(object,ipAdress);
 	}
 	
+	@POST
+	@Path("/dotransformertransfer")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject dotransformertransfer(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.dotransformertransfer(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/doipsettransfer")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject doipsettransfer(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.doipsettransfer(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getipsetdetails_to_transferipset")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getipsetdetails_to_transferipset(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getipsetdetails_to_transferipset(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getrrnumberslistfortransfer")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getrrnumberslistfortransfer(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return enumObj.getrrnumberslistfortransfer(object,ipAdress);
+	}
+	
+	
+	
 	/**********************************/
 	//View Map
 	
@@ -364,6 +422,15 @@ public class ServiceRouter {
 	public JSONObject getmappingpoints(final JSONObject object, @Context HttpServletRequest request){
 		String ipAdress = request.getRemoteHost();
 		return mapObj.getmappingpoints(object,ipAdress);
+	}
+	
+	@POST
+	@Path("/getmaindashboarddetails")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	public JSONObject getmaindashboarddetails(final JSONObject object, @Context HttpServletRequest request){
+		String ipAdress = request.getRemoteHost();
+		return reportObj.getmaindashboarddetails(object,ipAdress);
 	}
 	
 	

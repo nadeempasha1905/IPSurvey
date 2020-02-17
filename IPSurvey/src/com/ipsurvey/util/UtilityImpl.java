@@ -305,7 +305,7 @@ public class UtilityImpl implements IUtility{
 		try {
 			String get_permission_query = " SELECT SM_STATION_CODE, SM_STATION_NAME  "
 					+ " FROM STATION_MASTER "
-					+ " WHERE SM_LOCATION_CODE = '"+(String)object.get("location_code")+"' " ;
+					+ " WHERE SM_LOCATION_CODE = '"+(String)object.get("location_code")+"' AND SM_DELETE_STATUS = 'N' " ;
 			
 			ps = dbConn.prepareStatement(get_permission_query);
 			rs = ps.executeQuery();
@@ -339,7 +339,7 @@ public class UtilityImpl implements IUtility{
 		try {
 			String get_permission_query = " SELECT FM_FEEDER_CODE, FM_FEEDER_NAME "
 					+ " FROM FEEDER_MASTER  "
-					+ " WHERE FM_LOCATION_CODE = '"+(String)object.get("location_code")+"' AND "
+					+ " WHERE FM_LOCATION_CODE = '"+(String)object.get("location_code")+"' AND NVL(FM_DELETE_FLAG,'N') = 'N' AND "
 					+ " FM_STATION_CODE = '"+(String)object.get("station_code")+"' ORDER BY FM_FEEDER_NAME ASC " ;
 
 			ps = dbConn.prepareStatement(get_permission_query);
@@ -422,7 +422,7 @@ public class UtilityImpl implements IUtility{
 		
 		try {
 			String get_permission_query = " select VE_VILLAGE_NAME from VILLAGE_ENUMERATION  "
-					+ " where VE_LOCATION_CODE = '"+(String)object.get("location_code")+"'   "
+					+ " where VE_LOCATION_CODE = '"+(String)object.get("location_code")+"' AND NVL(VE_DELETED_FLAG,'N') = 'N'  "
 							+ " order by nvl(VE_UPDATED_ON,VE_CREATED_ON) desc " ;
 			
 			ps = dbConn.prepareStatement(get_permission_query);
@@ -457,9 +457,20 @@ public class UtilityImpl implements IUtility{
 		try {
 			String get_permission_query = " select TE_TRANSFORMER_CODE, TE_TRANSFORMER_NAME  "
 					+ " from TRANSFORMER_ENUMERATION  "
-					+ " where TE_OM_CODE = '"+(String)object.get("location_code")+"'   "
-					+ " order by nvl(TE_UPDATED_ON,TE_CREATED_ON) desc " ;
+					+ " where "
+					+ " TE_OM_CODE like '"+(String)object.get("location_code")+"%' " ;
 			
+					if(((String)object.get("station_code")).length() > 1) {
+						get_permission_query = get_permission_query + "  AND  TE_STATION_CODE like '"+(String)object.get("station_code")+"%' " ;
+					}
+					
+					if(((String)object.get("feeder_code")).length() > 1) {
+						get_permission_query = get_permission_query + "  AND  TE_FEEDER_CODE like '"+(String)object.get("feeder_code")+"%' " ;
+					}
+					
+					get_permission_query = get_permission_query + "  AND nvl(TE_DELETED_FLAG,'N') = 'N' order by TE_TRANSFORMER_NAME " ;
+			
+					System.out.println(get_permission_query);
 			ps = dbConn.prepareStatement(get_permission_query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -477,6 +488,44 @@ public class UtilityImpl implements IUtility{
 			DBManagerResourceRelease.close(rs);
 			DBManagerResourceRelease.close(ps);
 		}
+		return JSON_RESPONSE;
+	}
+
+	@Override
+	public JSONObject getcastecategory(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		JSONObject json = null;
+		JSONArray  json_array = new JSONArray();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		
+		try {
+			String get_permission_query = " select distinct categoryid, categoryname from caste_master order by categoryid ";
+			
+			ps = dbConn.prepareStatement(get_permission_query);
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				
+				json = new JSONObject();
+				json.put("key",   rs.getString("categoryid"));
+				json.put("value", rs.getString("categoryname"));
+				json_array.add(json);
+			}
+			
+			JSON_RESPONSE.put("status", "success");
+			JSON_RESPONSE.put("CASTECATEGORY_LIST", json_array);
+			
+			
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBManagerResourceRelease.close(rs);
+			DBManagerResourceRelease.close(ps);
+		}
+		
 		return JSON_RESPONSE;
 	}
 	

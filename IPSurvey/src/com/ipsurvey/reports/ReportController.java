@@ -8,7 +8,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -24,7 +26,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import oracle.jdbc.OracleTypes;
+
 import org.apache.commons.io.IOUtils;
 
 import com.ipsurvey.database.DBManagerIMPL;
@@ -79,6 +84,8 @@ public class ReportController implements IReportController {
 		String village = request.getParameter("village").trim();
 		String location_code = request.getParameter("location_code").trim();
 		String datetimepicker = request.getParameter("reportdate").trim();
+		String login_location = request.getParameter("login_location").trim();
+		
 		
 		if(report_type.length() > 0){
 			
@@ -119,6 +126,10 @@ public class ReportController implements IReportController {
 				fileName = "IPset_Enumeration_new";
 				report = "IPSET";
 				report_title = "Details Of Irrigation Pumpset Enumerated";
+			}else if(report_type.equals("10")){
+				fileName = "IPReport";
+				report = "IPSET";
+				report_title = "Detailed Report Of IPsets";
 			}else if(report_type.equals("15")){
 				fileName = "progress_kerc";
 				report = "KERC";
@@ -138,6 +149,8 @@ public class ReportController implements IReportController {
 			}
 			else if(report_type.equals("25")){
 				fileName = "annex5";
+			}else if(report_type.equals("26")){
+				fileName = "Annex_abstract";
 			}
 
 	        try {
@@ -167,6 +180,7 @@ public class ReportController implements IReportController {
 	            parameterMap.put("P_SUBDIVISION_CODE", subdivision);
 	            
 	            parameterMap.put("P_LOCATION_CODE", location_code);
+	            parameterMap.put("P_LOC", (location_code == null || location_code == "" || location_code.equals("") ? login_location : location_code));
 	            
 	            parameterMap.put("P_OM_CODE", om_code);
 	            parameterMap.put("P_STATION_CODE", station);
@@ -285,5 +299,70 @@ public class ReportController implements IReportController {
 		    .header("Content-Length", buffer2.length)
 		    .header("Content-Disposition","attachment; filename=angularjs_tutorial.pdf").build();*/
 		 }
+
+	@Override
+	public JSONObject getmaindashboarddetails(JSONObject object, String ipAdress) {
+		// TODO Auto-generated method stub
+		
+		
+		CallableStatement accountsCS = null;
+		ResultSet accountsRS = null;
+		JSONArray array = new JSONArray();
+		JSONObject obj = new JSONObject();
+
+		String location_code = object.getString("location_code");
+		
+		System.out.println(object);
+
+		try {
+
+				dbConn = dbObject.getDatabaseConnection();
+
+			accountsCS = dbConn.prepareCall("{ call  GET_DASHBOARD (?,'"+location_code+"')}");
+			accountsCS.registerOutParameter(1, OracleTypes.CURSOR);
+			
+			accountsCS.executeUpdate();
+			accountsRS = (ResultSet) accountsCS.getObject(1);
+			System.out.println(accountsRS);
+			while (accountsRS.next()) {
+				JSONObject ackobj = new JSONObject();
+
+				ackobj.put("slno", accountsRS.getString("slno"));
+				ackobj.put("GROUPNAME", accountsRS.getString("GROUPNAME"));
+				ackobj.put("LOCATION_CODE", accountsRS.getString("LOCATION_CODE"));
+				ackobj.put("LOCATION", accountsRS.getString("LOCATION"));
+				ackobj.put("NOOFFDRS", accountsRS.getString("NOOFFDRS"));
+				ackobj.put("NOOFTCS", accountsRS.getString("NOOFTCS"));
+				ackobj.put("TOTINTL", accountsRS.getString("TOTINTL"));
+				ackobj.put("AUTHORIZED", accountsRS.getString("AUTHORIZED"));
+				ackobj.put("UNAUTHORIZED", accountsRS.getString("UNAUTHORIZED"));
+				ackobj.put("INUSE", accountsRS.getString("INUSE"));
+				ackobj.put("NOTINUSE", accountsRS.getString("NOTINUSE"));
+				ackobj.put("DRY", accountsRS.getString("DRY"));
+				ackobj.put("HP10ANDBELOW", accountsRS.getString("HP10ANDBELOW"));
+				ackobj.put("HP10ABOVE", accountsRS.getString("HP10ABOVE"));
+				
+				array.add(ackobj);
+
+			}
+			if (array.isEmpty()) {
+				// no tasks for user
+				obj.put("status", "success");
+				obj.put("message", "No Records Found !!!");
+			} else {
+				obj.put("status", "success");
+				obj.put("message", "Main-Dashboard Retrieved !!!");
+				obj.put("MAINDASHBOARD", array);
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			obj.put("status", "fail");
+			e.printStackTrace();
+			obj.put("message", "database not connected");
+		}
+
+		return obj;
+	}
 
 }

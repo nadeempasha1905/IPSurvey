@@ -1,4 +1,9 @@
 <style>
+
+i
+{
+	cursor: pointer;
+}
  .thalign thead tr th{vertical-align: middle; }
  .thalign tbody tr td{vertical-align: middle; }
  
@@ -16,8 +21,8 @@
 .modal_fixed_header_column tbody td {min-width: 100px;width: 100px;color: #353535;word-break: break-all;height: 35px;
 										word-wrap:break-word;font-weight: normal;}
 .modal_fixed_header_column th,.modal_fixed_header_column td {border: 1px solid #00bf8f;}
-.modal_fixed_header_column thead tr th:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
-.modal_fixed_header_column tbody tr td:nth-child(1){ min-width: 90px; width : 90px;word-wrap:break-word;}
+.modal_fixed_header_column thead tr th:nth-child(1){ min-width:  90px; width :  90px;word-wrap:break-word;}
+.modal_fixed_header_column tbody tr td:nth-child(1){ min-width:  90px; width :  90px;word-wrap:break-word;}
 .modal_fixed_header_column thead tr th:nth-child(2){ min-width: 300px; width : 300px;word-wrap:break-word;}
 .modal_fixed_header_column tbody tr td:nth-child(2){ min-width: 300px; width : 300px;word-wrap:break-word;}
 .modal_fixed_header_column thead tr th:nth-child(3){ min-width: 150px; width : 150px;word-wrap:break-word;}
@@ -89,7 +94,7 @@
 			   		 		
 			   		 		<div class="col-md-2" style="margin-top: 25px;">
 			   		 			<button class="btn btn-sm btn-primary" ng-click="searchstationmasterdetails()">Search</button>
-			   		 			<button class="btn btn-sm btn-secondary" ng-click="ResetUserDetails()">Reset</button>
+			   		 			<button class="btn btn-sm btn-secondary" ng-click="Reset()">Reset</button>
 			   		 		</div>
     						</div>
     							
@@ -102,26 +107,33 @@
     						</div>	
     						<div class="row mt-3">
     							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
-    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
-									  <thead>
+    								<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 100%;">
+									  <thead style="background-color: #007bff;color: white;">
 									    <tr>
 									      <th></th>
 									      <th>Sub-Division Name</th>
 									      <th>Station Code</th>
 									      <th>Station Name</th>
 									      <th>Station Type</th>
+									      <th>Station Sub Type</th>
 									      <th>Updated By</th>
 									      <th>Updated On</th>
 									    </tr>
 									  </thead>
 									  <tbody>
 									  	<tr ng-repeat="data in STATION_MASTER_DATA">
-									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".stationmaster-addedit-modal" 
-									  			ng-click="addeditstationmaster(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>
+									  		<!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".stationmaster-addedit-modal" 
+									  			ng-click="addeditstationmaster(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button> -->
+									  			
+									  			<i class="fa fa-edit"  ng-click="addeditstationmaster(data,'edit')" data-toggle="modal" data-target=".stationmaster-addedit-modal" ></i>&nbsp;&nbsp;
+									  			<i class="fa fa-trash" ng-click="addeditstationmaster(data,'delete')"></i>
+									  			</td>
 									  		<td>{{data.SUBDIV_NAME}}</td>
 									  		<td>{{data.STATION_CODE}}</td>
 									  		<td>{{data.STATION_NAME}}</td>
 									  		<td>{{data.STATION_TYPE_DESCR}}</td>
+									  		<td>{{data.STATION_SUB_TYPE_DESCR}}</td>
 									  		<td>{{data.UPDATED_BY}}</td>
 									  		<td>{{data.UPDATED_ON}}</td>
 									  	</tr>
@@ -158,6 +170,7 @@
 					    <select class="form-control" id="modalsubdivision" 
 					    ng-model="modal.subdivision"
 					    ng-options="u as u.value for u in modalsubdivisionlist"  
+					    ng-disabled = "action === 'add'"
 					    >
 					      <option value="">------Select------</option>
 					    </select>
@@ -171,11 +184,23 @@
 					      <option value="">------Select------</option>
 					    </select>
    		 		</div>
+   		 	</div>	
+   		 	<div class="row mt-3" >	
+   		 		<div class="col-md-6">
+    		 		 <label for="modalstationtype">Station Sub Type</label>
+					    <select class="form-control" id="modalstationsubtype" 
+					    ng-model="modal.stationsubtype"
+					    ng-options="u as u.value for u in modalstationsubtypelist"  
+					    >
+					      <option value="">------Select------</option>
+					    </select>
+   		 		</div>
 			 </div>
     		 <div class="row mt-3" >
    		 		<div class="col-md-6">
    		 			<label for="modalstationcode">Station Code</label>
-   		 			<input class="form-control" type="text" ng-model="modal.stationcode" id="modalstationcode" >
+   		 			<input class="form-control" type="text" ng-model="modal.stationcode" id="modalstationcode" 
+   		 			numbers-only ng-disabled = "action === 'edit'">
    		 		</div>
    		 		<div class="col-md-6">
    		 			<label for="modalstationname">Station Name</label>

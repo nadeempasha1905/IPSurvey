@@ -115,11 +115,15 @@ public class ViewMapImpl implements IViewMap {
 					 JSON_RESPONSE.put("message", "Invalid Object");
 				 }else {
 					
-					 String sql = "{ call GET_MAP_DETAILS(?,'"+(String)object.get("location_code")+"',"
+					 String sql = "{ call GET_MAP_DETAILS(?,"
+							 + "'"+((String)object.get("subdivisioncode") == null || (String)object.get("subdivisioncode") == "" ? "" : (String)object.get("subdivisioncode") )+"',"
+					 		+ "'"+(String)object.get("location_code")+"',"
 					 		+ "'"+((String)object.get("station_code") == null || (String)object.get("station_code") == "" ? "" : (String)object.get("station_code") )+"',"
-					 				+ "'"+((String)object.get("feeder_code") == null || (String)object.get("feeder_code") == "" ? "" : (String)object.get("feeder_code"))+"',"
-					 						+ "'"+((String)object.get("village") == null || (String)object.get("village") == "" ? "" : (String)object.get("village"))+"',"
-					 								+ "'"+((String)object.get("transformer_code") == null || (String)object.get("transformer_code") == "" ? "" : (String)object.get("transformer_code"))+"')}";
+			 				+ "'"+((String)object.get("feeder_code") == null || (String)object.get("feeder_code") == "" ? "" : (String)object.get("feeder_code"))+"',"
+	 						+ "'"+((String)object.get("village") == null || (String)object.get("village") == "" ? "" : (String)object.get("village"))+"',"
+							+ "'"+((String)object.get("transformer_code") == null || (String)object.get("transformer_code") == "" ? "" : (String)object.get("transformer_code"))+"',"
+							+ "'"+((String)object.get("search_rrnumber") == null || (String)object.get("search_rrnumber") == "" ? "" : (String)object.get("search_rrnumber"))+"')"
+					 										+ "}";
 
 					 System.out.println(sql);
 				calstmt = dbConn.prepareCall(sql);
@@ -151,7 +155,7 @@ public class ViewMapImpl implements IViewMap {
 					json.put("TC_ALTITUDE", (rs.getString("TC_ALTITUDE") == null ? "" : rs.getString("TC_ALTITUDE")));
 					json.put("TC_IMAGE_PATH", (rs.getString("TC_IMAGE_PATH") == null ? "" : rs.getString("TC_IMAGE_PATH")));
 					
-					if(((String)object.get("transformer_code")).length() > 0) {
+					if(((String)object.get("transformer_code")).length() > 0 || ((String)object.get("search_rrnumber")).length() > 0) {
 						json.put("POLE_CODE", (rs.getString("POLE_CODE") == null ? "" : rs.getString("POLE_CODE")));
 						json.put("POLE_NUMBER", (rs.getString("POLE_NUMBER") == null ? "" : rs.getString("POLE_NUMBER")));
 						json.put("POLE_LATTITUDE", (rs.getString("POLE_LATTITUDE") == null ? "" : rs.getString("POLE_LATTITUDE")));

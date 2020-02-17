@@ -7,6 +7,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("changepasswordCtrl Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		$scope.modal={};

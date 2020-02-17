@@ -50,5 +50,13 @@ public interface IEnumeration {
 	JSONObject upsertfeedermaster(JSONObject object, String ipAdress);
 
 	JSONObject getfeedermasterdetails(JSONObject object, String ipAdress);
+
+	JSONObject dotransformertransfer(JSONObject object, String ipAdress);
+
+	JSONObject doipsettransfer(JSONObject object, String ipAdress);
+
+	JSONObject getipsetdetails_to_transferipset(JSONObject object, String ipAdress);
+
+	JSONObject getrrnumberslistfortransfer(JSONObject object, String ipAdress);
 	
 }

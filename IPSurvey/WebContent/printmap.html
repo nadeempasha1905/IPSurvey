@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>IPSurvey-Print</title>
+<link rel="stylesheet" href="assets/chart/table_style_print.css" />
+
+<script	src="assets/chart/jquery-2.1.1.min.js"></script>
+<script	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAjY-7_O0St6p0iwEuGEP4mhhN4il1CSto"></script>
+<script	src="assets/chart/maplabel-compiled.js"></script>
+
+<script type="text/javascript">
+	function noBack() {
+		window.history.forward();
+	}
+	noBack();
+	window.onload = noBack;
+	window.onpageshow = function(evt) {
+		if (evt.persisted)
+			noBack();
+	}
+	window.onunload = function() {
+		void (0);
+	}
+</script>
+<style>
+/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+#googleMap {
+	/* float: left; */
+	width: 1250px;
+	height: 1300px;
+}
+
+#index_details {
+	float: left;
+	width: 70%;
+	margin-top: 10px;
+	/* width: 1250px; */
+	/* height: 1300px; */
+}
+
+#color_details {
+	margin-top: 10px;
+}
+
+@media print {
+	#googleMap {
+		width: 1250px;
+		height: (($("#myheight") .val()) .length> 0? ($("#myheight") .val()): 1300px;
+		)
+	}
+	#index_details {
+		/* margin-top : 200px; */
+		margin-top: 10px;
+		/* width: 1250px; */
+		float: left;
+		width: 70%;
+	}
+	#color_details {
+		margin-top: 10px;
+	}
+	#myheight_div {
+		display: none;
+	}
+}
+</style>
+
+
+</head>
+<body>
+
+<div id="myheight_div">
+<strong style="color:green;font-size: 20px;"><u>Set Height : </u></strong>
+	<input style="color:maroon; font-size: 20px;" type="text" id="myheight" value="1300" maxlength="4" onkeypress='return (event.charCode >= 48 && event.charCode <= 57)'>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Print" onclick="window.print();">
+	&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Close" onclick="window.close();">
+</div>
+
+	<table style="width: 100%;" class="hovertable">
+		<tr>
+			<td style="width: 50%;"><b>CIRCLE</b><span id="span_circle"></span></td>
+			<td style="width: 50%;"><b>DIVISION</b><span id="span_division"></span></td>
+		</tr>
+		<tr>	
+			<td style="width: 100%;" colspan="2"><b>SUB_DIVISION</b><span id="span_subdivision"></span></td>
+			<!-- <td style="width: 25%;"></td> -->
+		</tr>
+		
+		<tr>
+			<td style="width: 50%;"><b>STATION</b><span id="span_station"></span></td>
+			<td style="width: 50%;"><b>FEEDER</b><span id="span_feeder"></span></td>
+		</tr>	
+		<tr>	
+			<td style="width: 50%;"><b>TRANSFORMER</b><span id="span_transformer"></span></td>
+			<td style="width: 50%;"><b>VILLAGE</b><span id="span_village"></span></td>
+		</tr>
+	</table>
+	
+	<div id="googleMap"></div>
+	
+		<div id="index_details" >
+		<table  class="hovertable" id="ipset_table_index_details" >
+			<caption id="caption">INDEX</caption>
+			<thead>
+			<tr>
+				<th>Sl.No </th>	
+				<th>Index </th>
+				<th>RR Number</th>
+				<th>Name</th>
+				<th>Load HP</th>
+				<th>Pole Number</th>
+				<th>Latitude</th>
+				<th>Longitude</th>
+			</tr>
+			</thead>
+			<tbody>
+			
+			</tbody>
+	</table>
+	
+	<table  class="hovertable" id="transformer_table_index_details" >
+			<caption id="caption">INDEX</caption>
+			<thead>
+			<tr>
+				<th>Sl.No </th>	
+				<th>Index </th>
+				<th>Transformer Name</th>
+				<th>Capacity(KVA)</th>
+				<th>Village</th>
+				<th>Latitude</th>
+				<th>Longitude</th>
+			</tr>
+			</thead>
+			<tbody>
+			
+			</tbody>
+			</table>
+	</div>
+	
+	<div id="color_details" >
+	<table  class="hovertable" id="color_index_details" >
+			<caption id="caption">Color Codes</caption>
+			<thead>
+			<tr>
+				<th>Icons </th>	
+				<th>Description</th>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+	</table>
+	</div>
+</body>
+<script type="text/javascript">
+	var retrievedObject = localStorage.getItem('MAP_DETAILS');
+	var userinfo = localStorage.getItem('userinfo');
+	var station_details = localStorage.getItem('station_details');
+	var print_map_type = localStorage.getItem('print_map_type');
+	
+	console.log('retrievedObject: ', JSON.parse(retrievedObject));
+	console.log('userinfo: ', JSON.parse(userinfo));
+	console.log('station_details: ', JSON.parse(station_details));
+	console.log('print_map_type: ', print_map_type);
+
+	MAP_OBJECT = JSON.parse(retrievedObject);
+	userinfo = JSON.parse(userinfo);
+	station_details = JSON.parse(station_details);
+	
+	 $('#span_circle').html(" : "+userinfo.circle_name);
+	$('#span_division').html(" : "+userinfo.division_name);
+	$('#span_subdivision').html(" : "+userinfo.subdiv_name);
+	
+	
+
+	var map;
+	var marker;
+	var infowindow = new google.maps.InfoWindow();
+
+	var iconBase = 'app/images/map/';
+
+	var icon_info = [
+
+	{
+		desc : 'Tapping Pole',
+		icon : iconBase + 'letter_p.png'
+	}, {
+		desc : 'Transformer - 25KVA',
+		icon : iconBase + 'powersubstation_blue_25.png'
+	}, {
+		desc : 'Transformer - 63KVA',
+		icon : iconBase + 'powersubstation_grey_63.png'
+	}, {
+		desc : 'Transformer - 100KVA',
+		icon : iconBase + 'powersubstation_green_100.png'
+	}, {
+		desc : 'Transformer - Others',
+		icon : iconBase + 'powersubstation_black.png'
+	}, {
+		desc : 'IPSET - Single Phase ',
+		icon : iconBase + 'black_letter_i.png'
+	}, {
+		desc : 'IPSET - Three Phase',
+		icon : iconBase + 'red_letter_i.png'
+	}, {
+		desc : 'IPSET - Dried/Shifted/DL',
+		icon : iconBase + 'yellow_letter_i.png'
+	}, {
+		desc : 'Village',
+		icon : iconBase + 'smallcity.png'
+	} ];
+	var icons = {
+		pole : {
+			/*  icon: iconBase + 'powerlinepole.png' */
+			desc : 'Tapping Pole',
+			icon : iconBase + 'letter_p.png'
+		},
+		transformer25 : {
+			desc : 'Transformer - 25KVA',
+			icon : iconBase + 'powersubstation_blue_25.png'
+		},
+		transformer63 : {
+			desc : 'Transformer - 63KVA',
+			icon : iconBase + 'powersubstation_grey_63.png'
+		},
+		transformer100 : {
+			desc : 'Transformer - 100KVA',
+			icon : iconBase + 'powersubstation_green_100.png'
+		},
+		transformer160 : {
+			desc : 'Transformer - 160KVA',
+			icon : iconBase + 'powersubstation_white_25.png'
+		},
+		transformer250 : {
+			desc : 'Transformer - 250KVA',
+			icon : iconBase + 'powersubstation_red_250.png'
+		},
+		transformer : {
+			desc : 'Transformer - Incorrect KVA',
+			icon : iconBase + 'powersubstation_black.png'
+		},
+		ipset : {
+			/*  icon: iconBase + 'information_red.png' */
+			desc : 'IPSET - Incorrect',
+			icon : iconBase + 'letter_i.png'
+		},
+		black_ipset : {
+			desc : 'IPSET - Single Phase ',
+			icon : iconBase + 'black_letter_i.png'
+		},
+		red_ipset : {
+			desc : 'IPSET - Three Phase',
+			icon : iconBase + 'red_letter_i.png'
+		},
+		yellow_ipset : {
+			desc : 'IPSET - Dried/Shifted',
+			icon : iconBase + 'yellow_letter_i.png'
+		},
+		village : {
+			desc : 'Village',
+			icon : iconBase + 'smallcity.png'
+		}
+	};
+
+	function initialize() {
+		var myLatLng = {
+			lat : 12.9761851,
+			lng : 77.6403459
+		};
+
+		var mapProp = {
+			center : new google.maps.LatLng(13.22312, 75.00572),
+			zoom : 16,
+			mapTypeId : google.maps.MapTypeId.ROADMAP
+		};
+		map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+		var marker = new google.maps.Marker({
+			position : myLatLng,
+			map : map,
+			title : 'Hello World!'
+		});
+
+	}
+
+	function addMarker(feature) {
+		marker = new google.maps.Marker({
+			position : feature.position,
+			icon : icons[feature.type].icon,
+			map : map,
+			title : feature.title
+		});
+
+		google.maps.event.addListener(marker, 'click', (function(marker) {
+			return function() {
+				infowindow.setContent(feature.content);
+				infowindow.open(map, marker);
+			}
+		})(marker));
+
+		console.log(feature.content);
+		mapLabel = new MapLabel({
+			text : feature.displaytext,
+			position : feature.position,
+			map : map,
+			fontSize : 15,
+			align : feature.align
+		});
+		mapLabel.set('position', feature.position);
+		mapLabel.set('fontSize', feature.fontsize);
+		mapLabel.set('fontColor', feature.fontcolor);
+	}
+
+	//initialize();
+	
+	var POSITIONS = [];
+	var temp_lat = '';
+	var temp_lang = '';
+	var IPSET_COUNT = 0 ;
+	var IPSET_INDEX = [];
+	
+	MAP_OBJECT.map(function(e,index){
+		if(index === 0){
+			var myposition = {
+					position : new google.maps.LatLng(e.VILLAGE_LATTITUDE,e.VILLAGE_LONGITUDE),
+					type : 'village',
+					content : "<h4>VILLAGE : " + e.VILLAGE_NAME+ "</h4>",
+					displaytext : "",
+					fontsize : 30,
+					fontcolor : "#4A235A",
+					align : "center"
+				};
+				
+			$('#span_village').html(" : " + e.VILLAGE_NAME);
+			
+				temp_lat = e.VILLAGE_LATTITUDE;
+				temp_lang = e.VILLAGE_LONGITUDE;
+				POSITIONS.push(myposition);
+		}
+	});
+	
+	if(print_map_type === 'IPSET'){
+		
+		MAP_OBJECT.map(function(e,index){
+			if (index === 0) {
+				temp_lat = e.TC_LATTITUDE;
+				temp_lang = e.TC_LONGITUDE;
+			}
+			
+			var t_type = 'transformer';
+
+			if (e.TC_CAPACITY_KVA === "25" || e.TC_CAPACITY_KVA === "63"
+					|| e.TC_CAPACITY_KVA === "100"
+					|| e.TC_CAPACITY_KVA === "160"
+					|| e.TC_CAPACITY_KVA === "250") {
+				t_type = t_type + e.TC_CAPACITY_KVA;
+			}
+
+			
+				var myposition = {
+						position : new google.maps.LatLng(e.TC_LATTITUDE,
+								e.TC_LONGITUDE),
+						type : t_type,
+						content : "<h4>DTC : " + e.TC_NAME + " <hr>"
+								+ "Capacity : " + e.TC_CAPACITY_KVA + "</h4>",
+						displaytext : "",
+						fontsize : 22,
+						fontcolor : "#17202A",
+						align : "center"
+					};
+				
+				
+						
+				$('#span_transformer').html(" : " + e.TC_NAME);
+				
+					POSITIONS.push(myposition);
+		});
+		
+		MAP_OBJECT.map(function(e,index){
+			
+			var t_type = 'ipset';
+
+			var voltage_count = 0;
+
+			if (e.VOLTAGE_BR > 0) {
+				voltage_count++;
+			}
+
+			if (e.VOLTAGE_RB > 0) {
+				voltage_count++;
+			}
+
+			if (e.VOLTAGE_RY > 0) {
+				voltage_count++;
+			}
+
+			var ipsetcolorcode = "";
+			if (voltage_count == 1) {
+				ipsetcolorcode = "black"; //black
+			} else if (voltage_count == 3) {
+				ipsetcolorcode = "red"; //red
+			} else {
+				ipsetcolorcode = "yellow"; //yellow
+			}
+
+			var myposition = {
+				position : new google.maps.LatLng(e.IP_LATTITUDE,
+						e.IP_LONGITUDE),
+				type : ipsetcolorcode + "_" + t_type,
+				content : "<h4>RRNO : " + e.RR_NO + "<hr>" + "NAME : "
+						+ e.CUSTOMER_NAME + "<hr>" + "LOAD HP : "
+						+ e.LOAD_HP
+						/* +"<hr>"+"LOAD KW : "+item.IE_LOAD_KW */
+						+ "</h4>",
+				/* displaytext : item.IE_RR_NO+",HP:"+item.IE_LOAD_HP, */
+				displaytext : "I-" + (IPSET_COUNT + 1),
+				fontsize : 15,
+				fontcolor : "#FF0000",
+				align : "left"
+			};
+			
+			json_temp = null;
+			json_temp = {
+				"RRNO" : e.RR_NO,
+				"NAME" : e.CUSTOMER_NAME,
+				"LOAD_HP" : e.LOAD_HP,
+				"POLE_NUMBER" : e.POLE_NUMBER,
+				"LATITUDE" : e.IP_LATTITUDE,
+				"LONGITUDE" : e.IP_LONGITUDE,
+				"IPSET_INDEX" : "I-" + (IPSET_COUNT + 1)
+			};
+			IPSET_INDEX.push(json_temp);
+
+			IPSET_COUNT++;
+			
+			$('#span_station').html(" : "+e.STATION_NAME);
+			
+			$('#span_feeder').html(" : "+e.FEEDER_NAME); 
+			
+					POSITIONS.push(myposition);
+		});
+	}
+	
+	if(print_map_type === 'TRANSFORMER'){
+		MAP_OBJECT.map(function(e,index){
+			if (index === 0) {
+				temp_lat = e.TC_LATTITUDE;
+				temp_lang = e.TC_LONGITUDE;
+			}
+			
+			var t_type = 'transformer';
+
+			if (e.TC_CAPACITY_KVA === "25" || e.TC_CAPACITY_KVA === "63"
+					|| e.TC_CAPACITY_KVA === "100"
+					|| e.TC_CAPACITY_KVA === "160"
+					|| e.TC_CAPACITY_KVA === "250") {
+				t_type = t_type + e.TC_CAPACITY_KVA;
+			}
+
+			
+				var myposition = {
+						position : new google.maps.LatLng(e.TC_LATTITUDE,
+								e.TC_LONGITUDE),
+						type : t_type,
+						content : "<h4>DTC : " + e.TC_NAME + " <hr>"
+								+ "Capacity : " + e.TC_CAPACITY_KVA + "</h4>",
+						displaytext : "T-"+(IPSET_COUNT+1),
+						fontsize : 22,
+						fontcolor : "#FF0000",
+						align : "center"
+					};
+				
+				json_temp = null;
+				json_temp = {
+				        "NAME" : e.TC_NAME,
+				        "CAPACITY" : e.TC_CAPACITY_KVA,
+				        "LATITUDE":e.TC_LATTITUDE,
+				        "LONGITUDE":e.TC_LONGITUDE,
+				        "VILLAGE":e.VILLAGE_NAME,
+				        "IPSET_INDEX" : "T-"+(IPSET_COUNT+1)
+					};
+				IPSET_INDEX.push(json_temp);
+				
+				$('#span_station').html(" : "+e.STATION_NAME);
+				
+				$('#span_feeder').html(" : "+e.FEEDER_NAME); 
+				
+					POSITIONS.push(myposition);
+					
+					IPSET_COUNT++;
+		});
+	}
+	
+
+	
+	var mapProp = {
+			center : new google.maps.LatLng(temp_lat, temp_lang),
+			zoom : 16,
+			mapTypeId : google.maps.MapTypeId.ROADMAP
+
+		};
+		map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+		for (var i = 0, feature; feature = POSITIONS[i]; i++) {
+			addMarker(feature);
+		}
+		
+		function fillIndexDetails(IPSET) {
+			
+			if(print_map_type === 'IPSET'){
+				$("#transformer_table_index_details").css("display", "none");
+				$("#ipset_table_index_details").css("display", "block");
+				
+				$("#ipset_table_index_details tbody").remove();
+
+				$.each(IPSET, function(ip_index, ip_item) {
+
+					var row = $("<tr id='myrow"+ip_index+"' />");
+
+					$("#ipset_table_index_details").append(row);
+
+					row.append($("<td >" + (ip_index + 1) + "</td>"));
+					row.append($("<td >" + ip_item.IPSET_INDEX + "</td>"));
+					row.append($("<td >" + ip_item.RRNO + "</td>"));
+					row.append($("<td >" + ip_item.NAME + "</td>"));
+					row.append($("<td >" + ip_item.LOAD_HP + "</td>"));
+					row.append($("<td >" + ip_item.POLE_NUMBER + "</td>"));
+					row.append($("<td >" + ip_item.LATITUDE + "</td>"));
+					row.append($("<td >" + ip_item.LONGITUDE + "</td>"));
+				});
+			}
+			
+			if(print_map_type === 'TRANSFORMER'){
+				
+				$("#ipset_table_index_details").css("display", "none");
+				$("#transformer_table_index_details").css("display", "block");
+				
+				
+				$("#transformer_table_index_details tbody").remove();
+				
+				$.each(IPSET,function(ip_index, ip_item) {
+					
+					var row= $("<tr id='myrow"+ip_index+"' />");
+					
+					$("#transformer_table_index_details").append(row);
+					
+					row.append($("<td >"+(ip_index+1) +"</td>"));
+					row.append($("<td >"+ip_item.IPSET_INDEX +"</td>"));
+					row.append($("<td >"+ip_item.NAME +"</td>"));
+					row.append($("<td >"+ip_item.CAPACITY +"</td>"));
+					row.append($("<td >"+ip_item.VILLAGE +"</td>"));
+					row.append($("<td >"+ip_item.LATITUDE +"</td>"));
+					row.append($("<td >"+ip_item.LONGITUDE +"</td>"));
+				});
+			}
+
+
+
+		}
+
+		function fillColorDetails() {
+
+			$("#color_index_details tbody").remove();
+
+			console.log("icon_info", icon_info);
+
+			$.each(icon_info, function(ip_index, ip_item) {
+
+				console.log("icon_info :" + ip_index, ip_item);
+
+				var row= $("<tr id='mycolorrow"+ip_index+"' />");
+				
+				 $("#color_index_details").append(row);
+				
+				 row.append($("<td ><img src='"+ip_item.icon+"'></img></td>"));
+				 row.append($("<td >"+ip_item.desc +"</td>")); 
+			});
+
+		}
+		
+		fillIndexDetails(IPSET_INDEX);
+		fillColorDetails();
+</script>
+
+ <script type="text/javascript">
+$('#myheight').bind("keyup", function(){
+	  //your stuff
+	//  alert($('#myheight').val());
+	  
+	  var myheight = $('#myheight').val();
+	  
+	  if(myheight.length == 0){
+		  
+		  myheight = 1300;
+		  
+		  location.reload();
+	  }
+	  
+ 	  if(myheight.length > 0){
+		  
+		  if( parseInt(myheight) > 1300){
+			  alert("Height Should Not Be Greater Than 1300px ");
+			  return false;
+		  }
+	  } 
+	  
+	 $("#googleMap").height(myheight);
+	});
+	
+
+</script>
+</html>

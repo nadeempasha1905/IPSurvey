@@ -9,6 +9,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("Login Controller Initiated");
 		
+		/*var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;*/
+		
 		$scope.ValidateUser = function(){
 			
 			if($scope.login.username === undefined || $scope.login.username === null){
@@ -27,12 +30,30 @@ angular.module('ipsurveyapp.Controllers', [])
 					
 					store.set('userinfo', response);
 					
-					/*$state.go("home");*/
-					$state.go("viewmap");
+					$rootScope.USER_INFO =  store.get('userinfo');
+					
+					var LOCATION_CODE = response.location_code;
+					$rootScope.LOCATION_CODE = '';
+					if(LOCATION_CODE.length == 2){$rootScope.LOCATION_CODE = 'ZONE';}
+					else if(LOCATION_CODE.length == 3){$rootScope.LOCATION_CODE = 'CIRCLE';}
+					else if(LOCATION_CODE.length == 5){$rootScope.LOCATION_CODE = 'DIVISION';}
+					else if(LOCATION_CODE.length == 7){$rootScope.LOCATION_CODE = 'SUBDIVISION'}
+					else if(LOCATION_CODE.length == 9){$rootScope.LOCATION_CODE = 'OMSECTION';}
+					else{$rootScope.LOCATION_CODE = null;}
+					
+					store.set('LOCATION_CODE', $rootScope.LOCATION_CODE);
+					
+					$state.go("home");
+					//$state.go("viewmap");
+					
+					console.log("signin_pc",response);
+					
+					$rootScope.NAVIGATE_FROM = 'IISPL'; 
+					
 				}else{
 					
 				}
-				console.log("signin_pc",response);
+				
 			},{
 				username:$scope.login.username,
 				password:$scope.login.password

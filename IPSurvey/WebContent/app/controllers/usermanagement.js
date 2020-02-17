@@ -5,6 +5,9 @@
 angular.module('ipsurveyapp.Controllers', [])
 	.controller("usermanagementCtrl", function($scope,$rootScope, $http, $filter, $compile, $state,$cookies,remote,notify,store,$timeout) {
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		if(!store.get('userinfo')){

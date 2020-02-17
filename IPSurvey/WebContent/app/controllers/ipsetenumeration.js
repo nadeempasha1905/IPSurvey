@@ -7,6 +7,9 @@ angular.module('ipsurveyapp.Controllers', [])
 		
 		console.log("ipsetenumerationCtrl Controller Initiated");
 		
+		var LOCATION_CODE = store.get('LOCATION_CODE');
+		$rootScope.LOCATION_CODE = LOCATION_CODE;
+		
 		$scope.search = {};
 		$scope.userinfo = {};
 		$scope.modal={};
@@ -17,9 +20,6 @@ angular.module('ipsurveyapp.Controllers', [])
 			$rootScope.IsLoggedIn = true;
 			$scope.userinfo = store.get('userinfo');
 		}
-		
-		$scope.modal.servicedate = moment(new Date()).format("DD/MM/YYYY").toString();
-		$scope.modal.inspectiondate = moment(new Date()).format("DD/MM/YYYY").toString();
 		
 		$scope.modalmeterstatus = [
 			{key:"Y",value:"YES"},
@@ -318,7 +318,9 @@ angular.module('ipsurveyapp.Controllers', [])
 				remote.load("getenumeratedtransformerslist", function(response){
 					$scope.getenumeratedtransformers = response.TRANSFORMER_ENUM_DATA;
 				},{
-					location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key)
+					location_code:($scope.search.omsection === undefined || $scope.search.omsection === null ? '' : $scope.search.omsection.key),
+					station_code:($scope.search.station === undefined || $scope.search.station === null ? '' : $scope.search.station.key),
+					feeder_code:($scope.search.feeder === undefined || $scope.search.feeder === null ? '' : $scope.search.feeder.key)
 				}, 'POST');
 			}else{
 				$scope.getmodalenumeratedtransformers = [];
@@ -332,10 +334,13 @@ angular.module('ipsurveyapp.Controllers', [])
 						$scope.modal.transformers =  $filter('filter')($scope.getmodalenumeratedtransformers,{key:value},true)[0];
 					}
 				},{
-					location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key)
+					location_code:($scope.modal.omsection === undefined || $scope.modal.omsection === null ? '' : $scope.modal.omsection.key),
+					station_code:($scope.modal.station === undefined || $scope.modal.station === null ? '' : $scope.modal.station.key),
+					feeder_code:($scope.modal.feeder === undefined || $scope.modal.feeder === null ? '' : $scope.modal.feeder.key)
 				}, 'POST');
 			}
 		};
+		
 		
 		$scope.getcodedetails = function(value,searchtype){
 			
@@ -410,6 +415,16 @@ angular.module('ipsurveyapp.Controllers', [])
 					code_type:'MTR_MAKE'
 				}, 'POST');
 			}
+			
+			if(searchtype === 'CASTE'){
+				$scope.modalcastecategory = [];
+				remote.load("getcastecategory", function(response){
+					$scope.modalcastecategory = response.CASTECATEGORY_LIST;
+					if(value != null || value.length >0){
+						$scope.modal.castecategory =  $filter('filter')($scope.modalcastecategory,{key:value},true)[0];
+					}
+				},{}, 'POST');
+			}
 		};
 		
 		$scope.getipcodenumber = function(value){
@@ -423,6 +438,10 @@ angular.module('ipsurveyapp.Controllers', [])
 							remote.load("getipcodenumber", function(response){
 								$scope.modal.codenumber = response.code_number;
 								$scope.modal.rrnumber =  response.code_number;
+								$scope.disable_rrnumber = true;
+								
+								$scope.VerifyRRNumber(false);
+								
 							},{
 								om_code:$scope.modal.omsection.key,
 								transformer_code:$scope.modal.transformers.key
@@ -430,10 +449,19 @@ angular.module('ipsurveyapp.Controllers', [])
 						}else{
 							$scope.modal.codenumber = '';
 							$scope.modal.rrnumber =  '';
+							$scope.disable_rrnumber = false;
+							$scope.newuseridexists = true;
+							
+							//$scope.modal.connectiontypes = $filter('filter')($scope.modalconnectiontypes,{key:'1'},true)[0];
+							$scope.modal.connectionstatus = undefined;
+							$scope.modal.watersource = undefined;
+							$scope.modal.connectionscheme = undefined;
+							$scope.modal.meterstatus = undefined;
 						}
 					}else{
 						remote.load("getipcodenumber", function(response){
 							$scope.modal.codenumber = response.code_number;
+							$scope.disable_rrnumber = false;
 						},{
 							om_code:$scope.modal.omsection.key,
 							transformer_code:$scope.modal.transformers.key
@@ -457,8 +485,22 @@ angular.module('ipsurveyapp.Controllers', [])
 			 $scope.modal.changeimage = false;
 			 $scope.modal.chooseimage = null;
 			 $('#modalchooseimage').val('');
+			 $scope.blockcurrentvoltgae = false;
+			 $scope.disable_rrnumber = false;
 			 
 			if(action === 'add'){
+				
+				$scope.modal = {};
+				
+				//$scope.modal.servicedate = $filter('date')(new Date('04/04/2019'), 'dd/MM/yyyy');
+				//$scope.modal.inspectiondate = moment(new Date()).format("DD/MM/YYYY").toString();
+				
+				//$scope.modal.inspectiondate = moment((moment().set({'year': 2013, 'month': 3,'date': 1}))).format("DD/MM/YYYY").toString();
+				
+				//$('.datepicker').datepicker('update', new Date(2011, 2, 5));
+				
+				$('#servicedate').datepicker('update', new Date());
+				$('#inspectiondate').datepicker('update', new Date());
 				
 				$scope.getomsectionList([],null,'modal');
 				$scope.getStationList('modal',null,null);
@@ -468,10 +510,11 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.getcodedetails('','SCHEME');
 				$scope.getcodedetails('','MTR_MAKE');
 				$scope.getcodedetails('','MTR_TYP');
+				$scope.getcodedetails('','CASTE');
 				
 				$scope.action = 'add';
 				
-				$scope.modal_heading = "Add Ipset Enumeration Data";
+				$scope.modal_heading = "Add IPSET Enumeration Data";
 				$scope.newuseridexists = true;
 				
 				$scope.modal.rrnumber = '';
@@ -479,6 +522,10 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.consumername = '';
 				$scope.modal.address1 = '';
 				$scope.modal.address2 = '';
+				$scope.modal.phone = '';
+				$scope.modal.castecategory = '';
+				$scope.modal.aadhaarnumber = '';
+				$scope.modal.surveynumber = '';
 				$scope.modal.loadkw = '0';
 				$scope.modal.loadhp = '5';
 				$scope.modal.meterslno = '';
@@ -497,8 +544,32 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.modal.altitude = '';
 				$scope.modal.remarks = '';
 				
+				/*$("#div-dsservicedate").addClass("dsservicedate");
+				 $("#div-dsinspectiondate").addClass("dsinspectiondate");
 				
-			}else{
+				
+				 $('.dsservicedate').datetimepicker({
+						format : 'dd/mm/yyyy',
+						minView : 2,
+						autoclose : 1,
+						showClear: false
+					});
+				 
+				 $('.dsinspectiondate').datetimepicker({
+						format : 'dd/mm/yyyy',
+						minView : 2,
+						autoclose : 1,
+						showClear: false
+					});*/
+				
+			}else if(action === 'edit') {
+				
+				$scope.modal = {};
+				
+				console.log("record",record);
+				
+				// $("#div-dsservicedate").removeClass("dsservicedate");
+				// $("#div-dsinspectiondate").removeClass("dsinspectiondate");
 				
 				$scope.getomsectionList([],null,'modal');
 				$timeout(function(){$scope.getStationList('modal',record.IE_STATION_CODE,record.IE_FEEDER_CODE);},500);
@@ -508,6 +579,8 @@ angular.module('ipsurveyapp.Controllers', [])
 				$timeout(function(){$scope.getcodedetails(record.IE_SCHEME,'SCHEME');},100);
 				$timeout(function(){$scope.getcodedetails(record.IE_MTR_MAKE,'MTR_MAKE');},100);
 				$timeout(function(){$scope.getcodedetails(record.IE_MTR_TYPE,'MTR_TYP');},100);
+				$timeout(function(){$scope.getcodedetails(record.CATEGORYID,'CASTE');},100);
+				
 				$scope.modal.meterstatus = $filter('filter')($scope.modalmeterstatus,{key:record.IE_METER_FLAG},true)[0];
 				
 				$timeout(function(){$scope.getenumeratedvillageslist(record.IE_VILLIAGE,'modal');},1000);
@@ -516,15 +589,24 @@ angular.module('ipsurveyapp.Controllers', [])
 				$scope.ROWID = record.row_id;
 				$scope.action = 'edit';
 				$scope.newuseridexists = false;
-				$scope.modal_heading = "Edit IPset Enumeration Data";
+				$scope.modal_heading = "Edit IPSET Enumeration Data";
 				
 				$scope.modal.rrnumber = record.IE_RR_NO;
 				$scope.modal.codenumber = record.IE_CODE_NUMBER;
 				$scope.modal.consumername = record.IE_CUSTOMER_NAME;
 				$scope.modal.address1 = record.IE_ADDRESS1;
 				$scope.modal.address2 = record.IE_ADDRESS2;
+				$scope.modal.aadhaarnumber = record.IE_AADHAR_NUMBER;
+				$scope.modal.surveynumber = record.IE_PROPERTY_SURVEY_NUMBER;
+				
+				var date_array = (record.IE_SERVICE_DATE.length > 0 ? record.IE_SERVICE_DATE.split("/") : '');
+				$('#servicedate').datepicker('update', new Date(parseInt(date_array[2]),parseInt(date_array[1])-1,parseInt(date_array[0])));
 				$scope.modal.servicedate =  record.IE_SERVICE_DATE;
+				
+				date_array = (record.IE_INSPECTION_DATE.length > 0 ? record.IE_INSPECTION_DATE.split("/") : '');
+				$('#inspectiondate').datepicker('update', new Date(parseInt(date_array[2]),parseInt(date_array[1]-1),parseInt(date_array[0])));
 				$scope.modal.inspectiondate =  record.IE_INSPECTION_DATE;
+				
 				$scope.modal.meterslno = record.IE_MTR_SLNO;
 				$scope.modal.finalreading = record.IE_FINAL_READING;
 				$scope.modal.loadkw = record.IE_LOAD_KW;
@@ -548,34 +630,121 @@ angular.module('ipsurveyapp.Controllers', [])
 						}, 'POST');
 					}
 				
+			}else if(action === 'delete'){
+				
+				$scope.modal = {};
+				
+				console.log("record",record);
+				
+				$scope.ROWID = record.row_id;
+				
+				var sts = confirm("Are You Sure To Delete ?");
+				console.log("sts",sts);
+				
+				if(sts){
+					
+					var request = {
+							rowid:$scope.ROWID,
+							location_code:record.IE_OM_CODE,
+							stationcode:record.IE_STATION_CODE,
+							feedercode:record.IE_FEEDER_CODE,
+							transformercode:record.IE_TRANSFORMER_CODE,
+							village:record.IE_VILLIAGE,
+							polecode:record.IE_POLE_CODE,
+							rrnumber:record.IE_RR_NO,
+							codenumber:record.IE_CODE_NUMBER,
+							consumername:record.IE_CUSTOMER_NAME,
+							address1:record.IE_ADDRESS1,
+							address2:record.IE_ADDRESS2,
+							connectiontypes:record.IE_CONNECTION_TYPE,
+							connectionstatus:record.IE_CUSTOMER_STATUS,
+							phone:record.IE_PHONE_NUMBER,
+							castecategory:record.CATEGORYID,
+							aadhar_number:record.IE_AADHAR_NUMBER,
+							survey_number:record.IE_PROPERTY_SURVEY_NUMBER,
+							watersource:record.IE_WATER_SOURCE,
+							connectionscheme:record.IE_SCHEME,
+							servicedate:record.IE_SERVICE_DATE,
+							inspectiondate:record.IE_INSPECTION_DATE,
+							meterstatus:record.IE_METER_FLAG,
+							metermake:record.IE_MTR_MAKE,
+							metertype:record.IE_MTR_TYPE,
+							meterslno:record.IE_MTR_SLNO,
+							finalreading:record.IE_FINAL_READING,
+							loadkw:record.IE_LOAD_KW,
+							loadhp:record.IE_LOAD_HP,
+							voltage1:record.IE_VOLTAGE_RY,
+							voltage2:record.IE_VOLTAGE_RB,
+							voltage3:record.IE_VOLTAGE_BR,
+							current1:record.IE_CURRENT_R,
+							current2:record.IE_CURRENT_Y,
+							current3:record.IE_CURRENT_B,
+							latitude:record.IE_LATTITUDE,
+							longitude:record.IE_LONGITUDE,
+							altitude:record.IE_ALTITUDE,
+							remarks:record.IE_REMARKS,
+							userid:$scope.userinfo.username,
+							deleteflag:'Y',
+							imagepath:record.IE_IMAGE_PATH	
+					};
+					
+					
+					
+					remote.load("upsertipsetenumeration", function(response){
+						console.log("upsertipsetenumeration",response);
+						if(response.status === 'success'){
+							$timeout(function(){
+								//$('#stationmaster-addedit-modal').modal('toggle');
+								$scope.SearchIpsetEnumDetails();
+							},2000);
+						}
+					},request, 'POST');
+				}
+				
 			}
 		};
 		
 		$scope.newuseridexists = true;
-		$scope.VerifyRRNumber = function(){
+		$scope.VerifyRRNumber = function(auth){
 			$scope.newuseridexists = true;
 			if($scope.search.subdivision === undefined || $scope.search.subdivision === null){notify.error("Please Select Subdivision !!!");return;}
 			if($scope.modal.omsection === undefined || $scope.modal.omsection === null){notify.error("Please Select O&M Section !!!");	return;	}
 			if($scope.modal.transformers === undefined || $scope.modal.transformers === null){notify.error("Please Select Transformer !!!");	return;	}
 			
-			remote.load("getconsumerdetailsbyrrno", function(response){
-				$scope.modal.consumername = response.customer_name;
-				$scope.modal.address1 = response.address1;
-				$scope.modal.address2 = response.address2;
-				$scope.modal.village = (response.village === undefined || response.village === null || response.village === '' ? undefined : $filter('filter')($scope.getmodalenumeratedvillages,{key:response.village},true)[0]);
+			if(auth){
+				remote.load("getconsumerdetailsbyrrno", function(response){
+					$scope.modal.consumername = response.customer_name;
+					$scope.modal.address1 = response.address1;
+					$scope.modal.address2 = response.address2;
+					$scope.modal.village = (response.village === undefined || response.village === null || response.village === '' ? undefined : $filter('filter')($scope.getmodalenumeratedvillages,{key:response.village},true)[0]);
+					$scope.newuseridexists = false;
+					
+					$scope.getipcodenumber(false);
+					
+					$scope.modal.connectiontypes = $filter('filter')($scope.modalconnectiontypes,{key:'1'},true)[0];
+					$scope.modal.connectionstatus = $filter('filter')($scope.modalconnectionstatus,{key:'1'},true)[0];
+					$scope.modal.watersource = $filter('filter')($scope.modalwatersource,{key:'1'},true)[0];
+					$scope.modal.connectionscheme = $filter('filter')($scope.modalconnectionscheme,{key:'1'},true)[0];
+					$scope.modal.meterstatus = $filter('filter')($scope.modalmeterstatus,{key:'N'},true)[0];
+				},{
+					location_code:$scope.search.subdivision.key,
+					rr_number:$scope.modal.rrnumber
+				}, 'POST');
+			}else{
+				
 				$scope.newuseridexists = false;
 				
 				$scope.getipcodenumber(false);
 				
-				$scope.modal.connectiontypes = $filter('filter')($scope.modalconnectiontypes,{key:'1'},true)[0];
+				//$scope.modal.connectiontypes = $filter('filter')($scope.modalconnectiontypes,{key:'1'},true)[0];
 				$scope.modal.connectionstatus = $filter('filter')($scope.modalconnectionstatus,{key:'1'},true)[0];
 				$scope.modal.watersource = $filter('filter')($scope.modalwatersource,{key:'1'},true)[0];
 				$scope.modal.connectionscheme = $filter('filter')($scope.modalconnectionscheme,{key:'1'},true)[0];
 				$scope.modal.meterstatus = $filter('filter')($scope.modalmeterstatus,{key:'N'},true)[0];
-			},{
-				location_code:$scope.search.subdivision.key,
-				rr_number:$scope.modal.rrnumber
-			}, 'POST');
+				
+			}
+			
+
 		};
 		
 		$scope.meterstatusdisable = true;
@@ -672,7 +841,7 @@ angular.module('ipsurveyapp.Controllers', [])
 					feedercode:$scope.modal.feeder.key,
 					transformercode:$scope.modal.transformers.key,
 					village:$scope.modal.village.key,
-					polecode:'01',
+					polecode:'00',
 					rrnumber:$scope.modal.rrnumber,
 					codenumber:$scope.modal.codenumber,
 					consumername:$scope.modal.consumername,
@@ -681,6 +850,9 @@ angular.module('ipsurveyapp.Controllers', [])
 					connectiontypes:$scope.modal.connectiontypes.key,
 					connectionstatus:$scope.modal.connectionstatus.key,
 					phone:($scope.modal.phone === undefined || $scope.modal.phone === '' || $scope.modal.phone == null ? '' : $scope.modal.phone),
+					castecategory:($scope.modal.castecategory === undefined || $scope.modal.castecategory === null ? '' : $scope.modal.castecategory.key),
+					aadhar_number:($scope.modal.aadhaarnumber === undefined || $scope.modal.aadhaarnumber === '' || $scope.modal.aadhaarnumber == null ? '' : $scope.modal.aadhaarnumber),
+					survey_number:($scope.modal.surveynumber === undefined || $scope.modal.surveynumber === '' || $scope.modal.surveynumber == null ? '' : $scope.modal.surveynumber),
 					watersource:$scope.modal.watersource.key,
 					connectionscheme:$scope.modal.connectionscheme.key,
 					servicedate:$scope.modal.servicedate,
@@ -703,8 +875,11 @@ angular.module('ipsurveyapp.Controllers', [])
 					altitude:$scope.modal.altitude,
 					remarks:($scope.modal.remarks === undefined || $scope.modal.remarks === null ? '' : $scope.modal.remarks),
 					userid:$scope.userinfo.username,
+					deleteflag:'N',
 					imagepath:(imagepath == null || imagepath == '' || imagepath == undefined ? '' : imagepath)	
 			};
+			
+			console.log(request);
 			
 			remote.load("upsertipsetenumeration", function(response){
 				console.log("upsertipsetenumeration",response);
@@ -720,7 +895,8 @@ angular.module('ipsurveyapp.Controllers', [])
 						        	//console.log(data);
 						        	$('#loading').hide();
 						        	$timeout(function(){
-										$('#ipsetenumerate-addedit-modal').modal('toggle');
+										$('#ipsetenumerate_addedit_modal').modal('toggle');
+										$scope.IPSET_ENUM_DATA = [];
 										$scope.SearchIpsetEnumDetails();
 									},2000);
 						        },function (data){
@@ -729,12 +905,36 @@ angular.module('ipsurveyapp.Controllers', [])
 							  	});
 						}else{
 							$timeout(function(){
-								$('#ipsetenumerate-addedit-modal').modal('toggle');
+								$('#ipsetenumerate_addedit_modal').modal('toggle');
+								$scope.IPSET_ENUM_DATA = [];
 								$scope.SearchIpsetEnumDetails();
 							},2000);
 						}
 				}
 			},request, 'POST');
+		};
+		
+		
+		$scope.blockVoltagesCurrents = function(){
+			
+			if($scope.modal.connectionstatus.key != '1'){
+				$scope.blockcurrentvoltgae = true;
+				$scope.modal.voltage1 = 0;
+				$scope.modal.voltage2 = 0;
+				$scope.modal.voltage3 = 0;
+				$scope.modal.current1 = 0;
+				$scope.modal.current2 = 0;
+				$scope.modal.current3 = 0;
+			}else{
+				$scope.blockcurrentvoltgae = false;
+				$scope.modal.voltage1 = '';
+				$scope.modal.voltage2 = '';
+				$scope.modal.voltage3 = '';
+				$scope.modal.current1 = '';
+				$scope.modal.current2 = '';
+				$scope.modal.current3 = '';
+			}
+			
 		};
 		
 		$scope.SearchIpsetEnumDetails = function(){

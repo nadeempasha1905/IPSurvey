@@ -88,7 +88,18 @@ public class UserManagementImpl implements IUserManagement {
 				String user_id = (String) object.get("username");
 				String password = (String) object.get("password");
 				// String imei_no = (String) object.get("imei_no");
+				
+				PreparedStatement ps1 = dbConn.prepareStatement("select distinct dum_void from DEVICE_USER_MASTER " );
+				ResultSet rs1 = ps1.executeQuery();
+				
+				String void_date = null;
+				if(rs1.next()) {
+					void_date = rs1.getString("dum_void");
+				}
 
+				DBManagerResourceRelease.close(rs1);
+				DBManagerResourceRelease.close(ps1);
+				
 				String Validate_user_query = " SELECT DUM_LOCATION_CODE LOCATION_CODE,"
 						+ " (SELECT LOCATION_NAME FROM LOCATION "
 						+ "  WHERE LOCATION_CODE = DUM_LOCATION_CODE) LOCATION_NAME,"
@@ -107,7 +118,9 @@ public class UserManagementImpl implements IUserManagement {
 						 * + " dm_imei_no = '" + imei_no + "' and  "
 						 */
 						+ " dum_user_id = '" + user_id + "' " + " and " + " dum_password = '"
-						+ EncriptAndDecript.encrypt(password) + "'";
+						+ EncriptAndDecript.encrypt(password) + "' "
+								+ " AND to_date('"+EncriptAndDecript.decrypt(void_date)+"','DD/MM/YYYY') < trunc(SYSDATE) " //added by nadeem
+								+ "";
 
 				System.out.println(EncriptAndDecript.encrypt(password) + Validate_user_query);
 				ps = dbConn.prepareStatement(Validate_user_query);
@@ -425,5 +438,125 @@ public class UserManagementImpl implements IUserManagement {
 		DBManagerResourceRelease.close(calstmt);
 	}
 	return JSON_RESPONSE;
+	}
+
+	@Override
+	public JSONObject signin_location_object(JSONObject object, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		JSONObject JSON_RESPONSE = new JSONObject();
+		JSONObject json = null;
+		HttpSession session = null;
+		
+
+		try {
+			
+			session = request.getSession();
+			
+			dbConn = dbObject.getDatabaseConnection();
+
+			if (object.isEmpty()) {
+				JSON_RESPONSE.put("status", "error");
+				JSON_RESPONSE.put("message", "Invalid Object...!");
+			} else {
+
+				String subdiv_code = "";
+				String subdiv_name = "";
+				String location_code = "";
+				String location_name = "";
+				String division_code = "";
+				String division_name = "";
+				String circle_code = "";
+				String circle_name = "";
+				String zone_code = "";
+				String zone_name = "";
+				String company_code = "";
+				String company_name = "";
+				String user_role = "";
+				String login_locationcode = (String) object.get("login_locationcode");
+
+				String Validate_user_query = " SELECT DISTINCT DUM_LOCATION_CODE LOCATION_CODE,"
+						+ " (SELECT LOCATION_NAME FROM LOCATION "
+						+ "  WHERE LOCATION_CODE = DUM_LOCATION_CODE) LOCATION_NAME,"
+						+ " SUBSTR(DUM_LOCATION_CODE,1,7) SUBDIV_CODE,(SELECT LOCATION_NAME FROM LOCATION "
+						+ " WHERE LOCATION_CODE = SUBSTR(DUM_LOCATION_CODE,1,7) ) SUBDIV_NAME,"
+						+ " SUBSTR(DUM_LOCATION_CODE,1,5) DIV_CODE," + "  (SELECT LOCATION_NAME FROM LOCATION "
+						+ "  WHERE LOCATION_CODE = SUBSTR(DUM_LOCATION_CODE,1,5) ) DIV_NAME,"
+						+ " SUBSTR(DUM_LOCATION_CODE,1,3) CIR_CODE, " + " (SELECT LOCATION_NAME FROM LOCATION "
+						+ " WHERE LOCATION_CODE = SUBSTR(DUM_LOCATION_CODE,1,3) ) CIR_NAME,"
+						+ " SUBSTR(DUM_LOCATION_CODE,1,2) ZN_CODE, " + " (SELECT LOCATION_NAME FROM LOCATION "
+						+ " WHERE LOCATION_CODE = SUBSTR(DUM_LOCATION_CODE,1,2) ) ZN_NAME,"
+						+ " SUBSTR(DUM_LOCATION_CODE,1,1) COM_CODE," + "  (SELECT LOCATION_NAME FROM LOCATION"
+						+ "  WHERE LOCATION_CODE = SUBSTR(DUM_LOCATION_CODE,1,1) ) COM_NAME ,DUM_USER_ROLE  "
+						+ " FROM DEVICE_USER_MASTER "
+						+ " WHERE DUM_LOCATION_CODE = '"+login_locationcode+"' AND "
+								+ " DUM_USER_ROLE = 'SUPERVISOR' ";
+
+				System.out.println(Validate_user_query);
+				ps = dbConn.prepareStatement(Validate_user_query);
+				rs = ps.executeQuery();
+
+				if (rs.next()) {
+					subdiv_code = rs.getString("SUBDIV_CODE");
+					subdiv_name = rs.getString("SUBDIV_NAME");
+					location_code = rs.getString("LOCATION_CODE");
+					location_name = rs.getString("LOCATION_NAME");
+					division_code = rs.getString("DIV_CODE");
+					division_name = rs.getString("DIV_NAME");
+					circle_code = rs.getString("CIR_CODE");
+					circle_name = rs.getString("CIR_NAME");
+					zone_code = rs.getString("ZN_CODE");
+					zone_name = rs.getString("ZN_NAME");
+					company_code = rs.getString("COM_CODE");
+					company_name = rs.getString("COM_NAME");
+					user_role = rs.getString("DUM_USER_ROLE");
+				}
+				System.out.println("location_code : " + location_code);
+
+				if (!location_code.isEmpty() && location_code.length() > 0 && location_code != null) {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Successfully Logged In ...!");
+					
+					JSON_RESPONSE.put("status1", "success");
+					JSON_RESPONSE.put("message1", "Successfully Logged In ...!");
+					
+					JSON_RESPONSE.put("location_code", location_code);
+					JSON_RESPONSE.put("location_name", location_name);
+					JSON_RESPONSE.put("division_code", division_code);
+					JSON_RESPONSE.put("division_name", division_name);
+					JSON_RESPONSE.put("circle_code", circle_code);
+					JSON_RESPONSE.put("circle_name", circle_name);
+					JSON_RESPONSE.put("zone_code", zone_code);
+					JSON_RESPONSE.put("zone_name", zone_name);
+					JSON_RESPONSE.put("company_code", company_code);
+					JSON_RESPONSE.put("company_name", company_name);
+					 JSON_RESPONSE.put("user_role", user_role);
+					 JSON_RESPONSE.put("subdiv_code", subdiv_code);
+					 JSON_RESPONSE.put("subdiv_name", subdiv_name);
+
+				} else {
+					JSON_RESPONSE.put("status", "success");
+					JSON_RESPONSE.put("message", "Invalid Username And Password ...!");
+					
+					JSON_RESPONSE.put("status1", "error");
+					JSON_RESPONSE.put("message1", "Invalid Username And Password ...!");
+				}
+
+				ps.close();
+				rs.close();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			DBManagerResourceRelease.close(rs, ps, dbConn);
+		}
+
+		session.setAttribute("JSON_RESPONSE", JSON_RESPONSE);
+		
+		return JSON_RESPONSE;
 	}
 }

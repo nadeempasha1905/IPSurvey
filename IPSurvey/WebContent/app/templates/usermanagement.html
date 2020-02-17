@@ -112,8 +112,8 @@
     						<br/>
     						<div class="row">
     							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
-    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
-									  <thead>
+    								<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 1500px;">
+									  <thead style="background-color: #007bff;color: white;">
 									    <tr>
 									      <th></th>
 									      <th>Location Name</th>
@@ -130,8 +130,11 @@
 									  </thead>
 									  <tbody>
 									  	<tr ng-repeat="data in getuserdetailslist">
-									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".user-managemaent-addedit-modal" 
-									  			ng-click="addeditUser(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>
+									  		<!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".user-managemaent-addedit-modal" 
+									  			ng-click="addeditUser(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button> -->
+									  			<i class="fa fa-edit"  ng-click="addeditUser(data,'edit')"  data-toggle="modal" data-target=".user-managemaent-addedit-modal" ></i>&nbsp;&nbsp;
+									  			</td>
 									  		<td>{{data.DUM_LOCATION_NAME}}</td>
 									  		<td>{{data.DUM_USER_ID}}</td>
 									  		<td>{{data.DUM_USER_ROLE}}</td>

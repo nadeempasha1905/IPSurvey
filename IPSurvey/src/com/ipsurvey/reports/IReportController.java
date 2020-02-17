@@ -17,4 +17,6 @@ public interface IReportController {
 
 	Response downloadreport( HttpServletRequest request, HttpServletResponse response);
 
+	JSONObject getmaindashboarddetails(JSONObject object, String ipAdress);
+
 }

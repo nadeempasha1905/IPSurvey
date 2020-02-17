@@ -1,4 +1,10 @@
 <style>
+
+i
+{
+	cursor: pointer;
+}
+
  .thalign thead tr th{vertical-align: middle; }
  .thalign tbody tr td{vertical-align: middle; }
  
@@ -130,9 +136,9 @@
     							</div>
     						</div>	
     						<div class="row mt-3">
-    							<div class="col-md-12" style="width: 100%;overflow-x: scroll">
-    								<table class="table table-hover modal_fixed_header_column thalign" style="width: 100%;">
-									  <thead>
+    							<div class="col-md-12" style="width: 100%;overflow: scroll;height: 500px;">
+    								<table class="table table-hover table-sm table-striped table-bordered table-condensed" style="width: 2500px;">
+									  <thead style="background-color: #007bff;color: white;">
 									    <tr>
 									      <th></th>
 									      <th>Sub Division</th>
@@ -153,8 +159,14 @@
 									  </thead>
 									  <tbody>
 									  	<tr ng-repeat="data in TRANSFORMER_ENUM_DATA">
-									  		<td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".transformerenumerate-addedit-modal" 
-									  			ng-click="addeditTransformerEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button></td>
+									  		<td>
+									  		<!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=".transformerenumerate-addedit-modal" 
+									  			ng-click="addeditTransformerEnumeration(data,'edit')"><i class="fa fa-edit"></i>&nbsp;Edit</button> -->
+									  			
+									  			<i class="fa fa-edit"  ng-click="addeditTransformerEnumeration(data,'edit')" data-toggle="modal" data-target=".transformerenumerate-addedit-modal" ></i>&nbsp;&nbsp;
+									  			<i class="fa fa-trash" ng-click="addeditTransformerEnumeration(data,'delete')"></i>
+									  			
+									  			</td>
 									  		<td>{{data.SUBDIVISION_NAME}}</td>
 									  		<td>{{data.OM_NAME}}</td>
 									  		<td>{{data.STATION_NAME}}</td>
@@ -255,21 +267,21 @@
    		 		</div>
    		 		<div class="col-md-4">
     		 		  <label for="modalcapacitykva">Capacity KVA</label>
-					 <input class="form-control" type="text" ng-model="modal.capacitykva" id="modal.capacitykva" ng-readonly="newuseridexists">
+					 <input class="form-control" type="text" ng-model="modal.capacitykva" id="modal.capacitykva" ng-readonly="newuseridexists" numbers-only>
    		 		</div>
     		 </div>
     		 <div class="row mt-3" >
    		 		<div class="col-md-4">
    		 			<label for="modallatitude">Latitude</label>
-   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists">
+   		 			<input class="form-control" type="text" ng-model="modal.latitude" id="modallatitude" ng-readonly="newuseridexists" decimal-numbers-only>
    		 		</div>
    		 		<div class="col-md-4">
    		 			<label for="modallongitude">Longitude</label>
-   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists">
+   		 			<input class="form-control" type="text" ng-model="modal.longitude" id="modallongitude" ng-readonly="newuseridexists" decimal-numbers-only>
    		 		</div>
    		 		<div class="col-md-4">
    		 			<label for="modalaltitude">Altitude</label>
-   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists">
+   		 			<input class="form-control" type="text" ng-model="modal.altitude" id="modalaltitude" ng-readonly="newuseridexists" decimal-numbers-only>
    		 		</div>
    		 	</div>
    		 	<div class="row mt-3" >
